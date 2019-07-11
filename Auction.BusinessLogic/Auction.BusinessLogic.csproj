@@ -55,11 +55,14 @@
     <Compile Include="DataTransfer\TradingLotDTO.cs" />
     <Compile Include="DataTransfer\UserDTO.cs" />
     <Compile Include="Exceptions\AuctionException.cs" />
+    <Compile Include="Interfaces\ICategoryService.cs" />
+    <Compile Include="Interfaces\ITradeService.cs" />
+    <Compile Include="Interfaces\ITradingLotService.cs" />
+    <Compile Include="Interfaces\IUserManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="IdentityDetails\" />
-    <Folder Include="Interfaces\" />
     <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
