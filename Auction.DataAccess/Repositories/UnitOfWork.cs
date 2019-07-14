@@ -15,8 +15,8 @@ namespace Auction.DataAccess.Repositories
         private GenericRepository<TradingLot> _tradingLotRepository;
         private GenericRepository<Trade> _tradeRepository;
         private GenericRepository<Category> _categoryRepository;
-        private GenericRepository<User> _userRepository;
-
+        private UserRepository _userRepository;
+        
         private UserManager _userManager;
         private UserRoleManager _userRoleManager;
         private IClientManager _clientManager;
@@ -26,12 +26,12 @@ namespace Auction.DataAccess.Repositories
             _context = new AuctionContext(connectionString);
         }
 
-        public IGenericRepository<User> Users
+        public IUserRepository Users
         {
             get
             {
                 if (_userRepository == null)
-                    _userRepository = new GenericRepository<User>(_context);
+                    _userRepository = new UserRepository(_context);
                 return _userRepository;
             }
         }

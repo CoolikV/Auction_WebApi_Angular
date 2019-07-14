@@ -15,7 +15,7 @@ namespace Auction.DataAccess.Interfaces
         IGenericRepository<TradingLot> TradingLots { get; }
         IGenericRepository<Trade> Trades { get; }
         IGenericRepository<Category> Categories { get; }
-        IGenericRepository<User> Users { get; }
+        IUserRepository Users { get; }
         void Save();
     }
 }
