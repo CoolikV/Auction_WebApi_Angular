@@ -55,6 +55,7 @@
     <Compile Include="DataTransfer\TradingLotDTO.cs" />
     <Compile Include="DataTransfer\UserDTO.cs" />
     <Compile Include="Exceptions\AuctionException.cs" />
+    <Compile Include="IdentityDetails\OperationDetails.cs" />
     <Compile Include="Interfaces\ICategoryService.cs" />
     <Compile Include="Interfaces\ITradeService.cs" />
     <Compile Include="Interfaces\ITradingLotService.cs" />
@@ -64,9 +65,7 @@
     <Compile Include="Services\TradeService.cs" />
     <Compile Include="Services\TradingLotService.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="IdentityDetails\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Auction.DataAccess\Auction.DataAccess.csproj">
       <Project>{8ccb75b5-fe61-4434-a41a-f8dfbea150f6}</Project>
