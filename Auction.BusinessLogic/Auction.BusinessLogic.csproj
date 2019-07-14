@@ -64,6 +64,7 @@
     <Compile Include="Services\CategoryService.cs" />
     <Compile Include="Services\TradeService.cs" />
     <Compile Include="Services\TradingLotService.cs" />
+    <Compile Include="Services\UserManager.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
