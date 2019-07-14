@@ -60,10 +60,12 @@
     <Compile Include="Interfaces\ITradingLotService.cs" />
     <Compile Include="Interfaces\IUserManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\CategoryService.cs" />
+    <Compile Include="Services\TradeService.cs" />
+    <Compile Include="Services\TradingLotService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="IdentityDetails\" />
-    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Auction.DataAccess\Auction.DataAccess.csproj">
