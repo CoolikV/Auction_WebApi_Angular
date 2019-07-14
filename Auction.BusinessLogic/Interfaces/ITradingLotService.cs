@@ -16,6 +16,7 @@ namespace Auction.BusinessLogic.Interfaces
         TradingLotDTO GetLot(int id);
         void ChangeLotCategory(int lotId, int categoryId);
         void VerifyLot(int lotId);
+        IEnumerable<TradingLotDTO> GetLotsForCategory(int categoryId);
         void Dispose();
     }
 }
