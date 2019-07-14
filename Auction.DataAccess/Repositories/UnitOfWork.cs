@@ -1,29 +1,48 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Auction.DataAccess.EF;
 using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
+using Auction.DataAccess.Identity.Repositories;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Auction.DataAccess.Identity.Entities;
 
 namespace Auction.DataAccess.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
         private AuctionContext _context;
-        private GenericRepository<TradingLot> tradingLotRepository;
-        private GenericRepository<Trade> tradeRepository;
-        private GenericRepository<Category> categoryRepository;
+        private GenericRepository<TradingLot> _tradingLotRepository;
+        private GenericRepository<Trade> _tradeRepository;
+        private GenericRepository<Category> _categoryRepository;
+        private GenericRepository<User> _userRepository;
+
+        private UserManager _userManager;
+        private UserRoleManager _userRoleManager;
+        private IClientManager _clientManager;
 
         public UnitOfWork(string connectionString)
         {
             _context = new AuctionContext(connectionString);
         }
 
+        public IGenericRepository<User> Users
+        {
+            get
+            {
+                if (_userRepository == null)
+                    _userRepository = new GenericRepository<User>(_context);
+                return _userRepository;
+            }
+        }
+
         public IGenericRepository<TradingLot> TradingLots
         {
             get
             {
-                if (tradingLotRepository == null)
-                    tradingLotRepository = new GenericRepository<TradingLot>(_context);
-                return tradingLotRepository;
+                if (_tradingLotRepository == null)
+                    _tradingLotRepository = new GenericRepository<TradingLot>(_context);
+                return _tradingLotRepository;
             }
         }
 
@@ -31,9 +50,9 @@ namespace Auction.DataAccess.Repositories
         {
             get
             {
-                if (tradeRepository == null)
-                    tradeRepository = new GenericRepository<Trade>(_context);
-                return tradeRepository;
+                if (_tradeRepository == null)
+                    _tradeRepository = new GenericRepository<Trade>(_context);
+                return _tradeRepository;
             }
         }
 
@@ -41,16 +60,45 @@ namespace Auction.DataAccess.Repositories
         {
             get
             {
-                if (categoryRepository == null)
-                    categoryRepository = new GenericRepository<Category>(_context);
-                return categoryRepository;
+                if (_categoryRepository == null)
+                    _categoryRepository = new GenericRepository<Category>(_context);
+                return _categoryRepository;
             }
         }
 
-        public void Save()
+        public UserManager UserManager
         {
-            _context.SaveChanges();
+            get
+            {
+                if (_userManager == null)
+                    _userManager = new UserManager(new UserStore<AppUser>(_context));
+                return _userManager;
+            }
         }
+
+        public UserRoleManager UserRoleManager
+        {
+            get
+            {
+                if (_userRoleManager == null)
+                    _userRoleManager = new UserRoleManager(new RoleStore<AppRole>(_context));
+                return _userRoleManager;
+            }
+        }
+
+        public IClientManager ClientManager
+        {
+            get
+            {
+                if (_clientManager == null)
+                    _clientManager = new ClientManager(_context);
+                return _clientManager;
+            }
+        }
+
+        public void Save() => _context.SaveChanges();
+
+        public async Task SaveAsync() => await _context.SaveChangesAsync();
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
