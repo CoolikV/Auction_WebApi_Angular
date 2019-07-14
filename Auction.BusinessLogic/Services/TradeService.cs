@@ -50,7 +50,7 @@ namespace Auction.BusinessLogic.Services
         public void Rate(int tradeId, string userId, double price)
         {
             Trade trade = Database.Trades.GetById(tradeId);
-            User user = Database.Users.Get(userId);
+            User user = Database.Users.GetById(userId);
 
             if (trade == null || user == null)
                 throw new ArgumentNullException();
@@ -99,7 +99,7 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradeDTO> GetUserLoseTrades(string userId)
         {
-            var user = Database.Users.Get(userId);
+            var user = Database.Users.GetById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -111,7 +111,7 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradeDTO> GetUserWinTrades(string userId)
         {
-            var user = Database.Users.Get(userId);
+            var user = Database.Users.GetById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();

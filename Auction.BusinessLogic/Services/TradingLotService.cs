@@ -36,7 +36,7 @@ namespace Auction.BusinessLogic.Services
                 Description = lot.Description,
                 Img = lot.Img,
                 TradeDuration = lot.TradeDuration,
-                //User = Database.Users.Get(entity.User.Id),
+                User = Database.Users.GetById(lot.User.Id),
                 Category = lot.Category == null ? Database.Categories.GetById(1) : Database.Categories.GetById(lot.Category.Id)
             };
 
@@ -116,7 +116,8 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradingLotDTO> GetLotsForCategory(int categoryId)
         {
-            return Mapper.Map<IEnumerable<TradingLot>, IEnumerable<TradingLotDTO>>(Database.TradingLots.Get(lot => lot.CategoryId == categoryId, q => q.OrderByDescending(l => l.TradeDuration)));
+            return Mapper.Map<IEnumerable<TradingLot>, IEnumerable<TradingLotDTO>>(Database.TradingLots.Get(lot => lot.CategoryId == categoryId,
+                q => q.OrderByDescending(l => l.TradeDuration)));
         }
     }
 }
