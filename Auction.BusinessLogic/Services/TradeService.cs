@@ -7,14 +7,16 @@ using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Mapster;
 namespace Auction.BusinessLogic.Services
 {
     public class TradeService : ITradeService
     {
+        //add adapter injection to constructor with configs
+        IAdapter adapter = new Adapter();
         IUnitOfWork Database { get; set; }
 
-        TradeService(IUnitOfWork uow)
+        public TradeService(IUnitOfWork uow)
         {
             Database = uow;
         }
@@ -84,17 +86,20 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradeDTO> GetAll()
         {
-            return Mapper.Map<IEnumerable<Trade>, List<TradeDTO>>(Database.Trades.Get());
+            //return Mapper.Map<IEnumerable<Trade>, List<TradeDTO>>(Database.Trades.Get());
+            return adapter.Adapt<List<TradeDTO>>(Database.Trades.Get());
         }
 
         public TradeDTO Get(int id)
         {
-            return Mapper.Map<Trade, TradeDTO>(Database.Trades.GetById(id));
+            //return Mapper.Map<Trade, TradeDTO>(Database.Trades.GetById(id));
+            return adapter.Adapt<TradeDTO>(Database.Trades.GetById(id));
         }
 
         public TradeDTO GetTradeByLot(int id)
         {
-            return Mapper.Map<Trade, TradeDTO>(Database.Trades.Get(x => x.LotId == id).FirstOrDefault());
+            //return Mapper.Map<Trade, TradeDTO>(Database.Trades.Get(x => x.LotId == id).FirstOrDefault());
+            return adapter.Adapt<TradeDTO>(Database.Trades.Get(t => t.LotId == id).FirstOrDefault());
         }
 
         public IEnumerable<TradeDTO> GetUserLoseTrades(string userId)
@@ -106,7 +111,9 @@ namespace Auction.BusinessLogic.Services
 
             var list = user.Trades.Where(x => DateTime.Now.CompareTo(x.TradeEnd) >= 0 && x.LastRateUserId != user.Id);
 
-            return Mapper.Map<IEnumerable<Trade>, List<TradeDTO>>(list);
+            //return Mapper.Map<IEnumerable<Trade>, List<TradeDTO>>(list);
+
+            return adapter.Adapt<List<TradeDTO>>(list);
         }
 
         public IEnumerable<TradeDTO> GetUserWinTrades(string userId)
@@ -118,7 +125,8 @@ namespace Auction.BusinessLogic.Services
 
             var list = user.Trades.Where(x => DateTime.Now.CompareTo(x.TradeEnd) >= 0 && x.LastRateUserId == user.Id);
 
-            return Mapper.Map<IEnumerable<Trade>, List<TradeDTO>>(list);
+            //return Mapper.Map<IEnumerable<Trade>, List<TradeDTO>>(list);
+            return adapter.Adapt<List<TradeDTO>>(list);
         }
     }
 }

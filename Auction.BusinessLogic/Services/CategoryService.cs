@@ -4,6 +4,7 @@ using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
 using AutoMapper;
+using Mapster;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Auction.BusinessLogic.Services
 {
     public class CategoryService : ICategoryService
     {
+        IAdapter adapter = new Adapter();
         IUnitOfWork Database { get; set; }
 
         public CategoryService(IUnitOfWork uow)
@@ -26,12 +28,14 @@ namespace Auction.BusinessLogic.Services
 
         public CategoryDTO Get(int id)
         {
-            return Mapper.Map<Category, CategoryDTO>(Database.Categories.GetById(id));
+            //return Mapper.Map<Category, CategoryDTO>(Database.Categories.GetById(id));
+            return adapter.Adapt<CategoryDTO>(Database.Categories.GetById(id));
         }
 
         public IEnumerable<CategoryDTO> GetAll()
         {
-            return Mapper.Map<IEnumerable<Category>, List<CategoryDTO>>(Database.Categories.Get());
+            //return Mapper.Map<IEnumerable<Category>, List<CategoryDTO>>(Database.Categories.Get());
+            return adapter.Adapt<List<CategoryDTO>>(Database.Categories.Get());
         }
 
         public void RemoveCategory(int id)
@@ -56,7 +60,7 @@ namespace Auction.BusinessLogic.Services
             var defaultCat = Database.Categories.GetById(defaultId);
             tradingLots.ToList().ForEach(lot => lot.Category = defaultCat);
         }
-
+        //maybe change name to ChangeCategoryName
         public void EditCategory(CategoryDTO category)
         {
             if (category == null)
@@ -72,7 +76,7 @@ namespace Auction.BusinessLogic.Services
             Database.Categories.Update(temp);
             Database.Save();
         }
-
+        //check is category with such name is already exists
         public void CreateCategory(CategoryDTO category)
         {
             if (category == null)

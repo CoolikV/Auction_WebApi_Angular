@@ -4,6 +4,7 @@ using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
 using AutoMapper;
+using Mapster;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Auction.BusinessLogic.Services
 {
     public class TradingLotService : ITradingLotService
     {
+        IAdapter adapter = new Adapter();
         IUnitOfWork Database { get; set; }
 
         public TradingLotService(IUnitOfWork uow)
@@ -23,7 +25,7 @@ namespace Auction.BusinessLogic.Services
         {
             Database.Dispose();
         }
-
+        //test using mapper
         public void CreateLot(TradingLotDTO lot)
         {
             if (lot == null || lot.User == null)
@@ -56,7 +58,7 @@ namespace Auction.BusinessLogic.Services
 
             if (tradingLot.IsVerified)
                 throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
-
+            //maybe mapping?
             tradingLot.Name = lot.Name;
             tradingLot.Description = lot.Description;
             tradingLot.Img = lot.Img;
@@ -79,12 +81,14 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradingLotDTO> GetAllLots()
         {
-            return Mapper.Map<IEnumerable<TradingLot>, IEnumerable<TradingLotDTO>>(Database.TradingLots.Get());
+            //return Mapper.Map<IEnumerable<TradingLot>, IEnumerable<TradingLotDTO>>(Database.TradingLots.Get());
+            return adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.Get());
         }
 
         public TradingLotDTO GetLot(int id)
         {
-            return Mapper.Map<TradingLot, TradingLotDTO>(Database.TradingLots.GetById(id));
+            //return Mapper.Map<TradingLot, TradingLotDTO>(Database.TradingLots.GetById(id));
+            return adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetById(id));
         }
 
         public void ChangeLotCategory(int lotId, int categoryId)
@@ -116,7 +120,10 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradingLotDTO> GetLotsForCategory(int categoryId)
         {
-            return Mapper.Map<IEnumerable<TradingLot>, IEnumerable<TradingLotDTO>>(Database.TradingLots.Get(lot => lot.CategoryId == categoryId,
+            //return Mapper.Map<IEnumerable<TradingLot>, IEnumerable<TradingLotDTO>>(Database.TradingLots.Get(lot => lot.CategoryId == categoryId,
+            //    q => q.OrderByDescending(l => l.TradeDuration)));
+
+            return adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.Get(lot => lot.CategoryId == categoryId,
                 q => q.OrderByDescending(l => l.TradeDuration)));
         }
     }
