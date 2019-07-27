@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ninject.Modules;
+﻿using Auction.DataAccess.EF;
 using Auction.DataAccess.Interfaces;
 using Auction.DataAccess.Repositories;
+using Ninject.Modules;
 
 namespace Auction.BusinessLogic.Configs
 {
@@ -20,6 +16,7 @@ namespace Auction.BusinessLogic.Configs
 
         public override void Load()
         {
+            Bind<IDataContext>().To<AuctionContext>();
             Bind<IUnitOfWork>().To<UnitOfWork>().WithConstructorArgument(connectionStr);
         }
     }
