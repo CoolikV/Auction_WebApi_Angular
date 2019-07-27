@@ -38,7 +38,7 @@ namespace Auction.DataAccess.Repositories
             DeleteUser(user);
         }
 
-        public IEnumerable<User> FindUser(Expression<Func<User, bool>> filter = null,
+        public IEnumerable<User> FindUsers(Expression<Func<User, bool>> filter = null,
             Func<IQueryable<User>, IOrderedQueryable<User>> orderBy = null,
             string includeProperties = "")
         {

@@ -28,12 +28,12 @@ namespace Auction.BusinessLogic.Services
 
         public CategoryDTO GetCategoryById(int id)
         {
-            return Adapter.Adapt<CategoryDTO>(Database.Categories.GetById(id));
+            return Adapter.Adapt<CategoryDTO>(Database.Categories.GetCategoryById(id));
         }
 
         public IEnumerable<CategoryDTO> GetAllCategories()
         {
-            return Adapter.Adapt<List<CategoryDTO>>(Database.Categories.Get());
+            return Adapter.Adapt<List<CategoryDTO>>(Database.Categories.FindCategories());
         }
 
         public void RemoveCategoryById(int id)
@@ -41,7 +41,7 @@ namespace Auction.BusinessLogic.Services
             if (id == 1)
                 throw new AuctionException("You cant delete default category");
 
-            var categoryToDelete = Database.Categories.GetById(id);
+            var categoryToDelete = Database.Categories.GetCategoryById(id);
 
             if (categoryToDelete == null)
                 throw new NullReferenceException();
@@ -49,13 +49,13 @@ namespace Auction.BusinessLogic.Services
             if (categoryToDelete.TradingLots != null)
                 MoveLotsToDefaultCategory(categoryToDelete.TradingLots);
 
-            Database.Categories.Delete(categoryToDelete.Id);
+            Database.Categories.DeleteCategoryById(categoryToDelete.Id);
             Database.Save();
         }
 
         private void MoveLotsToDefaultCategory(ICollection<TradingLot> tradingLots, int defaultId = 1)
         {
-            var defaultCat = Database.Categories.GetById(defaultId);
+            var defaultCat = Database.Categories.GetCategoryById(defaultId);
             tradingLots.ToList().ForEach(lot => lot.Category = defaultCat);
         }
         //maybe change name to ChangeCategoryName
@@ -64,14 +64,14 @@ namespace Auction.BusinessLogic.Services
             if (category == null)
                 throw new ArgumentNullException(nameof(category));
 
-            var temp = Database.Categories.GetById(category.Id);
+            var temp = Database.Categories.GetCategoryById(category.Id);
 
             if (temp == null)
                 throw new ArgumentNullException(nameof(temp));
 
             temp.Name = category.Name;
 
-            Database.Categories.Update(temp);
+            Database.Categories.UpdadeCategory(temp);
             Database.Save();
         }
         //check is category with such name is already exists
@@ -80,7 +80,7 @@ namespace Auction.BusinessLogic.Services
             if (category == null)
                 throw new ArgumentNullException(nameof(category));
 
-            Database.Categories.Insert(new Category { Name = category.Name });
+            Database.Categories.AddCategory(new Category { Name = category.Name });
             Database.Save();
         }
     }

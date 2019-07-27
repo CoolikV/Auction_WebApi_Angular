@@ -13,7 +13,7 @@ namespace Auction.DataAccess.Interfaces
         void UpdadeTrade(Trade trade);
         void DeleteTradeById(int id);
         void DeleteTrade(Trade trade);
-        IEnumerable<Trade> FindTrade(Expression<Func<Trade, bool>> filter = null,
+        IEnumerable<Trade> FindTrades(Expression<Func<Trade, bool>> filter = null,
             Func<IQueryable<Trade>, IOrderedQueryable<Trade>> orderBy = null,
             string includeProperties = "");
     }

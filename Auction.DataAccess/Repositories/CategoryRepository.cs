@@ -38,7 +38,7 @@ namespace Auction.DataAccess.Repositories
             DeleteCategory(category);
         }
 
-        public IEnumerable<Category> FindCategory(Expression<Func<Category, bool>> filter = null,
+        public IEnumerable<Category> FindCategories(Expression<Func<Category, bool>> filter = null,
             Func<IQueryable<Category>, IOrderedQueryable<Category>> orderBy = null,
             string includeProperties = "")
         {

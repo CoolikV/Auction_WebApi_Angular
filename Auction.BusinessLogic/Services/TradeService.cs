@@ -3,10 +3,11 @@ using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
+using Mapster;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Mapster;
+
 namespace Auction.BusinessLogic.Services
 {
     public class TradeService : ITradeService
@@ -27,7 +28,7 @@ namespace Auction.BusinessLogic.Services
 
         public void StartTrade(int lotId)
         {
-            var lot = Database.TradingLots.GetById(lotId);
+            var lot = Database.TradingLots.GetTradingLotById(lotId);
 
             if (lot == null)
                 throw new ArgumentNullException();
@@ -38,7 +39,7 @@ namespace Auction.BusinessLogic.Services
             if (!lot.IsVerified)
                 throw new AuctionException("Lot is not verified");
 
-            Database.Trades.Insert(new Trade
+            Database.Trades.AddTrade(new Trade
             {
                 TradingLot = lot,
                 TradeStart = DateTime.Now,
@@ -50,8 +51,8 @@ namespace Auction.BusinessLogic.Services
 
         public void RateTradingLot(int tradeId, string userId, double price)
         {
-            Trade trade = Database.Trades.GetById(tradeId);
-            User user = Database.Users.GetById(userId);
+            Trade trade = Database.Trades.GetTradeById(tradeId);
+            User user = Database.Users.GetUserById(userId);
 
             if (trade == null || user == null)
                 throw new ArgumentNullException();
@@ -78,29 +79,29 @@ namespace Auction.BusinessLogic.Services
             else
                 throw new AuctionException($"Your price should be greater than: {trade.LastPrice}");
 
-            Database.Users.Update(user);
-            Database.Trades.Update(trade);
+            Database.Users.UpdadeUser(user);
+            Database.Trades.UpdadeTrade(trade);
             Database.Save();
         }
 
         public IEnumerable<TradeDTO> GetAllTrades()
         {
-            return Adapter.Adapt<List<TradeDTO>>(Database.Trades.Get());
+            return Adapter.Adapt<List<TradeDTO>>(Database.Trades.FindTrades());
         }
 
         public TradeDTO GetTradeById(int id)
         {
-            return Adapter.Adapt<TradeDTO>(Database.Trades.GetById(id));
+            return Adapter.Adapt<TradeDTO>(Database.Trades.GetTradeById(id));
         }
 
         public TradeDTO GetTradeByLotId(int id)
         {
-            return Adapter.Adapt<TradeDTO>(Database.Trades.Get(t => t.LotId == id).FirstOrDefault());
+            return Adapter.Adapt<TradeDTO>(Database.Trades.FindTrades(t => t.LotId == id).FirstOrDefault());
         }
 
         public IEnumerable<TradeDTO> GetUserLoseTrades(string userId)
         {
-            var user = Database.Users.GetById(userId);
+            var user = Database.Users.GetUserById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -112,7 +113,7 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradeDTO> GetUserWinTrades(string userId)
         {
-            var user = Database.Users.GetById(userId);
+            var user = Database.Users.GetUserById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();

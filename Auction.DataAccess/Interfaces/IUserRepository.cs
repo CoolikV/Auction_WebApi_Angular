@@ -12,7 +12,7 @@ namespace Auction.DataAccess.Interfaces
         void UpdadeUser(User user);
         void DeleteUser(User user);
         void DeleteUserById(string id);
-        IEnumerable<User> FindUser(Expression<Func<User, bool>> filter = null,
+        IEnumerable<User> FindUsers(Expression<Func<User, bool>> filter = null,
             Func<IQueryable<User>, IOrderedQueryable<User>> orderBy = null,
             string includeProperties = "");
     }

@@ -13,7 +13,7 @@ namespace Auction.DataAccess.Interfaces
         void UpdadeCategory(Category category);
         void DeleteCategoryById(int id);
         void DeleteCategory(Category category);
-        IEnumerable<Category> FindCategory(Expression<Func<Category, bool>> filter = null,
+        IEnumerable<Category> FindCategories(Expression<Func<Category, bool>> filter = null,
             Func<IQueryable<Category>, IOrderedQueryable<Category>> orderBy = null,
             string includeProperties = "");
     }

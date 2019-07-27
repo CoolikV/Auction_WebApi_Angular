@@ -38,11 +38,11 @@ namespace Auction.BusinessLogic.Services
                 Description = lot.Description,
                 Img = lot.Img,
                 TradeDuration = lot.TradeDuration,
-                User = Database.Users.GetById(lot.User.Id),
-                Category = lot.Category == null ? Database.Categories.GetById(1) : Database.Categories.GetById(lot.Category.Id)
+                User = Database.Users.GetUserById(lot.User.Id),
+                Category = lot.Category == null ? Database.Categories.GetCategoryById(1) : Database.Categories.GetCategoryById(lot.Category.Id)
             };
 
-            Database.TradingLots.Insert(newLot);
+            Database.TradingLots.AddTradingLot(newLot);
             Database.Save();
         }
 
@@ -51,7 +51,7 @@ namespace Auction.BusinessLogic.Services
             if (lot == null)
                 throw new ArgumentNullException(nameof(lot));
 
-            var tradingLot = Database.TradingLots.GetById(lot.Id);
+            var tradingLot = Database.TradingLots.GetTradingLotById(lot.Id);
 
             if (tradingLot == null)
                 throw new ArgumentNullException(nameof(tradingLot));
@@ -64,61 +64,61 @@ namespace Auction.BusinessLogic.Services
             tradingLot.Img = lot.Img;
             tradingLot.TradeDuration = lot.TradeDuration;
 
-            Database.TradingLots.Update(tradingLot);
+            Database.TradingLots.UpdadeTradingLot(tradingLot);
             Database.Save();
         }
 
         public void RemoveLotById(int id)
         {
-            TradingLot lot = Database.TradingLots.GetById(id);
+            TradingLot lot = Database.TradingLots.GetTradingLotById(id);
 
             if (lot == null)
                 throw new ArgumentNullException(nameof(lot));
 
-            Database.TradingLots.Delete(lot.Id);
+            Database.TradingLots.DeleteTradingLotById(lot.Id);
             Database.Save();
         }
 
         public IEnumerable<TradingLotDTO> GetAllLots()
         {
-            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.Get());
+            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.FindTradingLots());
         }
 
         public TradingLotDTO GetLotById(int id)
         {
-            return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetById(id));
+            return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetTradingLotById(id));
         }
 
         public void ChangeLotCategory(int lotId, int categoryId)
         {
-            TradingLot lot = Database.TradingLots.GetById(lotId);
-            Category category = Database.Categories.GetById(categoryId);
+            TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
+            Category category = Database.Categories.GetCategoryById(categoryId);
 
             if (lot == null || category == null)
                 throw new ArgumentNullException();
 
             lot.Category = category;
 
-            Database.TradingLots.Update(lot);
+            Database.TradingLots.UpdadeTradingLot(lot);
             Database.Save();
         }
 
         public void VerifyLot(int lotId)
         {
-            TradingLot lot = Database.TradingLots.GetById(lotId);
+            TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
 
             if (lot == null)
                 throw new ArgumentNullException(nameof(lot));
 
             lot.IsVerified = true;
 
-            Database.TradingLots.Update(lot);
+            Database.TradingLots.UpdadeTradingLot(lot);
             Database.Save();
         }
 
         public IEnumerable<TradingLotDTO> GetLotsForCategory(int categoryId)
         {
-            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.Get(lot => lot.CategoryId == categoryId,
+            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.FindTradingLots(lot => lot.CategoryId == categoryId,
                 q => q.OrderByDescending(l => l.TradeDuration)));
         }
     }

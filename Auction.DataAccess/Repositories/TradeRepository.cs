@@ -6,7 +6,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Auction.DataAccess.Repositories 
+namespace Auction.DataAccess.Repositories
 {
     public class TradeRepository : ITradeRepository
     {
@@ -38,7 +38,7 @@ namespace Auction.DataAccess.Repositories
             DeleteTrade(trade);
         }
 
-        public IEnumerable<Trade> FindTrade(Expression<Func<Trade, bool>> filter = null,
+        public IEnumerable<Trade> FindTrades(Expression<Func<Trade, bool>> filter = null,
             Func<IQueryable<Trade>, IOrderedQueryable<Trade>> orderBy = null,
             string includeProperties = "")
         {

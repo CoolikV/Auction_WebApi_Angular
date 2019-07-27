@@ -38,7 +38,7 @@ namespace Auction.DataAccess.Repositories
             DeleteTradingLot(tradingLot);
         }
 
-        public IEnumerable<TradingLot> FindTradingLot(Expression<Func<TradingLot, bool>> filter = null,
+        public IEnumerable<TradingLot> FindTradingLots(Expression<Func<TradingLot, bool>> filter = null,
             Func<IQueryable<TradingLot>, IOrderedQueryable<TradingLot>> orderBy = null,
             string includeProperties = "")
         {
