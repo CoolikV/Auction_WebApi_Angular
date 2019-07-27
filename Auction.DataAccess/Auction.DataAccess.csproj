@@ -61,15 +61,18 @@
     <Compile Include="Entities\User.cs" />
     <Compile Include="Identity\Entities\AppRole.cs" />
     <Compile Include="Identity\Entities\AppUser.cs" />
-    <Compile Include="Identity\Repositories\ClientManager.cs" />
     <Compile Include="Identity\Repositories\UserManager.cs" />
     <Compile Include="Identity\Repositories\UserRoleManager.cs" />
-    <Compile Include="Interfaces\IClientManager.cs" />
-    <Compile Include="Interfaces\IGenericRepository.cs" />
+    <Compile Include="Interfaces\ICategoryRepository.cs" />
+    <Compile Include="Interfaces\IDataContext.cs" />
+    <Compile Include="Interfaces\ITradeRepository.cs" />
+    <Compile Include="Interfaces\ITradingLotRepository.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
     <Compile Include="Interfaces\IUserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositories\GenericRepository.cs" />
+    <Compile Include="Repositories\CategoryRepository.cs" />
+    <Compile Include="Repositories\TradeRepository.cs" />
+    <Compile Include="Repositories\TradingLotRepository.cs" />
     <Compile Include="Repositories\UnitOfWork.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
   </ItemGroup>
