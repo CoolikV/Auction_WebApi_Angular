@@ -52,9 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configs\AutoMapperModule.cs" />
-    <Compile Include="Configs\BLRegister.cs" />
-    <Compile Include="Configs\BusinessLogicMapProfile.cs" />
+    <Compile Include="Configs\BLMapRegister.cs" />
     <Compile Include="Configs\ConnectionModule.cs" />
     <Compile Include="DataTransfer\CategoryDTO.cs" />
     <Compile Include="DataTransfer\TradeDTO.cs" />

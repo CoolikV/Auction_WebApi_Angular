@@ -20,7 +20,7 @@ namespace BusinessLogicTests.ServiceTests
     {
         static TradeServiceTests()
         {
-            TypeAdapterConfig.GlobalSettings.Scan(typeof(BLRegister).Assembly);
+            TypeAdapterConfig.GlobalSettings.Scan(typeof(BLMapRegister).Assembly);
         }
 
         private ITradeService tradeService;
