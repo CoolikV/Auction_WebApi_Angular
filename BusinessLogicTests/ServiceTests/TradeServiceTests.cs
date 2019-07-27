@@ -103,7 +103,7 @@ namespace BusinessLogicTests.ServiceTests
             uow.Setup(x => x.Users.GetById(It.IsAny<string>())).Returns<User>(null);
 
             //act & assert
-            Assert.Throws<ArgumentNullException>(() => tradeService.Rate(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<double>()));
+            Assert.Throws<ArgumentNullException>(() => tradeService.RateTradingLot(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<double>()));
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace BusinessLogicTests.ServiceTests
             uow.Setup(x => x.Trades.GetById(It.IsAny<int>())).Returns<TradingLot>(null);
 
             //act & assert
-            Assert.Throws<ArgumentNullException>(() => tradeService.Rate(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<double>()));
+            Assert.Throws<ArgumentNullException>(() => tradeService.RateTradingLot(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<double>()));
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace BusinessLogicTests.ServiceTests
             uow.Setup(x => x.Users.GetById(It.IsAny<string>())).Returns(user);
 
             //act & arrange
-            var ex = Assert.Throws<AuctionException>(() => tradeService.Rate(trade.Id, user.Id, It.IsAny<double>()));
+            var ex = Assert.Throws<AuctionException>(() => tradeService.RateTradingLot(trade.Id, user.Id, It.IsAny<double>()));
             Assert.AreEqual("This is your lot", ex.Message);
         }
 
@@ -142,7 +142,7 @@ namespace BusinessLogicTests.ServiceTests
             tradeRepository.Setup(x => x.GetById(It.IsAny<int>())).Returns(trade);
 
             //act & assert
-            var ex = Assert.Throws<AuctionException>(() => tradeService.Rate(trade.Id, It.IsAny<string>(), It.IsAny<double>()));
+            var ex = Assert.Throws<AuctionException>(() => tradeService.RateTradingLot(trade.Id, It.IsAny<string>(), It.IsAny<double>()));
             Assert.AreEqual(ex.Message, "This trade is over");
 
         }
@@ -157,7 +157,7 @@ namespace BusinessLogicTests.ServiceTests
             tradeRepository.Setup(x => x.GetById(It.IsAny<int>())).Returns(trade);
 
             //act & assert
-            var ex = Assert.Throws<AuctionException>(() => tradeService.Rate(trade.Id, It.IsAny<string>(), It.Is<double>(x => trade.LastPrice > x)));//maybe create delegate for rate method and etc..
+            var ex = Assert.Throws<AuctionException>(() => tradeService.RateTradingLot(trade.Id, It.IsAny<string>(), It.Is<double>(x => trade.LastPrice > x)));//maybe create delegate for rate method and etc..
             Assert.AreEqual(ex.Message, $"Your price should be greater than: {trade.LastPrice}");
         }
 
@@ -169,7 +169,7 @@ namespace BusinessLogicTests.ServiceTests
             tradeRepository.Setup(x => x.GetById(It.IsAny<int>())).Returns(trade);
 
             //act
-            tradeService.Rate(trade.Id, It.IsAny<string>(), trade.LastPrice + 1);
+            tradeService.RateTradingLot(trade.Id, It.IsAny<string>(), trade.LastPrice + 1);
 
             //assert
             tradeRepository.Verify(x => x.Update(It.IsAny<Trade>()), Times.Once);

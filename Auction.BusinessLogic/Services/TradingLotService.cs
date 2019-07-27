@@ -68,7 +68,7 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
-        public void RemoveLot(int id)
+        public void RemoveLotById(int id)
         {
             TradingLot lot = Database.TradingLots.GetById(id);
 
@@ -84,7 +84,7 @@ namespace Auction.BusinessLogic.Services
             return Adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.Get());
         }
 
-        public TradingLotDTO GetLot(int id)
+        public TradingLotDTO GetLotById(int id)
         {
             return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetById(id));
         }

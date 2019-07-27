@@ -32,7 +32,7 @@ namespace Auction.BusinessLogic.Services
             if (lot == null)
                 throw new ArgumentNullException();
 
-            if (GetTradeByLot(lotId) != null)
+            if (GetTradeByLotId(lotId) != null)
                 throw new AuctionException($"Trade for lot: {lot.Name} has already began");
 
             if (!lot.IsVerified)
@@ -48,7 +48,7 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
-        public void Rate(int tradeId, string userId, double price)
+        public void RateTradingLot(int tradeId, string userId, double price)
         {
             Trade trade = Database.Trades.GetById(tradeId);
             User user = Database.Users.GetById(userId);
@@ -83,17 +83,17 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
-        public IEnumerable<TradeDTO> GetAll()
+        public IEnumerable<TradeDTO> GetAllTrades()
         {
             return Adapter.Adapt<List<TradeDTO>>(Database.Trades.Get());
         }
 
-        public TradeDTO Get(int id)
+        public TradeDTO GetTradeById(int id)
         {
             return Adapter.Adapt<TradeDTO>(Database.Trades.GetById(id));
         }
 
-        public TradeDTO GetTradeByLot(int id)
+        public TradeDTO GetTradeByLotId(int id)
         {
             return Adapter.Adapt<TradeDTO>(Database.Trades.Get(t => t.LotId == id).FirstOrDefault());
         }

@@ -26,17 +26,17 @@ namespace Auction.BusinessLogic.Services
             Database.Dispose();
         }
 
-        public CategoryDTO Get(int id)
+        public CategoryDTO GetCategoryById(int id)
         {
             return Adapter.Adapt<CategoryDTO>(Database.Categories.GetById(id));
         }
 
-        public IEnumerable<CategoryDTO> GetAll()
+        public IEnumerable<CategoryDTO> GetAllCategories()
         {
             return Adapter.Adapt<List<CategoryDTO>>(Database.Categories.Get());
         }
 
-        public void RemoveCategory(int id)
+        public void RemoveCategoryById(int id)
         {
             if (id == 1)
                 throw new AuctionException("You cant delete default category");
