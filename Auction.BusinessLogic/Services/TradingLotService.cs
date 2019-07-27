@@ -3,7 +3,6 @@ using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
-using AutoMapper;
 using Mapster;
 using System;
 using System.Collections.Generic;
@@ -13,12 +12,13 @@ namespace Auction.BusinessLogic.Services
 {
     public class TradingLotService : ITradingLotService
     {
-        IAdapter adapter = new Adapter();
+        IAdapter Adapter { get; set; }
         IUnitOfWork Database { get; set; }
 
-        public TradingLotService(IUnitOfWork uow)
+        public TradingLotService(IUnitOfWork uow, IAdapter adapter)
         {
             Database = uow;
+            Adapter = adapter;
         }
 
         public void Dispose()
@@ -81,14 +81,12 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradingLotDTO> GetAllLots()
         {
-            //return Mapper.Map<IEnumerable<TradingLot>, IEnumerable<TradingLotDTO>>(Database.TradingLots.Get());
-            return adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.Get());
+            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.Get());
         }
 
         public TradingLotDTO GetLot(int id)
         {
-            //return Mapper.Map<TradingLot, TradingLotDTO>(Database.TradingLots.GetById(id));
-            return adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetById(id));
+            return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetById(id));
         }
 
         public void ChangeLotCategory(int lotId, int categoryId)
@@ -120,10 +118,7 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradingLotDTO> GetLotsForCategory(int categoryId)
         {
-            //return Mapper.Map<IEnumerable<TradingLot>, IEnumerable<TradingLotDTO>>(Database.TradingLots.Get(lot => lot.CategoryId == categoryId,
-            //    q => q.OrderByDescending(l => l.TradeDuration)));
-
-            return adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.Get(lot => lot.CategoryId == categoryId,
+            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.Get(lot => lot.CategoryId == categoryId,
                 q => q.OrderByDescending(l => l.TradeDuration)));
         }
     }

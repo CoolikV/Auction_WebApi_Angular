@@ -3,7 +3,6 @@ using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
-using AutoMapper;
 using Mapster;
 using System;
 using System.Collections.Generic;
@@ -13,12 +12,13 @@ namespace Auction.BusinessLogic.Services
 {
     public class CategoryService : ICategoryService
     {
-        IAdapter adapter = new Adapter();
+        IAdapter Adapter { get; set; }
         IUnitOfWork Database { get; set; }
 
-        public CategoryService(IUnitOfWork uow)
+        public CategoryService(IUnitOfWork uow, IAdapter adapter)
         {
             Database = uow;
+            Adapter = adapter;
         }
 
         public void Dispose()
@@ -28,14 +28,12 @@ namespace Auction.BusinessLogic.Services
 
         public CategoryDTO Get(int id)
         {
-            //return Mapper.Map<Category, CategoryDTO>(Database.Categories.GetById(id));
-            return adapter.Adapt<CategoryDTO>(Database.Categories.GetById(id));
+            return Adapter.Adapt<CategoryDTO>(Database.Categories.GetById(id));
         }
 
         public IEnumerable<CategoryDTO> GetAll()
         {
-            //return Mapper.Map<IEnumerable<Category>, List<CategoryDTO>>(Database.Categories.Get());
-            return adapter.Adapt<List<CategoryDTO>>(Database.Categories.Get());
+            return Adapter.Adapt<List<CategoryDTO>>(Database.Categories.Get());
         }
 
         public void RemoveCategory(int id)
