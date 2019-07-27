@@ -8,41 +8,41 @@ using System.Linq.Expressions;
 
 namespace Auction.DataAccess.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class CategoryRepository : ICategoryRepository
     {
         internal readonly IDataContext Database;
-        internal readonly DbSet<User> dbSet;
+        internal readonly DbSet<Category> dbSet;
 
-        public UserRepository(IDataContext context)
+        public CategoryRepository(IDataContext context)
         {
             Database = context;
-            dbSet = context.Set<User>();
+            dbSet = context.Set<Category>();
         }
 
-        public void AddUser(User user)
+        public void AddCategory(Category category)
         {
-            dbSet.Add(user);
+            dbSet.Add(category);
         }
 
-        public void DeleteUser(User user)
+        public void DeleteCategory(Category category)
         {
-            if (Database.Entry(user).State == EntityState.Detached)
-                dbSet.Attach(user);
+            if (Database.Entry(category).State == EntityState.Detached)
+                dbSet.Attach(category);
 
-            dbSet.Remove(user);
+            dbSet.Remove(category);
         }
 
-        public void DeleteUserById(string id)
+        public void DeleteCategoryById(int id)
         {
-            User user = dbSet.Find(id);
-            DeleteUser(user);
+            Category category = dbSet.Find(id);
+            DeleteCategory(category);
         }
 
-        public IEnumerable<User> FindUser(Expression<Func<User, bool>> filter = null,
-            Func<IQueryable<User>, IOrderedQueryable<User>> orderBy = null,
+        public IEnumerable<Category> FindCategory(Expression<Func<Category, bool>> filter = null,
+            Func<IQueryable<Category>, IOrderedQueryable<Category>> orderBy = null,
             string includeProperties = "")
         {
-            IQueryable<User> query = dbSet;
+            IQueryable<Category> query = dbSet;
 
             if (filter != null)
             {
@@ -65,15 +65,15 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public User GetUserById(string id)
+        public Category GetCategoryById(int id)
         {
             return dbSet.Find(id);
         }
 
-        public void UpdadeUser(User user)
+        public void UpdadeCategory(Category category)
         {
-            dbSet.Attach(user);
-            Database.Entry(user).State = EntityState.Modified;
+            dbSet.Attach(category);
+            Database.Entry(category).State = EntityState.Modified;
         }
 
         public void Dispose()

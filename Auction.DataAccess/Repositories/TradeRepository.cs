@@ -6,43 +6,43 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Auction.DataAccess.Repositories
+namespace Auction.DataAccess.Repositories 
 {
-    public class UserRepository : IUserRepository
+    public class TradeRepository : ITradeRepository
     {
         internal readonly IDataContext Database;
-        internal readonly DbSet<User> dbSet;
+        internal readonly DbSet<Trade> dbSet;
 
-        public UserRepository(IDataContext context)
+        public TradeRepository(IDataContext context)
         {
             Database = context;
-            dbSet = context.Set<User>();
+            dbSet = context.Set<Trade>();
         }
 
-        public void AddUser(User user)
+        public void AddTrade(Trade trade)
         {
-            dbSet.Add(user);
+            dbSet.Add(trade);
         }
 
-        public void DeleteUser(User user)
+        public void DeleteTrade(Trade trade)
         {
-            if (Database.Entry(user).State == EntityState.Detached)
-                dbSet.Attach(user);
+            if (Database.Entry(trade).State == EntityState.Detached)
+                dbSet.Attach(trade);
 
-            dbSet.Remove(user);
+            dbSet.Remove(trade);
         }
 
-        public void DeleteUserById(string id)
+        public void DeleteTradeById(int id)
         {
-            User user = dbSet.Find(id);
-            DeleteUser(user);
+            Trade trade = dbSet.Find(id);
+            DeleteTrade(trade);
         }
 
-        public IEnumerable<User> FindUser(Expression<Func<User, bool>> filter = null,
-            Func<IQueryable<User>, IOrderedQueryable<User>> orderBy = null,
+        public IEnumerable<Trade> FindTrade(Expression<Func<Trade, bool>> filter = null,
+            Func<IQueryable<Trade>, IOrderedQueryable<Trade>> orderBy = null,
             string includeProperties = "")
         {
-            IQueryable<User> query = dbSet;
+            IQueryable<Trade> query = dbSet;
 
             if (filter != null)
             {
@@ -65,15 +65,15 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public User GetUserById(string id)
+        public Trade GetTradeById(int id)
         {
             return dbSet.Find(id);
         }
 
-        public void UpdadeUser(User user)
+        public void UpdadeTrade(Trade trade)
         {
-            dbSet.Attach(user);
-            Database.Entry(user).State = EntityState.Modified;
+            dbSet.Attach(trade);
+            Database.Entry(trade).State = EntityState.Modified;
         }
 
         public void Dispose()
