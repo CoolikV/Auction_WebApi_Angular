@@ -3,12 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-
 namespace Auction.DataAccess.Interfaces
 {
-    public interface IUserRepository : IGenericRepository<User>
+    public interface IUserRepository : IDisposable
     {
-        User GetById(string id);
-        void Delete(string id);
+        User GetUserById(string id);
+        void AddUser(User user);
+        void UpdadeUser(User user);
+        void DeleteUser(User user);
+        void DeleteUserById(string id);
+        IEnumerable<User> FindUser(Expression<Func<User, bool>> filter = null,
+            Func<IQueryable<User>, IOrderedQueryable<User>> orderBy = null,
+            string includeProperties = "");
     }
 }

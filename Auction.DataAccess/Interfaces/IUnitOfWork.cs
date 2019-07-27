@@ -1,20 +1,18 @@
-﻿using System;
+﻿using Auction.DataAccess.Identity.Repositories;
+using System;
 using System.Threading.Tasks;
-using Auction.DataAccess.Entities;
-using Auction.DataAccess.Identity.Repositories;
 
 namespace Auction.DataAccess.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
         UserManager UserManager { get; }
-        IClientManager ClientManager { get; }
         UserRoleManager UserRoleManager { get; }
         Task SaveAsync();
-            
-        IGenericRepository<TradingLot> TradingLots { get; }
-        IGenericRepository<Trade> Trades { get; }
-        IGenericRepository<Category> Categories { get; }
+        
+        ITradingLotRepository TradingLots { get; }
+        ITradeRepository Trades { get; }
+        ICategoryRepository Categories { get; }
         IUserRepository Users { get; }
         void Save();
     }
