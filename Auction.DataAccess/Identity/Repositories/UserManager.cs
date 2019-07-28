@@ -3,9 +3,9 @@ using Auction.DataAccess.Identity.Entities;
 
 namespace Auction.DataAccess.Identity.Repositories
 {
-    public class UserManager : UserManager<AppUser>
+    public class AppUserManager : UserManager<AppUser>
     {
-        public UserManager(IUserStore<AppUser> store) : base(store)
+        public AppUserManager(IUserStore<AppUser> store) : base(store)
         {
         }
     }

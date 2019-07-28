@@ -6,7 +6,7 @@ namespace Auction.DataAccess.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        UserManager UserManager { get; }
+        AppUserManager UserManager { get; }
         UserRoleManager UserRoleManager { get; }
         Task SaveAsync();
         

@@ -17,7 +17,7 @@ namespace Auction.DataAccess.Repositories
         private GenericRepository<Category> _categoryRepository;
         private UserRepository _userRepository;
         
-        private UserManager _userManager;
+        private AppUserManager _userManager;
         private UserRoleManager _userRoleManager;
         private IClientManager _clientManager;
 
@@ -66,12 +66,12 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public UserManager UserManager
+        public AppUserManager UserManager
         {
             get
             {
                 if (_userManager == null)
-                    _userManager = new UserManager(new UserStore<AppUser>(_context));
+                    _userManager = new AppUserManager(new UserStore<AppUser>(_context));
                 return _userManager;
             }
         }
