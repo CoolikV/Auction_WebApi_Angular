@@ -1,25 +1,23 @@
-﻿using System;
-using System.Threading.Tasks;
-using Auction.DataAccess.EF;
-using Auction.DataAccess.Entities;
-using Auction.DataAccess.Interfaces;
-using Auction.DataAccess.Identity.Repositories;
-using Microsoft.AspNet.Identity.EntityFramework;
+﻿using Auction.DataAccess.EF;
 using Auction.DataAccess.Identity.Entities;
+using Auction.DataAccess.Identity.Repositories;
+using Auction.DataAccess.Interfaces;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System;
+using System.Threading.Tasks;
 
 namespace Auction.DataAccess.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private AuctionContext _context;
-        private GenericRepository<TradingLot> _tradingLotRepository;
-        private GenericRepository<Trade> _tradeRepository;
-        private GenericRepository<Category> _categoryRepository;
-        private UserRepository _userRepository;
+        private IDataContext _context;
+        private ITradingLotRepository _tradingLotRepository;
+        private ITradeRepository _tradeRepository;
+        private ICategoryRepository _categoryRepository;
+        private IUserRepository _userRepository;
         
         private AppUserManager _userManager;
         private UserRoleManager _userRoleManager;
-        private IClientManager _clientManager;
 
         public UnitOfWork(string connectionString)
         {
@@ -36,32 +34,32 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public IGenericRepository<TradingLot> TradingLots
+        public ITradingLotRepository TradingLots
         {
             get
             {
                 if (_tradingLotRepository == null)
-                    _tradingLotRepository = new GenericRepository<TradingLot>(_context);
+                    _tradingLotRepository = new TradingLotRepository(_context);
                 return _tradingLotRepository;
             }
         }
 
-        public IGenericRepository<Trade> Trades
+        public ITradeRepository Trades
         {
             get
             {
                 if (_tradeRepository == null)
-                    _tradeRepository = new GenericRepository<Trade>(_context);
+                    _tradeRepository = new TradeRepository(_context);
                 return _tradeRepository;
             }
         }
 
-        public IGenericRepository<Category> Categories
+        public ICategoryRepository Categories
         {
             get
             {
                 if (_categoryRepository == null)
-                    _categoryRepository = new GenericRepository<Category>(_context);
+                    _categoryRepository = new CategoryRepository(_context);
                 return _categoryRepository;
             }
         }
@@ -71,7 +69,7 @@ namespace Auction.DataAccess.Repositories
             get
             {
                 if (_userManager == null)
-                    _userManager = new AppUserManager(new UserStore<AppUser>(_context));
+                    _userManager = new AppUserManager(new UserStore<AppUser>(_context as AuctionContext));
                 return _userManager;
             }
         }
@@ -81,18 +79,8 @@ namespace Auction.DataAccess.Repositories
             get
             {
                 if (_userRoleManager == null)
-                    _userRoleManager = new UserRoleManager(new RoleStore<AppRole>(_context));
+                    _userRoleManager = new UserRoleManager(new RoleStore<AppRole>(_context as AuctionContext));
                 return _userRoleManager;
-            }
-        }
-
-        public IClientManager ClientManager
-        {
-            get
-            {
-                if (_clientManager == null)
-                    _clientManager = new ClientManager(_context);
-                return _clientManager;
             }
         }
 
