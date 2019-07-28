@@ -9,11 +9,11 @@ namespace Auction.BusinessLogic.Interfaces
 {
     public interface IUserManager : IDisposable
     {
-        Task<OperationDetails> CreateUser(UserDTO userDto);
+        Task<OperationDetails> CreateUserAsync(UserDTO userDto);
         IEnumerable<UserDTO> GetAllUsers();
-        Task<Tuple<ClaimsIdentity, ClaimsIdentity>> FindUserAsync(string username, string password);
+        Task<ClaimsIdentity> Authenticate(string username, string password);
         UserDTO GetUserByName(string name);
-        Task EditUserRole(string userId, string newRoleName);
+        Task EditUserRoleAsync(string userId, string newRoleName);
         IEnumerable<string> GetAllRoles();
     }
 }
