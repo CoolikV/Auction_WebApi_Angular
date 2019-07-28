@@ -22,22 +22,22 @@ namespace BusinessLogicTests.ServiceTests
         {
             TypeAdapterConfig.GlobalSettings.Scan(typeof(BLMapRegister).Assembly);
         }
-
+        private IAdapter adapter;
         private ITradeService tradeService;
         private Mock<IUnitOfWork> uow;
-        private Mock<IGenericRepository<Trade>> tradeRepository;
+        private Mock<ITradeRepository> tradeRepository;
 
         [SetUp]
         public void Load()
         {
             uow = new Mock<IUnitOfWork>();
-            tradeRepository = new Mock<IGenericRepository<Trade>>();
+            tradeRepository = new Mock<ITradeRepository>();
 
             uow.Setup(x => x.Trades).Returns(tradeRepository.Object);
-            uow.Setup(x => x.TradingLots.GetById(It.IsAny<int>())).Returns(new TradingLot { Name = It.IsAny<string>(), User = It.IsAny<User>(), TradeDuration = It.IsAny<int>(), Price = It.IsAny<double>(), IsVerified = true });
-            uow.Setup(x => x.Users.GetById(It.IsAny<string>())).Returns(new User { Id = "defId" });
-
-            tradeService = new TradeService(uow.Object);
+            uow.Setup(x => x.TradingLots.GetTradingLotById(It.IsAny<int>())).Returns(new TradingLot { Name = It.IsAny<string>(), User = It.IsAny<User>(), TradeDuration = It.IsAny<int>(), Price = It.IsAny<double>(), IsVerified = true });
+            uow.Setup(x => x.Users.GetUserById(It.IsAny<string>())).Returns(new User { Id = "defId" });
+            //may cause exception (adapter)
+            tradeService = new TradeService(uow.Object, adapter);
         }
 
         [Test]
