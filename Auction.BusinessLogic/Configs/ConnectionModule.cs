@@ -7,12 +7,16 @@ namespace Auction.BusinessLogic.Configs
 {
     public class ConnectionModule : NinjectModule
     {
-        public static string ConnectionString;
+        private readonly string _connectionString;
 
+        public ConnectionModule(string connStr)
+        {
+            _connectionString = connStr;
+        }
         public override void Load()
         {
             Bind<IDataContext>().To<AuctionContext>().InSingletonScope();
-            Bind<IUnitOfWork>().To<UnitOfWork>().WithConstructorArgument(ConnectionString);
+            Bind<IUnitOfWork>().To<UnitOfWork>().WithConstructorArgument(_connectionString);
         }
     }
 }
