@@ -9,15 +9,14 @@ namespace Auction.WebApi
 {
     public partial class Startup
     {
-        public void Configuration(IAppBuilder app, IUserManager userManager)
+        public void Configuration(IAppBuilder app)
         {
-            HttpConfiguration config = new HttpConfiguration();
+            //HttpConfiguration config = new HttpConfiguration();
 
-            ConfigureAuth(app, userManager);
+            ConfigureAuth(app);
 
-            WebApiConfig.Register(config);
+            app.UseWebApi(GlobalConfiguration.Configuration);
             app.UseCors(CorsOptions.AllowAll);
-            app.UseWebApi(config);
         }
     }
 }
