@@ -14,5 +14,20 @@ namespace Auction.DataAccess.EF
         public DbSet<Category> Categories { get; }
 
         public AuctionContext(string connectionString) : base(connectionString) { }
+
+        static AuctionContext()
+        {
+            Database.SetInitializer(new DbInitializer());
+        }
+
+        public class DbInitializer : DropCreateDatabaseAlways<AuctionContext>
+        {
+            protected override void Seed(AuctionContext context)
+            {
+                context.Roles.Add(new IdentityRole("user"));
+
+                context.SaveChanges();
+            }
+        }
     }
 }
