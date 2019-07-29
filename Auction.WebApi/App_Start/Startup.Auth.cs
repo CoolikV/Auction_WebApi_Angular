@@ -11,9 +11,10 @@ namespace Auction.WebApi
     {
         public static OAuthAuthorizationServerOptions OAuthOptions { get; private set; }
         private IUserManager UserManager { get; set; }
-        public void ConfigureAuth(IAppBuilder app, IUserManager userManager)
+        public void ConfigureAuth(IAppBuilder app)
         {
-            UserManager = userManager;
+            var userManager = System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver
+                            .GetService(typeof(IUserManager)) as IUserManager;
 
             OAuthOptions = new OAuthAuthorizationServerOptions
             {

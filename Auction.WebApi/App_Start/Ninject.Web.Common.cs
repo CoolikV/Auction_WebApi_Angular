@@ -69,7 +69,7 @@ namespace Auction.WebApi.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Load(ConnectionModule.ConnectionString = "DefaultConnecton");
+            kernel.Load(new ConnectionModule("DefaultConnection"));
             kernel.Bind<IUserManager>().To<UserManager>();
             kernel.Bind<ICategoryService>().To<CategoryService>();
             kernel.Bind<ITradeService>().To<TradeService>();
