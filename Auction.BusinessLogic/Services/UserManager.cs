@@ -80,7 +80,7 @@ namespace Auction.BusinessLogic.Services
             ClaimsIdentity claim = null;
             // находим пользователя
             var appUser = await Database.UserManager.FindAsync(userName, password)
-                ?? throw new UserNotFoundException("The user name or password is incorrect.");
+                ?? throw new NotFoundException("The user name or password is incorrect.");
 
             // авторизуем его и возвращаем объект ClaimsIdentity (Bearer token)
             if (appUser != null)
@@ -93,7 +93,7 @@ namespace Auction.BusinessLogic.Services
         public UserDTO GetUserByName(string name)
         {
             var appUser = Database.UserManager.FindByName(name) 
-                ?? throw new UserNotFoundException();
+                ?? throw new NotFoundException();
 
             return Adapter.Adapt<UserDTO>(appUser);
         }
@@ -101,7 +101,7 @@ namespace Auction.BusinessLogic.Services
         public async Task EditUserRoleAsync(string userId, string newRoleName)
         {
             var appUser = await Database.UserManager.FindByIdAsync(userId)
-                ?? throw new UserNotFoundException();
+                ?? throw new NotFoundException();
 
             var currentUserRole = GetRoleNameForUser(userId);
 

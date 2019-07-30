@@ -28,7 +28,10 @@ namespace Auction.BusinessLogic.Services
 
         public CategoryDTO GetCategoryById(int id)
         {
-            return Adapter.Adapt<CategoryDTO>(Database.Categories.GetCategoryById(id));
+            var category = Database.Categories.GetCategoryById(id)
+                ?? throw new AuctionException("Category with such id does not exist");
+
+            return Adapter.Adapt<CategoryDTO>(category);
         }
 
         public IEnumerable<CategoryDTO> GetAllCategories()
@@ -41,13 +44,13 @@ namespace Auction.BusinessLogic.Services
             if (id == 1)
                 throw new AuctionException("You cant delete default category");
 
-            var categoryToDelete = Database.Categories.GetCategoryById(id);
+            var categoryToDelete = GetCategoryById(id);
 
             if (categoryToDelete == null)
                 throw new NullReferenceException();
 
             if (categoryToDelete.TradingLots != null)
-                MoveLotsToDefaultCategory(categoryToDelete.TradingLots);
+               // MoveLotsToDefaultCategory(categoryToDelete.TradingLots);
 
             Database.Categories.DeleteCategoryById(categoryToDelete.Id);
             Database.Save();

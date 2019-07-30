@@ -46,15 +46,15 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
-        public void EditLot(TradingLotDTO lot)
+        public void EditLot(int lotId, TradingLotDTO lot)
         {
             if (lot == null)
                 throw new ArgumentNullException(nameof(lot));
 
-            var tradingLot = Database.TradingLots.GetTradingLotById(lot.Id);
+            var tradingLot = Database.TradingLots.GetTradingLotById(lotId);
 
             if (tradingLot == null)
-                throw new ArgumentNullException(nameof(tradingLot));
+                throw new NotFoundException($"Trading lot with id : {lotId}");
 
             if (tradingLot.IsVerified)
                 throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
@@ -68,25 +68,29 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
-        public void RemoveLotById(int id)
+        public void RemoveLotById(int lotId)
         {
-            TradingLot lot = Database.TradingLots.GetTradingLotById(id);
+            TradingLot tradingLot = Database.TradingLots.GetTradingLotById(lotId)
+                ?? throw new NotFoundException($"Trading lot with id : {lotId}");
 
-            if (lot == null)
-                throw new ArgumentNullException(nameof(lot));
-
-            Database.TradingLots.DeleteTradingLotById(lot.Id);
+            Database.TradingLots.DeleteTradingLotById(tradingLot.Id);
             Database.Save();
         }
 
-        public IEnumerable<TradingLotDTO> GetAllLots()
+        public IQueryable<TradingLotDTO> FindLots(int? categoryId)
         {
-            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.FindTradingLots());
+            var query = categoryId.HasValue ? Database.TradingLots.FindTradingLots(l => l.CategoryId == categoryId.Value)
+                : Database.TradingLots.FindTradingLots();
+
+            return Adapter.Adapt<IQueryable<TradingLotDTO>>(query);
         }
 
-        public TradingLotDTO GetLotById(int id)
+        public TradingLotDTO GetLotById(int lotId)
         {
-            return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetTradingLotById(id));
+            var tradingLot = Database.TradingLots.GetTradingLotById(lotId)
+                ?? throw new NotFoundException($"Trading lot with id : {lotId}");
+
+            return Adapter.Adapt<TradingLotDTO>(tradingLot);
         }
 
         public void ChangeLotCategory(int lotId, int categoryId)
@@ -114,12 +118,6 @@ namespace Auction.BusinessLogic.Services
 
             Database.TradingLots.UpdadeTradingLot(lot);
             Database.Save();
-        }
-
-        public IEnumerable<TradingLotDTO> GetLotsForCategory(int categoryId)
-        {
-            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(Database.TradingLots.FindTradingLots(lot => lot.CategoryId == categoryId,
-                q => q.OrderByDescending(l => l.TradeDuration)));
         }
     }
 }
