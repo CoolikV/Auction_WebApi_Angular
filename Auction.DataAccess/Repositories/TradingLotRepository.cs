@@ -19,6 +19,8 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<TradingLot>();
         }
 
+        public IQueryable<TradingLot> TradingLots => dbSet;
+
         public void AddTradingLot(TradingLot tradingLot)
         {
             dbSet.Add(tradingLot);

@@ -15,5 +15,6 @@ namespace Auction.DataAccess.Interfaces
         IEnumerable<User> FindUsers(Expression<Func<User, bool>> filter = null,
             Func<IQueryable<User>, IOrderedQueryable<User>> orderBy = null,
             string includeProperties = "");
+        IQueryable<User> Users { get; }
     }
 }

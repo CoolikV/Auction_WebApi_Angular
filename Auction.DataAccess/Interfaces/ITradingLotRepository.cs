@@ -16,5 +16,6 @@ namespace Auction.DataAccess.Interfaces
         IEnumerable<TradingLot> FindTradingLots(Expression<Func<TradingLot, bool>> filter = null,
             Func<IQueryable<TradingLot>, IOrderedQueryable<TradingLot>> orderBy = null,
             string includeProperties = "");
+        IQueryable<TradingLot> TradingLots { get; }
     }
 }

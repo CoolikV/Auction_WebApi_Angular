@@ -1,4 +1,5 @@
-﻿using Auction.DataAccess.Entities;
+﻿using Auction.DataAccess.EF;
+using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,8 @@ namespace Auction.DataAccess.Repositories
             Database = context;
             dbSet = context.Set<Trade>();
         }
+
+        public IQueryable<Trade> Trades => dbSet;
 
         public void AddTrade(Trade trade)
         {

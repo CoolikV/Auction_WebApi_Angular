@@ -21,7 +21,7 @@ namespace Auction.DataAccess.EF
             Database.SetInitializer(new DbInitializer());
         }
 
-        public class DbInitializer : DropCreateDatabaseAlways<AuctionContext>
+        public class DbInitializer : DropCreateDatabaseIfModelChanges<AuctionContext>
         {
             protected override void Seed(AuctionContext context)
             {
