@@ -9,9 +9,22 @@ namespace Auction.BusinessLogic.Configs
         public void Register(TypeAdapterConfig config)
         {
             config.NewConfig<CategoryDTO, Category>().TwoWays();
+
             config.NewConfig<TradeDTO, Trade>().TwoWays();
-            config.NewConfig<TradingLotDTO, TradingLot>().TwoWays();
-            config.NewConfig<UserDTO, User>().TwoWays();
+
+            config.NewConfig<TradingLotDTO, TradingLot>().IgnoreNullValues(true);
+            config.NewConfig<TradingLot, TradingLot>().IgnoreNullValues(true);
+
+            config.NewConfig<UserDTO, UserProfile>()
+                .Ignore(dest => dest.Id)
+                .TwoWays();
+
+            //config.NewConfig<CategoryDTO, Category>().PreserveReference(true).TwoWays();
+            //config.NewConfig<TradeDTO, Trade>().PreserveReference(true).TwoWays();
+            //config.NewConfig<TradingLot, TradingLotDTO>()
+            //    .IgnoreAttribute(typeof(Category))
+            //    .PreserveReference(true).TwoWays();
+            //config.NewConfig<UserDTO, User>().PreserveReference(true).TwoWays();
         }
     }
 }
