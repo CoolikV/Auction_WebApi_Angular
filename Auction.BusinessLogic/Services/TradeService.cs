@@ -52,7 +52,7 @@ namespace Auction.BusinessLogic.Services
         public void RateTradingLot(int tradeId, string userId, double price)
         {
             Trade trade = Database.Trades.GetTradeById(tradeId);
-            User user = Database.Users.GetUserById(userId);
+            UserProfile user = Database.Users.GetUserById(userId);
 
             if (trade == null || user == null)
                 throw new ArgumentNullException();
