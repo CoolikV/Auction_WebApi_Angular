@@ -1,7 +1,6 @@
 ﻿using Auction.BusinessLogic.DataTransfer;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Auction.BusinessLogic.Interfaces
 {
@@ -10,8 +9,9 @@ namespace Auction.BusinessLogic.Interfaces
         void CreateLot(TradingLotDTO lot);
         void EditLot(int lotId, TradingLotDTO lot);
         void RemoveLotById(int id);
-        IQueryable<TradingLotDTO> FindLots(int? categoryId);
+        IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int count, string category, out int pagesCount, out int totalItemsCount);
         TradingLotDTO GetLotById(int id);
+        IEnumerable<TradingLotDTO> FindLotsByCategoryName(string categoryName);
         void ChangeLotCategory(int lotId, int categoryId);
         void VerifyLot(int lotId);
     }
