@@ -19,7 +19,7 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<UserProfile>();
         }
 
-        public IQueryable<UserProfile> Users => dbSet;
+        public IQueryable<UserProfile> Entities => dbSet;
 
         public void AddUser(UserProfile user)
         {

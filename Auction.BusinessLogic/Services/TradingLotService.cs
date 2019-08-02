@@ -134,7 +134,7 @@ namespace Auction.BusinessLogic.Services
         public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, string category,
             out int pagesCount, out int totalItemsCount)
         {
-            var source = Database.TradingLots.TradingLots;
+            var source = Database.TradingLots.Entities;
 
             if (!string.IsNullOrEmpty(category))
                 source = source.Where(l => l.Category.Name.Equals(category));

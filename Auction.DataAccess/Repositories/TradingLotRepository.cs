@@ -19,7 +19,7 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<TradingLot>();
         }
 
-        public IQueryable<TradingLot> TradingLots => dbSet;
+        public IQueryable<TradingLot> Entities => dbSet;
 
         public void AddTradingLot(TradingLot tradingLot)
         {

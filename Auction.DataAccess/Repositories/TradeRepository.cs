@@ -20,7 +20,7 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<Trade>();
         }
 
-        public IQueryable<Trade> Trades => dbSet;
+        public IQueryable<Trade> Entities => dbSet;
 
         public void AddTrade(Trade trade)
         {

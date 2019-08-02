@@ -19,7 +19,7 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<Category>();
         }
 
-        public IQueryable<Category> Categories => dbSet;
+        public IQueryable<Category> Entities => dbSet;
 
         public void AddCategory(Category category)
         {

@@ -17,6 +17,6 @@ namespace Auction.DataAccess.Interfaces
         IEnumerable<Category> FindCategories(Expression<Func<Category, bool>> filter = null,
             Func<IQueryable<Category>, IOrderedQueryable<Category>> orderBy = null,
             string includeProperties = "");
-        IQueryable<Category> Categories { get; }
+        IQueryable<Category> Entities { get; }
     }
 }
