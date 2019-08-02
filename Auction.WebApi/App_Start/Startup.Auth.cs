@@ -4,6 +4,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 using System;
+using System.Web.Http;
 
 namespace Auction.WebApi
 {
@@ -13,7 +14,7 @@ namespace Auction.WebApi
         private IUserManager UserManager { get; set; }
         public void ConfigureAuth(IAppBuilder app)
         {
-            var userManager = System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver
+            var userManager = GlobalConfiguration.Configuration.DependencyResolver
                             .GetService(typeof(IUserManager)) as IUserManager;
 
             OAuthOptions = new OAuthAuthorizationServerOptions

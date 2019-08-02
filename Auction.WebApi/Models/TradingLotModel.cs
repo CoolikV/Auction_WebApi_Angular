@@ -18,7 +18,7 @@ namespace Auction.WebApi.Models
         [Required]
         public int TradeDuration { get; set; }
 
-        public string Creator { get; set; }
+        public string Owner { get; set; }
         public bool IsVerified { get; set; }
         public string Category { get; set; }
         public int CategoryId { get; set; }

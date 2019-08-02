@@ -4,16 +4,15 @@ using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Models;
 using Mapster;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 
 namespace Auction.WebApi.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [RoutePrefix("api/lots")]
     public class LotsController : ApiController
     {
@@ -37,9 +36,13 @@ namespace Auction.WebApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data");
+
             try
             {
-                var currentUser = userManager.GetUserByName(User.Identity.Name);
+                //refactoring
+                var currentUserName = Request.GetOwinContext().Request.User.Identity.Name;
+                var currentUser = userManager.GetUserByName(currentUserName);
+
                 var lotDto = _adapter.Adapt<TradingLotDTO>(newTradingLot);
 
                 lotDto.Category = categoryService.GetCategoryById(newTradingLot.CategoryId);
@@ -66,6 +69,7 @@ namespace Auction.WebApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data");
+
             try
             {
                 lotService.EditLot(id, _adapter.Adapt<TradingLotDTO>(model));
@@ -119,28 +123,22 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("")]
-        public IEnumerable<TradingLotModel> GetTradingLots([FromUri] PagingParameterModel pagingParameter, int? categoryId)
+        public IEnumerable<TradingLotModel> GetTradingLots([FromUri] PagingParameterModel pagingParameter, string category)
         {
-            //var source = lotService.FindLots();
-            var source = categoryId.HasValue ? lotService.FindLots(categoryId.Value)
-                : lotService.FindLots(null);
+            int? currentPage = pagingParameter?.PageNumber ?? 1;
+            int? pageSize = pagingParameter?.PageSize ?? 10;
 
-            int totalCount = source.Count();
-            int currentPage = pagingParameter.PageNumber;
-            int pageSize = pagingParameter.PageSize;
-
-            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
-
-            var lotsForPage = source.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            var lotsForPage = lotService.GetLotsForPage(currentPage.Value, pageSize.Value, category,
+                out int pagesCount, out int totalItemsCount);
 
             bool hasPreviousPage = currentPage > 1 ? true : false;
-            bool hasNextPage = currentPage < totalPages ? true : false;
+            bool hasNextPage = currentPage < pagesCount ? true : false;
 
             var paginationMetadata = new
             {
-                totalCount,
+                totalItemsCount,
                 pageSize,
-                totalPages,
+                pagesCount,
                 hasPreviousPage,
                 hasNextPage
             };
@@ -150,5 +148,23 @@ namespace Auction.WebApi.Controllers
 
             return _adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage);
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("{lotId:int}/category")]
+        public IHttpActionResult GetCategoryByLotId(int lotId)
+        {
+            CategoryDTO category;
+            try
+            {
+                category = lotService.GetLotById(lotId).Category;
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok(category);
+        } 
     }
 }
