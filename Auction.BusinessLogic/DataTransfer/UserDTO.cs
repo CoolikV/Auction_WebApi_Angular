@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Auction.BusinessLogic.DataTransfer
 {
@@ -6,12 +7,15 @@ namespace Auction.BusinessLogic.DataTransfer
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public ICollection<TradingLotDTO> TradingLots { get; set; }
-        public ICollection<TradeDTO> Trades { get; set; }
+        public string Surname { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string UserName { get; set; }
         public string Role { get; set; }
+        public DateTime BirthDate { get; set; }
+
+        public ICollection<TradingLotDTO> TradingLots { get; set; }
+        public ICollection<TradeDTO> Trades { get; set; }
 
         public UserDTO()
         {
