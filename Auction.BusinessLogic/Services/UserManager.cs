@@ -38,7 +38,10 @@ namespace Auction.BusinessLogic.Services
                     return new OperationDetails(false, result.Errors.FirstOrDefault(), "");
 
                 await Database.UserManager.AddToRoleAsync(user.Id, "user");
-                User clientProfile = new User { Id = user.Id, Name = userDto.UserName };
+
+                var clientProfile = Adapter.Adapt<UserProfile>(userDto);
+                clientProfile.Id = user.Id;
+
                 Database.Users.AddUser(clientProfile);
                 await Database.SaveAsync();
                 return new OperationDetails(true, "Регистрация успешно пройдена", "");
@@ -61,20 +64,6 @@ namespace Auction.BusinessLogic.Services
             return Adapter.Adapt<IEnumerable<UserDTO>>(appUsers);
         }
 
-        //use this mwthod above when mapping
-        private UserDTO CreateUserDTO(AppUser user)
-        {
-            return new UserDTO()
-            {
-                //Id = user.Id,
-                //Email = user.Email,
-                //UserName = user.UserName,
-                //Name = user.User.Name,
-                //Role = GetRoleForUser(user.Id),
-                //Lots = Mapper.Map<IEnumerable<Lot>, ICollection<LotDTO>>(DatabaseDomain.Lots.Find(x => x.User.Id == user.Id))
-            };
-        }
-
         public async Task<ClaimsIdentity> Authenticate(string userName, string password)
         {
             ClaimsIdentity claim = null;
@@ -93,7 +82,7 @@ namespace Auction.BusinessLogic.Services
         public UserDTO GetUserByName(string name)
         {
             var appUser = Database.UserManager.FindByName(name) 
-                ?? throw new NotFoundException();
+                ?? throw new NotFoundException($"User with name {name}");
 
             return Adapter.Adapt<UserDTO>(appUser);
         }
