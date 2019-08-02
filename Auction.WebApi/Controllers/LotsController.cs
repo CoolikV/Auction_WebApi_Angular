@@ -39,7 +39,7 @@ namespace Auction.WebApi.Controllers
 
             try
             {
-                //refactoring
+                //REFACTORING
                 var currentUserName = Request.GetOwinContext().Request.User.Identity.Name;
                 var currentUser = userManager.GetUserByName(currentUserName);
 
