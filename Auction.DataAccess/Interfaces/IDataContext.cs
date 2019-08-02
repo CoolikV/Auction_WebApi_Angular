@@ -9,7 +9,7 @@ namespace Auction.DataAccess.Interfaces
     public interface IDataContext : IDisposable
     {
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
-        DbSet<User> UserProfiles { get; }
+        DbSet<UserProfile> UserProfiles { get; }
         DbSet<TradingLot> TradingLots { get; }
         DbSet<Trade> Trades { get; }
         DbSet<Category> Categories { get; }

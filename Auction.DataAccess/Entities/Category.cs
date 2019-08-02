@@ -7,6 +7,7 @@ namespace Auction.DataAccess.Entities
         public int Id { get; set; }
         public string Name { get; set; }
         public virtual ICollection<TradingLot> TradingLots { get; set; }
+
         public Category()
         {
             TradingLots = new List<TradingLot>();

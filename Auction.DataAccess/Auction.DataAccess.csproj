@@ -58,7 +58,7 @@
     <Compile Include="Entities\Category.cs" />
     <Compile Include="Entities\Trade.cs" />
     <Compile Include="Entities\TradingLot.cs" />
-    <Compile Include="Entities\User.cs" />
+    <Compile Include="Entities\UserProfile.cs" />
     <Compile Include="Identity\Entities\AppRole.cs" />
     <Compile Include="Identity\Entities\AppUser.cs" />
     <Compile Include="Identity\Repositories\UserManager.cs" />

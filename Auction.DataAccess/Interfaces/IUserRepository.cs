@@ -7,14 +7,14 @@ namespace Auction.DataAccess.Interfaces
 {
     public interface IUserRepository : IDisposable
     {
-        User GetUserById(string id);
-        void AddUser(User user);
-        void UpdadeUser(User user);
-        void DeleteUser(User user);
+        UserProfile GetUserById(string id);
+        void AddUser(UserProfile user);
+        void UpdadeUser(UserProfile user);
+        void DeleteUser(UserProfile user);
         void DeleteUserById(string id);
-        IEnumerable<User> FindUsers(Expression<Func<User, bool>> filter = null,
-            Func<IQueryable<User>, IOrderedQueryable<User>> orderBy = null,
+        IEnumerable<UserProfile> FindUsers(Expression<Func<UserProfile, bool>> filter = null,
+            Func<IQueryable<UserProfile>, IOrderedQueryable<UserProfile>> orderBy = null,
             string includeProperties = "");
-        IQueryable<User> Users { get; }
+        IQueryable<UserProfile> Users { get; }
     }
 }

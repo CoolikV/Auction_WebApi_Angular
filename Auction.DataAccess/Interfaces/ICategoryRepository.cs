@@ -9,6 +9,7 @@ namespace Auction.DataAccess.Interfaces
     public interface ICategoryRepository : IDisposable
     {
         Category GetCategoryById(int id);
+        Category GetCategoryByName(string name);
         void AddCategory(Category category);
         void UpdadeCategory(Category category);
         void DeleteCategoryById(int id);

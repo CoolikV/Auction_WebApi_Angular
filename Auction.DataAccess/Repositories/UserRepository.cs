@@ -11,22 +11,22 @@ namespace Auction.DataAccess.Repositories
     public class UserRepository : IUserRepository
     {
         internal readonly IDataContext Database;
-        internal readonly DbSet<User> dbSet;
+        internal readonly DbSet<UserProfile> dbSet;
 
         public UserRepository(IDataContext context)
         {
             Database = context;
-            dbSet = context.Set<User>();
+            dbSet = context.Set<UserProfile>();
         }
 
-        public IQueryable<User> Users => dbSet;
+        public IQueryable<UserProfile> Users => dbSet;
 
-        public void AddUser(User user)
+        public void AddUser(UserProfile user)
         {
             dbSet.Add(user);
         }
 
-        public void DeleteUser(User user)
+        public void DeleteUser(UserProfile user)
         {
             if (Database.Entry(user).State == EntityState.Detached)
                 dbSet.Attach(user);
@@ -36,15 +36,15 @@ namespace Auction.DataAccess.Repositories
 
         public void DeleteUserById(string id)
         {
-            User user = dbSet.Find(id);
+            UserProfile user = dbSet.Find(id);
             DeleteUser(user);
         }
 
-        public IEnumerable<User> FindUsers(Expression<Func<User, bool>> filter = null,
-            Func<IQueryable<User>, IOrderedQueryable<User>> orderBy = null,
+        public IEnumerable<UserProfile> FindUsers(Expression<Func<UserProfile, bool>> filter = null,
+            Func<IQueryable<UserProfile>, IOrderedQueryable<UserProfile>> orderBy = null,
             string includeProperties = "")
         {
-            IQueryable<User> query = dbSet;
+            IQueryable<UserProfile> query = dbSet;
 
             if (filter != null)
             {
@@ -67,12 +67,12 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public User GetUserById(string id)
+        public UserProfile GetUserById(string id)
         {
             return dbSet.Find(id);
         }
 
-        public void UpdadeUser(User user)
+        public void UpdadeUser(UserProfile user)
         {
             dbSet.Attach(user);
             Database.Entry(user).State = EntityState.Modified;

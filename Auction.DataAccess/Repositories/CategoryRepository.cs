@@ -72,6 +72,11 @@ namespace Auction.DataAccess.Repositories
             return dbSet.Find(id);
         }
 
+        public Category GetCategoryByName(string name)
+        {
+            return dbSet.Where(category => category.Name.Equals(name)).SingleOrDefault();
+        }
+
         public void UpdadeCategory(Category category)
         {
             dbSet.Attach(category);
