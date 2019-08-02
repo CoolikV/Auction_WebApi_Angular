@@ -25,24 +25,17 @@ namespace Auction.BusinessLogic.Services
         {
             Database.Dispose();
         }
-        //test using mapper
+
         public void CreateLot(TradingLotDTO lot)
         {
             if (lot == null || lot.User == null)
                 throw new ArgumentNullException(nameof(lot));
-            //try to automapper for most of properties and set user and category after that
-            var newLot = new TradingLot()
-            {
-                Name = lot.Name,
-                Price = lot.Price,
-                Description = lot.Description,
-                Img = lot.Img,
-                TradeDuration = lot.TradeDuration,
-                User = Database.Users.GetUserById(lot.User.Id),
-                Category = lot.Category == null ? Database.Categories.GetCategoryById(1) : Database.Categories.GetCategoryById(lot.Category.Id)
-            };
 
-            Database.TradingLots.AddTradingLot(newLot);
+            var lotPoco = Adapter.Adapt<TradingLot>(lot);
+            lotPoco.User = Database.Users.GetUserById(lot.User.Id);
+            lotPoco.Category = lot.Category is null ? Database.Categories.GetCategoryById(1) : Database.Categories.GetCategoryById(lot.Category.Id);
+
+            Database.TradingLots.AddTradingLot(lotPoco);
             Database.Save();
         }
 
@@ -58,11 +51,14 @@ namespace Auction.BusinessLogic.Services
 
             if (tradingLot.IsVerified)
                 throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
-            //maybe mapping?
+            //cant ignore null values in mapster
+            //tradingLot = Adapter.Adapt<TradingLot>(lot);
+
             tradingLot.Name = lot.Name;
             tradingLot.Description = lot.Description;
             tradingLot.Img = lot.Img;
             tradingLot.TradeDuration = lot.TradeDuration;
+            tradingLot.Price = lot.Price;
 
             Database.TradingLots.UpdadeTradingLot(tradingLot);
             Database.Save();
@@ -77,12 +73,13 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
-        public IQueryable<TradingLotDTO> FindLots(int? categoryId)
+        //change 
+        public IEnumerable<TradingLotDTO> FindLotsByCategory(int? categoryId)
         {
             var query = categoryId.HasValue ? Database.TradingLots.FindTradingLots(l => l.CategoryId == categoryId.Value)
-                : Database.TradingLots.FindTradingLots();
+                : Database.TradingLots.FindTradingLots().AsQueryable();
 
-            return Adapter.Adapt<IQueryable<TradingLotDTO>>(query);
+            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(query);
         }
 
         public TradingLotDTO GetLotById(int lotId)
@@ -118,6 +115,38 @@ namespace Auction.BusinessLogic.Services
 
             Database.TradingLots.UpdadeTradingLot(lot);
             Database.Save();
+        }
+
+        public IEnumerable<TradingLotDTO> FindLotsByCategoryName(string categoryName)
+        {
+            if (string.IsNullOrEmpty(categoryName))
+                throw new ArgumentException("Category name is empty", nameof(categoryName));
+
+            var lotsInCategory = Database.TradingLots.FindTradingLots(lot => lot.Category.Name.Equals(categoryName),
+                orderBy: q => q.OrderBy(l => l.TradeDuration));
+
+            if (lotsInCategory.Any())
+                throw new NotFoundException($"Lots in category {categoryName}");
+
+            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsInCategory);
+        }
+
+        public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, string category,
+            out int pagesCount, out int totalItemsCount)
+        {
+            var source = Database.TradingLots.TradingLots;
+
+            if (!string.IsNullOrEmpty(category))
+                source = source.Where(l => l.Category.Name.Equals(category));
+
+            totalItemsCount = source.Count();
+            pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
+            var lotsForPage = source.OrderBy(l => l.TradeDuration)
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .AsEnumerable();
+
+            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsForPage);
         }
     }
 }
