@@ -12,8 +12,8 @@ namespace Auction.BusinessLogic.Configs
 
             config.NewConfig<TradeDTO, Trade>().TwoWays();
 
-            config.NewConfig<TradingLotDTO, TradingLot>().IgnoreNullValues(true);
-            config.NewConfig<TradingLot, TradingLot>().IgnoreNullValues(true);
+            config.NewConfig<TradingLotDTO, TradingLot>().MaxDepth(4).IgnoreNullValues(true);
+            config.NewConfig<TradingLot, TradingLotDTO>().MaxDepth(4).IgnoreNullValues(true);
 
             config.NewConfig<UserDTO, UserProfile>()
                 .Ignore(dest => dest.Id)
