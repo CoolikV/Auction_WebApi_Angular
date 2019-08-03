@@ -8,7 +8,7 @@ namespace Auction.WebApi.App_Start
     {
         public void Register(TypeAdapterConfig config)
         {
-            TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
+            //TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
             TypeAdapterConfig.GlobalSettings.Default.IgnoreNullValues(true);
             TypeAdapterConfig.GlobalSettings.Default.MaxDepth(3);
 
