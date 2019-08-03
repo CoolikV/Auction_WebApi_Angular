@@ -154,10 +154,11 @@ namespace Auction.WebApi.Controllers
         [Route("{lotId:int}/category")]
         public IHttpActionResult GetCategoryByLotId(int lotId)
         {
-            CategoryDTO category;
+            CategoryModel category;
             try
             {
-                category = lotService.GetLotById(lotId).Category;
+                var categoryDto = lotService.GetLotById(lotId).Category;
+                category = _adapter.Adapt<CategoryModel>(categoryDto);
             }
             catch (NotFoundException)
             {
