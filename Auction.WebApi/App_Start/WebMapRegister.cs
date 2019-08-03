@@ -21,6 +21,10 @@ namespace Auction.WebApi.App_Start
 
             config.NewConfig<RegisterModel, UserDTO>()
                 .Map(dest => dest.Role, src => "user");
+
+            config.NewConfig<CategoryModel, CategoryDTO>().MaxDepth(4);
+
+            config.NewConfig<CategoryDTO, CategoryModel>().MaxDepth(4);
         }
     }
 }
