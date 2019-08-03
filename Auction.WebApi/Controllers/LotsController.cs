@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using Auction.WebApi.Helpers;
 
 namespace Auction.WebApi.Controllers
 {
@@ -123,28 +124,16 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("")]
-        public IEnumerable<TradingLotModel> GetTradingLots([FromUri] PagingParameterModel pagingParameter, string category)
+        public IEnumerable<TradingLotModel> GetTradingLots([FromUri] PagingParameterModel pagingParameter)
         {
-            int? currentPage = pagingParameter?.PageNumber ?? 1;
-            int? pageSize = pagingParameter?.PageSize ?? 10;
+            //maybe remove such constructions (pagingParameter?.PageNumber ?? 1 and pagingParameter?.PageSize ?? 10) inside method
+            var lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1,
+                pagingParameter?.PageSize ?? 10, null, out int pagesCount, out int totalItemsCount);
 
-            var lotsForPage = lotService.GetLotsForPage(currentPage.Value, pageSize.Value, category,
-                out int pagesCount, out int totalItemsCount);
+            string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter, 
+                totalItemsCount,pagesCount));
 
-            bool hasPreviousPage = currentPage > 1 ? true : false;
-            bool hasNextPage = currentPage < pagesCount ? true : false;
-
-            var paginationMetadata = new
-            {
-                totalItemsCount,
-                pageSize,
-                pagesCount,
-                hasPreviousPage,
-                hasNextPage
-            };
-
-            HttpContext.Current.Response.Headers.Add("Paging-Headers",
-                JsonConvert.SerializeObject(paginationMetadata));
+            HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
 
             return _adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage);
         }
