@@ -9,7 +9,7 @@ namespace Auction.BusinessLogic.Interfaces
         void CreateLot(TradingLotDTO lot);
         void EditLot(int lotId, TradingLotDTO lot);
         void RemoveLotById(int id);
-        IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int count, string category, out int pagesCount, out int totalItemsCount);
+        IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int count, int? categoryId, out int pagesCount, out int totalItemsCount);
         TradingLotDTO GetLotById(int id);
         IEnumerable<TradingLotDTO> FindLotsByCategoryName(string categoryName);
         void ChangeLotCategory(int lotId, int categoryId);

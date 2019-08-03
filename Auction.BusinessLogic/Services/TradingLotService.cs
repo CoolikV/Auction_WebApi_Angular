@@ -131,13 +131,13 @@ namespace Auction.BusinessLogic.Services
             return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsInCategory);
         }
 
-        public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, string category,
+        public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? category,
             out int pagesCount, out int totalItemsCount)
         {
             var source = Database.TradingLots.Entities;
 
-            if (!string.IsNullOrEmpty(category))
-                source = source.Where(l => l.Category.Name.Equals(category));
+            if (category.HasValue)
+                source = source.Where(l => l.Category.Id.Equals(category.Value));
 
             totalItemsCount = source.Count();
             pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
@@ -145,6 +145,8 @@ namespace Auction.BusinessLogic.Services
                 .Skip((pageNum - 1) * pageSize)
                 .Take(pageSize)
                 .AsEnumerable();
+
+            var test = lotsForPage.ToList();
 
             return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsForPage);
         }

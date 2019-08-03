@@ -29,7 +29,7 @@ namespace Auction.BusinessLogic.Services
         public CategoryDTO GetCategoryById(int id)
         {
             var category = Database.Categories.GetCategoryById(id)
-                ?? throw new AuctionException("Category with such id does not exist");
+                ?? throw new NotFoundException($"Category with id: {id}");
 
             return Adapter.Adapt<CategoryDTO>(category);
         }
