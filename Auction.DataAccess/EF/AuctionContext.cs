@@ -29,7 +29,7 @@ namespace Auction.DataAccess.EF
                 context.Roles.Add(new IdentityRole("user"));
                 var user = new AppUser() { UserName = "coolik" };
                 context.Users.Add(user);
-                var userProf = new UserProfile() { Id = user.Id, Name = "coolik1" ,BirthDate = DateTime.Now};
+                var userProf = new UserProfile() { Id = user.Id, Name = "coolik1" , BirthDate = DateTime.Now , UserName = "coolik1"};
                 context.UserProfiles.Add(userProf);
                 context.Categories.Add(new Category() { Id = 1, Name = "Category 1" });
                 context.Categories.Add(new Category() { Id = 2, Name = "Category 2" });
