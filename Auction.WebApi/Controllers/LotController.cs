@@ -49,9 +49,9 @@ namespace Auction.WebApi.Controllers
 
                 lotService.CreateLot(lotDto);
             }
-            catch (NotFoundException ex)
+            catch (NotFoundException)
             {
-                return BadRequest(ex.Message);
+                return NotFound();
             }
             catch (AuctionException ex)
             {
