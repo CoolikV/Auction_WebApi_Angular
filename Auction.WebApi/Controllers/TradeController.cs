@@ -72,7 +72,7 @@ namespace Auction.WebApi.Controllers
             return Ok(_adapter.Adapt<IEnumerable<TradeModel>>(tradesForPage));
         }
 
-        [HttpPut]
+        [HttpPost]
         [Route("{lotId:int}")]
         [Authorize()]
         public IHttpActionResult StartTrade(int lotId)
@@ -86,6 +86,28 @@ namespace Auction.WebApi.Controllers
                 return NotFound();
             }
             catch (AuctionException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("")]
+        [Authorize]
+        public IHttpActionResult Rate([FromBody] RateModel rate)
+        {
+            try
+            {
+                var userId = userManager.GetUserByName(User.Identity.Name).Id;
+                tradeService.RateTradingLot(rate.TradeId, userId, rate.Sum);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+            catch(AuctionException ex)
             {
                 return BadRequest(ex.Message);
             }

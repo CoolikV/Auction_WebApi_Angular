@@ -41,14 +41,11 @@ namespace Auction.WebApi.Controllers
             try
             {
                 //REFACTORING
-                var currentUserName = Request.GetOwinContext().Request.User.Identity.Name;
-                var currentUser = userManager.GetUserByName(currentUserName);
-
                 var lotDto = _adapter.Adapt<TradingLotDTO>(newTradingLot);
 
                 lotDto.Category = categoryService.GetCategoryById(newTradingLot.CategoryId);
 
-                lotDto.User = currentUser;
+                lotDto.User = userManager.GetUserByName(User.Identity.Name);
 
                 lotService.CreateLot(lotDto);
             }
