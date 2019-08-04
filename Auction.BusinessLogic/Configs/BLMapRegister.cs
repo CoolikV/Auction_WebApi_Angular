@@ -8,7 +8,7 @@ namespace Auction.BusinessLogic.Configs
     {
         public void Register(TypeAdapterConfig config)
         {
-            config.NewConfig<CategoryDTO, Category>().TwoWays();
+            config.NewConfig<CategoryDTO, Category>().MaxDepth(3).IgnoreNullValues(true).TwoWays();
 
             config.NewConfig<TradeDTO, Trade>().TwoWays();
 
