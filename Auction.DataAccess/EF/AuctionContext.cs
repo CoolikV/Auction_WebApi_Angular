@@ -29,7 +29,7 @@ namespace Auction.DataAccess.EF
                 context.Roles.Add(new IdentityRole("user"));
                 var user = new AppUser() { UserName = "coolik" };
                 context.Users.Add(user);
-                var userProf = new UserProfile() { Id = user.Id, Name = "coolik1" , BirthDate = DateTime.Now , UserName = "coolik1"};
+                var userProf = new UserProfile() { Id = user.Id, Name = "coolik1" , BirthDate = DateTime.Now , UserName = "coolik1", Surname = "surname"};
                 context.UserProfiles.Add(userProf);
                 context.Categories.Add(new Category() { Id = 1, Name = "Category 1" });
                 context.Categories.Add(new Category() { Id = 2, Name = "Category 2" });
@@ -37,7 +37,7 @@ namespace Auction.DataAccess.EF
 
                 context.TradingLots.AddRange(new List<TradingLot>()
                 {
-                    new TradingLot(){CategoryId = 1, User = userProf},
+                    new TradingLot(){CategoryId = 1, User = userProf,IsVerified = true, Name = "Name1", Img = new byte[13], Description = "Desc"},
                     new TradingLot(){CategoryId = 1, User = userProf},
                     new TradingLot(){CategoryId = 1, User = userProf},
                     new TradingLot(){CategoryId = 1, User = userProf},
