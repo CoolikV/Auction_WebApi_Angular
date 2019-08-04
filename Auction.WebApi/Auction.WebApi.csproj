@@ -215,7 +215,8 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\LotsController.cs" />
+    <Compile Include="Controllers\LotController.cs" />
+    <Compile Include="Controllers\TradeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -223,7 +224,9 @@
     <Compile Include="Models\CategoryModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\PagingParameterModel.cs" />
+    <Compile Include="Models\RateModel.cs" />
     <Compile Include="Models\RegisterModel.cs" />
+    <Compile Include="Models\TradeModel.cs" />
     <Compile Include="Models\TradingLotModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\AppOAuthProvider.cs" />
