@@ -25,6 +25,9 @@ namespace Auction.WebApi.App_Start
             config.NewConfig<CategoryModel, CategoryDTO>().MaxDepth(4);
 
             config.NewConfig<CategoryDTO, CategoryModel>().MaxDepth(4);
+
+            config.NewConfig<TradeDTO, TradeModel>()
+                .Map(dest => dest.DaysLeft, src => src.TradeEnd.Subtract(src.TradeStart).Days);
         }
     }
 }
