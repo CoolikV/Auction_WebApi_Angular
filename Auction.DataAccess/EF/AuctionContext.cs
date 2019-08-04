@@ -37,7 +37,7 @@ namespace Auction.DataAccess.EF
 
                 context.TradingLots.AddRange(new List<TradingLot>()
                 {
-                    new TradingLot(){CategoryId = 1, User = userProf,IsVerified = true, Name = "Name1", Img = new byte[13], Description = "Desc"},
+                    new TradingLot(){CategoryId = 1, User = userProf,IsVerified = true, Name = "Name1", Img = new byte[13], Description = "Desc", TradeDuration = 10},
                     new TradingLot(){CategoryId = 1, User = userProf},
                     new TradingLot(){CategoryId = 1, User = userProf},
                     new TradingLot(){CategoryId = 1, User = userProf},
