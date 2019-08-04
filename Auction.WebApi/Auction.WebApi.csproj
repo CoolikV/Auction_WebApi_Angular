@@ -216,10 +216,10 @@
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LotsController.cs" />
+    <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\PaginationHelper.cs" />
     <Compile Include="Models\CategoryModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Models\PagingParameterModel.cs" />
