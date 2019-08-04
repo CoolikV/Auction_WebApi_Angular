@@ -50,11 +50,11 @@ namespace Auction.BusinessLogic.Services
 
         public void RateTradingLot(int tradeId, string userId, double price)
         {
-            Trade trade = Database.Trades.GetTradeById(tradeId);
-            UserProfile user = Database.Users.GetUserById(userId);
+            Trade trade = Database.Trades.GetTradeById(tradeId)
+                ?? throw new NotFoundException($"Trade with id: {tradeId}");
 
-            if (trade == null || user == null)
-                throw new ArgumentNullException();
+            UserProfile user = Database.Users.GetUserById(userId) 
+                ?? throw new NotFoundException($"User with id: {userId}");
 
             if (trade.TradingLot.User.Id == user.Id)
                 throw new AuctionException("This is your lot");
@@ -62,11 +62,7 @@ namespace Auction.BusinessLogic.Services
             if (DateTime.Now.CompareTo(trade.TradeEnd) >= 0)
                 throw new AuctionException("This trade is over");
 
-            bool isNew = true;
-
-            foreach (var el in user.Trades)
-                if (el.Id == trade.Id)
-                    isNew = false;
+            bool isNew = user.Trades.All(t => !t.Id.Equals(trade.Id));
 
             if (trade.LastPrice < price)
             {
