@@ -19,14 +19,12 @@ namespace Auction.WebApi.Controllers
         readonly IAdapter _adapter;
 
         readonly ITradingLotService lotService;
-        readonly IUserManager userManager;
         readonly ICategoryService categoryService;
 
-        public CategoryController(IAdapter adapter, ITradingLotService lotService, IUserManager userManager, ICategoryService categoryService)
+        public CategoryController(IAdapter adapter, ITradingLotService lotService, ICategoryService categoryService)
         {
             _adapter = adapter;
             this.lotService = lotService;
-            this.userManager = userManager;
             this.categoryService = categoryService;
         }
 
