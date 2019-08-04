@@ -1,8 +1,12 @@
 ﻿using Auction.BusinessLogic.DataTransfer;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
+using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
 using Mapster;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Web;
 using System.Web.Http;
 
 namespace Auction.WebApi.Controllers
@@ -47,9 +51,25 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [Route("")]
         [Authorize()]
-        public IHttpActionResult GetTrades()
+        public IHttpActionResult GetTrades([FromUri] PagingParameterModel pagingParameter, int? category)
         {
+            IEnumerable<TradeDTO> tradesForPage;
+            try
+            {
+                tradesForPage = tradeService.GetTradesForPage(pagingParameter?.PageNumber ?? 1,
+                    pagingParameter?.PageSize ?? 10, category, out int pagesCount, out int totalItemsCount);
 
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
+                totalItemsCount, pagesCount));
+
+                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok(_adapter.Adapt<IEnumerable<TradeModel>>(tradesForPage));
         }
 
         [HttpPut]

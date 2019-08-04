@@ -132,5 +132,26 @@ namespace Auction.BusinessLogic.Services
 
             return Adapter.Adapt<List<TradeDTO>>(list);
         }
+
+        public IEnumerable<TradeDTO> GetTradesForPage(int pageNum, int pageSize, int? category,
+            out int pagesCount, out int totalItemsCount)
+        {
+            var source = Database.Trades.Entities;
+
+            if (category.HasValue)
+                source = source.Where(t => t.TradingLot.CategoryId.Equals(category.Value));
+
+            totalItemsCount = source.Count();
+            if (totalItemsCount < 1)
+                throw new NotFoundException();
+
+            pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
+            var tradesForPage = source.OrderBy(t => t.TradeEnd)
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .AsEnumerable();
+
+            return Adapter.Adapt<IEnumerable<TradeDTO>>(tradesForPage);
+        }
     }
 }

@@ -140,13 +140,14 @@ namespace Auction.BusinessLogic.Services
                 source = source.Where(l => l.Category.Id.Equals(category.Value));
 
             totalItemsCount = source.Count();
+            if (totalItemsCount < 1)
+                throw new NotFoundException();
+
             pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
             var lotsForPage = source.OrderBy(l => l.TradeDuration)
                 .Skip((pageNum - 1) * pageSize)
                 .Take(pageSize)
                 .AsEnumerable();
-
-            var test = lotsForPage.ToList();
 
             return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsForPage);
         }
