@@ -18,7 +18,7 @@ namespace Auction.BusinessLogic.Services
         public TradeService(IUnitOfWork uow, IAdapter adapter)
         {
             Database = uow;
-            Adapter = Adapter;
+            Adapter = adapter;
         }
 
         public void Dispose()
@@ -28,12 +28,10 @@ namespace Auction.BusinessLogic.Services
 
         public void StartTrade(int lotId)
         {
-            var lot = Database.TradingLots.GetTradingLotById(lotId);
+            var lot = Database.TradingLots.GetTradingLotById(lotId)
+                ?? throw new NotFoundException($"Lot with id: {lotId}");
 
-            if (lot == null)
-                throw new ArgumentNullException();
-
-            if (GetTradeByLotId(lotId) != null)
+            if (IsTradeForLotAlreadyStarted(lotId))
                 throw new AuctionException($"Trade for lot: {lot.Name} has already began");
 
             if (!lot.IsVerified)
@@ -41,6 +39,7 @@ namespace Auction.BusinessLogic.Services
 
             Database.Trades.AddTrade(new Trade
             {
+                LotId = lotId,
                 TradingLot = lot,
                 TradeStart = DateTime.Now,
                 TradeEnd = DateTime.Now.AddDays(lot.TradeDuration)
@@ -91,12 +90,23 @@ namespace Auction.BusinessLogic.Services
 
         public TradeDTO GetTradeById(int id)
         {
-            return Adapter.Adapt<TradeDTO>(Database.Trades.GetTradeById(id));
+            var lot = Database.Trades.GetTradeById(id)
+                ?? throw new NotFoundException($"Trade with id: {id}");
+
+            return Adapter.Adapt<TradeDTO>(lot);
+        }
+
+        private bool IsTradeForLotAlreadyStarted(int lotId)
+        {
+            return Database.Trades.Entities.Any(t => t.LotId.Equals(lotId));
         }
 
         public TradeDTO GetTradeByLotId(int id)
         {
-            return Adapter.Adapt<TradeDTO>(Database.Trades.FindTrades(t => t.LotId == id).FirstOrDefault());
+            var tradePoco = Database.Trades.FindTrades(t => t.LotId == id).FirstOrDefault();
+
+            var a = Adapter.Adapt<TradeDTO>(tradePoco);
+            return a;
         }
 
         public IEnumerable<TradeDTO> GetUserLoseTrades(string userId)
