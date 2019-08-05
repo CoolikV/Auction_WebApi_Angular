@@ -8,6 +8,7 @@ using Auction.DataAccess.Interfaces;
 using Mapster;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security.OAuth;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -44,11 +45,11 @@ namespace Auction.BusinessLogic.Services
 
                 Database.Users.AddUser(clientProfile);
                 await Database.SaveAsync();
-                return new OperationDetails(true, "Регистрация успешно пройдена", "");
+                return new OperationDetails(true, "Registration successful", "");
             }
             else
             {
-                return new OperationDetails(false, "Пользователь с таким логином уже существует", "Email");
+                return new OperationDetails(false, "User with such email already exists", "Email");
             }
         }
 
@@ -81,16 +82,13 @@ namespace Auction.BusinessLogic.Services
 
         public UserDTO GetUserByName(string name)
         {
-            var appUser = Database.UserManager.FindByName(name) 
-                ?? throw new NotFoundException($"User with name {name}");
-
-            return Adapter.Adapt<UserDTO>(appUser);
+            return Adapter.Adapt<UserDTO>(FindUserByName(name));
         }
 
         public async Task EditUserRoleAsync(string userId, string newRoleName)
         {
             var appUser = await Database.UserManager.FindByIdAsync(userId)
-                ?? throw new NotFoundException();
+                ?? throw new NotFoundException($"User with id: {userId}");
 
             var currentUserRole = GetRoleNameForUser(userId);
 
@@ -117,10 +115,65 @@ namespace Auction.BusinessLogic.Services
             return role;
         }
 
+        public async Task<OperationDetails> DeleteUserAccount(string userId)
+        {
+            var userProfile = FindUserById(userId).User;
+            var user = FindUserById(userId);
+
+            Database.Users.DeleteUser(userProfile);
+            var operationResult = await Database.UserManager.DeleteAsync(user);
+
+            if (operationResult.Errors.Count() > 0)
+                return new OperationDetails(false, operationResult.Errors.FirstOrDefault(), "");
+
+            await Database.SaveAsync();
+
+            return new OperationDetails(true, $"User account with id: {userId} was successfuly deleted", "");
+        }
+
+        public UserDTO GetUserProfileById(string id)
+        {
+            var userProfile = FindUserById(id).User;
+
+            return Adapter.Adapt<UserDTO>(userProfile);
+        }
+
+        public UserDTO GetUserProfileByEmail(string email)
+        {
+            var userProfile = FindUserByName(email).User;
+
+            return Adapter.Adapt<UserDTO>(userProfile);
+        }
+
+        public void EditUserProfile(string id, UserDTO user)
+        {
+            var userProfile = FindUserById(id).User;
+
+            userProfile = Adapter.Adapt<UserProfile>(user);
+
+            Database.Users.UpdadeUser(userProfile);
+        }
+
+        #region Helper methods
+        private AppUser FindUserByName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("User name not valid", nameof(name));
+
+            return Database.UserManager.FindByName(name)
+                ?? throw new NotFoundException($"User with name {name}");
+        }
+
+        private AppUser FindUserById(string userId)
+        {
+            return Database.UserManager.FindById(userId)
+                ?? throw new NotFoundException($"User with id: {userId}");
+        }
+        #endregion
+
         public void Dispose()
         {
             Database.Dispose();
         }
-
     }
 }

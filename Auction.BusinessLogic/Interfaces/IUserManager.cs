@@ -13,7 +13,11 @@ namespace Auction.BusinessLogic.Interfaces
         IEnumerable<UserDTO> GetAllUsers();
         Task<ClaimsIdentity> Authenticate(string username, string password);
         UserDTO GetUserByName(string name);
+        UserDTO GetUserProfileById(string userId);
+        UserDTO GetUserProfileByEmail(string email);
         Task EditUserRoleAsync(string userId, string newRoleName);
         IEnumerable<string> GetAllRoles();
+        Task<OperationDetails> DeleteUserAccount(string userId);
+        void EditUserProfile(string userId, UserDTO user);
     }
 }
