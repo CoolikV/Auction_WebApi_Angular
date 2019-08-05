@@ -1,12 +1,16 @@
 ﻿using Auction.BusinessLogic.DataTransfer;
+using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
+using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
 using Mapster;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 
 namespace Auction.WebApi.Controllers
@@ -37,13 +41,12 @@ namespace Auction.WebApi.Controllers
         [Route("")]
         public IHttpActionResult GetProfileInfo()
         {
-            var user = CurrentUser;
             return Ok(_adapter.Adapt<UserProfileModel>(CurrentUser));
         }
 
         [HttpGet]
         [Route("lots")]
-        public IEnumerable<TradingLotModel> GetUserLots()
+        public IEnumerable<TradingLotModel> GetUserLots(PagingParameterModel pagingParameter)
         {
             return _adapter.Adapt<IEnumerable<TradingLotModel>>(CurrentUser.TradingLots);
         }
@@ -53,7 +56,23 @@ namespace Auction.WebApi.Controllers
         [Route("trades")]
         public IHttpActionResult GetTrades(PagingParameterModel pagingParameter, string state)
         {
-            return null;
+            IEnumerable<TradeDTO> tradesForPage;
+            try
+            {
+                tradesForPage = tradeService.GetTradesForPage(CurrentUser.Id, pagingParameter?.PageNumber ?? 1,
+                    pagingParameter?.PageSize ?? 10, state, out int pagesCount, out int totalItemsCount);
+
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
+                totalItemsCount, pagesCount));
+
+                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok(_adapter.Adapt<IEnumerable<TradeModel>>(tradesForPage));
         }
     }
 }

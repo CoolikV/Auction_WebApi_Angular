@@ -129,13 +129,25 @@ namespace Auction.BusinessLogic.Services
             return Adapter.Adapt<List<TradeDTO>>(list);
         }
 
-        public IEnumerable<TradeDTO> GetTradesForPage(int pageNum, int pageSize, int? category,
+        public IEnumerable<TradeDTO> GetTradesForPage(string userId, int pageNum, int pageSize, string tradeState,
             out int pagesCount, out int totalItemsCount)
         {
-            var source = Database.Trades.Entities;
-
-            if (category.HasValue)
-                source = source.Where(t => t.TradingLot.CategoryId.Equals(category.Value));
+            IQueryable<Trade> source;
+            switch (tradeState)
+            {
+                case "won":
+                    source = UserWinTrades(userId);
+                    break;
+                case "lose":
+                    source = UserLoseTrades(userId);
+                    break;
+                case "all":
+                    source = UserTrades(userId);
+                    break;
+                default:
+                    source = Database.Trades.Entities;
+                    break;
+            };
 
             totalItemsCount = source.Count();
             if (totalItemsCount < 1)
@@ -149,5 +161,23 @@ namespace Auction.BusinessLogic.Services
 
             return Adapter.Adapt<IEnumerable<TradeDTO>>(tradesForPage);
         }
+
+        #region Queries
+        private IQueryable<Trade> UserWinTrades(string userId)
+        {
+            return Database.Trades.Entities.Where(t => t.LastRateUserId == userId && DateTime.Now.CompareTo(t.TradeEnd) >= 0);
+        }
+
+        private IQueryable<Trade> UserLoseTrades(string userId)
+        {
+            return UserTrades(userId).Where(t => t.LastRateUserId != userId && DateTime.Now.CompareTo(t.TradeEnd) >= 0);
+        }
+
+        private IQueryable<Trade> UserTrades(string userId)
+        {
+            IEnumerable<int> userTradesId = Database.Users.GetUserById(userId).Trades.Select(t => t.Id);
+            return Database.Trades.Entities.Where(t => userTradesId.Contains(t.Id));//check work maybe "contains" is a wrong method
+        }
+        #endregion
     }
 }

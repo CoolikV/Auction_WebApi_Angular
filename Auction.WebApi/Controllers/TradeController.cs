@@ -12,6 +12,7 @@ using System.Web.Http;
 namespace Auction.WebApi.Controllers
 {
     [RoutePrefix("api/trades")]
+    [Authorize]
     public class TradeController : ApiController
     {
         readonly IAdapter _adapter;
@@ -32,7 +33,7 @@ namespace Auction.WebApi.Controllers
 
         [HttpGet]
         [Route("{id:int}")]
-        [Authorize()]
+        [AllowAnonymous]
         public IHttpActionResult GetTradeById(int id)
         {
             TradeDTO tradeDto; 
@@ -47,17 +48,17 @@ namespace Auction.WebApi.Controllers
 
             return Ok(_adapter.Adapt<TradeModel>(tradeDto));
         }
-
+        //change methods for get trades with pagination 
         [HttpGet]
         [Route("")]
-        [Authorize()]
-        public IHttpActionResult GetTrades([FromUri] PagingParameterModel pagingParameter, int? category)
+        [AllowAnonymous]
+        public IHttpActionResult GetTrades([FromUri] PagingParameterModel pagingParameter, string state)
         {
             IEnumerable<TradeDTO> tradesForPage;
             try
             {
-                tradesForPage = tradeService.GetTradesForPage(pagingParameter?.PageNumber ?? 1,
-                    pagingParameter?.PageSize ?? 10, category, out int pagesCount, out int totalItemsCount);
+                tradesForPage = tradeService.GetTradesForPage(null,pagingParameter?.PageNumber ?? 1,
+                    pagingParameter?.PageSize ?? 10, null, out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
                 totalItemsCount, pagesCount));
