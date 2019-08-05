@@ -28,6 +28,8 @@ namespace Auction.WebApi.App_Start
 
             config.NewConfig<TradeDTO, TradeModel>()
                 .Map(dest => dest.DaysLeft, src => src.TradeEnd.Subtract(src.TradeStart).Days);
+
+            config.NewConfig<UserProfileModel, UserDTO>();
         }
     }
 }
