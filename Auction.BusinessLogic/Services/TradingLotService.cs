@@ -106,10 +106,8 @@ namespace Auction.BusinessLogic.Services
 
         public void VerifyLot(int lotId)
         {
-            TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
-
-            if (lot == null)
-                throw new ArgumentNullException(nameof(lot));
+            TradingLot lot = Database.TradingLots.GetTradingLotById(lotId)
+                ?? throw new NotFoundException($"Lot with id: {lotId}");
 
             lot.IsVerified = true;
 

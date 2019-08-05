@@ -1,15 +1,14 @@
 ﻿using Auction.BusinessLogic.DataTransfer;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
+using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
 using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Web;
 using System.Web.Http;
-using Auction.WebApi.Helpers;
 
 namespace Auction.WebApi.Controllers
 {

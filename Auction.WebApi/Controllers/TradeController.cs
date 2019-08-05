@@ -75,10 +75,11 @@ namespace Auction.WebApi.Controllers
         [HttpPost]
         [Route("{lotId:int}")]
         [Authorize()]
-        public IHttpActionResult StartTrade(int lotId)
+        public IHttpActionResult VerifyLotAndStartTrade(int lotId)
         {
             try
             {
+                lotService.VerifyLot(lotId);
                 tradeService.StartTrade(lotId);
             }
             catch (NotFoundException)
