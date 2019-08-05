@@ -138,7 +138,7 @@ namespace Auction.WebApi.Controllers
                 totalItemsCount, pagesCount));
 
                 HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
-            }//remove not found or add check for it
+            }
             catch (NotFoundException)
             {
                 return NotFound();

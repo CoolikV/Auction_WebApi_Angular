@@ -120,18 +120,26 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("")]
-        public IEnumerable<TradingLotModel> GetTradingLots([FromUri] PagingParameterModel pagingParameter, int? category)
+        public IHttpActionResult GetTradingLots([FromUri] PagingParameterModel pagingParameter, int? category)
         {
-            //maybe remove such constructions (pagingParameter?.PageNumber ?? 1 and pagingParameter?.PageSize ?? 10) inside method
-            var lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1,
-                pagingParameter?.PageSize ?? 10, category, out int pagesCount, out int totalItemsCount);
+            IEnumerable<TradingLotDTO> lotsForPage;
+            try
+            {
+                lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1,
+                    pagingParameter?.PageSize ?? 10, category, out int pagesCount, out int totalItemsCount);
 
-            string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter, 
-                totalItemsCount,pagesCount));
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter, 
+                    totalItemsCount,pagesCount));
 
-            HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
+                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
 
-            return _adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok(_adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage));
         }
 
         [HttpGet]
