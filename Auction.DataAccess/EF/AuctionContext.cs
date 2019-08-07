@@ -125,10 +125,14 @@ namespace Auction.DataAccess.EF
                 var user1 = new AppUser() { UserName = "user2" };
                 context.Users.Add(user);
                 context.Users.Add(user1);
-                var userProf = new UserProfile() { Id = user.Id, Name = "user1" , BirthDate = DateTime.Now , UserName = "userName1", Surname = "surname1"};
-                var userProf1 = new UserProfile() { Id = user1.Id, Name = "user2" , BirthDate = DateTime.Now , UserName = "userName2", Surname = "surname2"};
-                context.UserProfiles.Add(userProf);
-                context.UserProfiles.Add(userProf1);
+
+                var userProfiles = new List<UserProfile>()
+                {
+                    new UserProfile(){Id = user.Id, Name = "user1" , BirthDate = DateTime.Now , UserName = "userName1", Surname = "surname1"},
+                    new UserProfile() { Id = user1.Id, Name = "user2" , BirthDate = DateTime.Now , UserName = "userName2", Surname = "surname2"}
+                };
+
+                context.UserProfiles.AddRange(userProfiles);
                 context.SaveChanges();
 
                 List<Category> categories = new List<Category>()
@@ -155,81 +159,81 @@ namespace Auction.DataAccess.EF
                 var tradingLots = new List<TradingLot>()
                 {
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage1", Description = "Some shitty thing1", Img = "/", Price = 11.2, TradeDuration = 4,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage2", Description = "Some shitty thing1", Img = "/", Price = 12.2, TradeDuration = 4,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
 
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
 
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf},
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]},
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
-                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProf.Id, User = userProf}
+                        LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]}
                 };
                
                 context.SaveChanges();
