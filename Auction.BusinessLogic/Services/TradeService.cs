@@ -34,8 +34,8 @@ namespace Auction.BusinessLogic.Services
             if (IsTradeForLotAlreadyStarted(lotId))
                 throw new AuctionException($"Trade for lot: {lot.Name} has already began");
 
-            if (!lot.IsVerified)
-                throw new AuctionException("Lot is not verified");
+            //if (!lot.IsVerified)
+            //    throw new AuctionException("Lot is not verified");
 
             Database.Trades.AddTrade(new Trade
             {

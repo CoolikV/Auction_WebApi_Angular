@@ -49,8 +49,8 @@ namespace Auction.BusinessLogic.Services
             if (tradingLot == null)
                 throw new NotFoundException($"Trading lot with id : {lotId}");
 
-            if (tradingLot.IsVerified)
-                throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
+            //if (tradingLot.IsVerified)
+            //    throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
             //cant ignore null values in mapster
             //tradingLot = Adapter.Adapt<TradingLot>(lot);
 
@@ -109,7 +109,7 @@ namespace Auction.BusinessLogic.Services
             TradingLot lot = Database.TradingLots.GetTradingLotById(lotId)
                 ?? throw new NotFoundException($"Lot with id: {lotId}");
 
-            lot.IsVerified = true;
+            //lot.IsVerified = true;
 
             Database.TradingLots.UpdadeTradingLot(lot);
             Database.Save();
