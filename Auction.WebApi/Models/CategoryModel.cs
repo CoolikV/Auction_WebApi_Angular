@@ -7,7 +7,7 @@ namespace Auction.WebApi.Models
     {
         public int Id { get; set; }
         [Required]
-        [RegularExpression(@"^[А-Я,/а-я\s?]{4,25}$")]
+        [RegularExpression(@"^[А-Я,/а-я\s?]{4,50}$")]
         public string Name { get; set; }
 
         public ICollection<TradingLotModel> TradingLots { get; set; }
