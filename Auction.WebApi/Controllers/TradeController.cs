@@ -36,7 +36,7 @@ namespace Auction.WebApi.Controllers
         [AllowAnonymous]
         public IHttpActionResult GetTradeById(int id)
         {
-            TradeDTO tradeDto; 
+            TradeDTO tradeDto;
             try
             {
                 tradeDto = tradeService.GetTradeById(id);
@@ -52,7 +52,7 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [Route("")]
         [AllowAnonymous]
-        public IHttpActionResult GetTrades([FromUri] PagingParameterModel pagingParameter, string state)
+        public IHttpActionResult GetTrades([FromUri] PagingParameterModel pagingParameter, int category)
         {
             IEnumerable<TradeDTO> tradesForPage;
             try

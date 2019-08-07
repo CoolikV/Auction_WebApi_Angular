@@ -25,7 +25,7 @@ namespace Auction.BusinessLogic.Services
         {
             Database.Dispose();
         }
-
+        //add methods to find trades and use it instead database.trades.gettdaebyid(int id) and etc...
         public void StartTrade(int lotId)
         {
             var lot = Database.TradingLots.GetTradingLotById(lotId)
@@ -128,7 +128,7 @@ namespace Auction.BusinessLogic.Services
 
             return Adapter.Adapt<List<TradeDTO>>(list);
         }
-
+        //maybe break this method for smaller but more informative such as GetUserWinTrades...
         public IEnumerable<TradeDTO> GetTradesForPage(string userId, int pageNum, int pageSize, string tradeState,
             out int pagesCount, out int totalItemsCount)
         {
