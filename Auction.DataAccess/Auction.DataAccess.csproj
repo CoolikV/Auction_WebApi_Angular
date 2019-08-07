@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="EF\AuctionContext.cs" />
     <Compile Include="Entities\Category.cs" />
+    <Compile Include="Entities\Enums\LotStatus.cs" />
     <Compile Include="Entities\Trade.cs" />
     <Compile Include="Entities\TradingLot.cs" />
     <Compile Include="Entities\UserProfile.cs" />
