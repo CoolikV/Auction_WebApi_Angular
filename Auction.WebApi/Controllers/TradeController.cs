@@ -48,7 +48,7 @@ namespace Auction.WebApi.Controllers
 
             return Ok(_adapter.Adapt<TradeModel>(tradeDto));
         }
-        //change methods for get trades with pagination 
+        //CHANGE methods for get trades with pagination 
         [HttpGet]
         [Route("")]
         [AllowAnonymous]

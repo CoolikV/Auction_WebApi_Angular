@@ -67,23 +67,7 @@ namespace Auction.WebApi.Controllers
 
             return Ok();
         }
-
-        //[HttpPut]
-        //[Authorize(Roles ="manager,admin")]
-        //[Route("{id:int}/lots")]
-        //public IHttpActionResult MoveLotsToAnotherCategory(int id,[FromUri] int newCategoryId)
-        //{
-        //    try
-        //    {
-
-        //    }
-        //    catch (NotFoundException)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok();
-        //}
-
+ 
         [HttpDelete]
         //[Authorize(Roles ="manager,admin")]
         [Route("{id:int}")]
@@ -150,7 +134,7 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("{id:int}/lots/{lotId:int}")]
-        public IHttpActionResult GetLotForCategory(int id, int lotId, [FromUri] PagingParameterModel pagingParameter)
+        public IHttpActionResult GetLotForCategory(int id, int lotId)
         {
             TradingLotDTO lotDto;
             try
