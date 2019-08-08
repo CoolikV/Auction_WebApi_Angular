@@ -17,7 +17,10 @@ namespace Auction.DataAccess.EF
         public DbSet<Trade> Trades { get; set; }
         public DbSet<Category> Categories { get; set; }
 
-        public AuctionContext(string connectionString) : base(connectionString) { }
+        public AuctionContext(string connectionString) : base(connectionString)
+        {
+            Database.SetInitializer(new DbInitializer());
+        }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -27,11 +30,6 @@ namespace Auction.DataAccess.EF
             modelBuilder.Configurations.Add(new UserProfileConfiguration());
 
             base.OnModelCreating(modelBuilder);
-        }
-
-        static AuctionContext()
-        {
-            Database.SetInitializer(new DbInitializer());
         }
 
         public class DbInitializer : DropCreateDatabaseAlways<AuctionContext>
