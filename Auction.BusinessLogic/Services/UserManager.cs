@@ -43,7 +43,7 @@ namespace Auction.BusinessLogic.Services
                 var clientProfile = Adapter.Adapt<UserProfile>(userDto);
                 clientProfile.Id = user.Id;
 
-                Database.Users.AddUser(clientProfile);
+                Database.UserProfiles.CreateProfile(clientProfile);
                 await Database.SaveAsync();
                 return new OperationDetails(true, "Registration successful", "");
             }
@@ -117,10 +117,10 @@ namespace Auction.BusinessLogic.Services
 
         public async Task<OperationDetails> DeleteUserAccount(string userId)
         {
-            var userProfile = FindUserById(userId).User;
+            var userProfile = FindUserById(userId).UserProfile;
             var user = FindUserById(userId);
 
-            Database.Users.DeleteUser(userProfile);
+            Database.UserProfiles.DeleteProfile(userProfile);
             var operationResult = await Database.UserManager.DeleteAsync(user);
 
             if (operationResult.Errors.Count() > 0)
@@ -133,25 +133,25 @@ namespace Auction.BusinessLogic.Services
 
         public UserDTO GetUserProfileById(string id)
         {
-            var userProfile = FindUserById(id).User;
+            var userProfile = FindUserById(id).UserProfile;
 
             return Adapter.Adapt<UserDTO>(userProfile);
         }
 
         public UserDTO GetUserProfileByEmail(string email)
         {
-            var userProfile = FindUserByName(email).User;
+            var userProfile = FindUserByName(email).UserProfile;
 
             return Adapter.Adapt<UserDTO>(userProfile);
         }
 
         public void EditUserProfile(string id, UserDTO user)
         {
-            var userProfile = FindUserById(id).User;
+            var userProfile = FindUserById(id).UserProfile;
 
             userProfile = Adapter.Adapt<UserProfile>(user);
 
-            Database.Users.UpdadeUser(userProfile);
+            Database.UserProfiles.UpdateProfile(userProfile);
         }
 
         #region Helper methods

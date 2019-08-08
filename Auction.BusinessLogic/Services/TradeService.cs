@@ -53,7 +53,7 @@ namespace Auction.BusinessLogic.Services
             Trade trade = Database.Trades.GetTradeById(tradeId)
                 ?? throw new NotFoundException($"Trade with id: {tradeId}");
 
-            UserProfile user = Database.Users.GetUserById(userId) 
+            UserProfile user = Database.UserProfiles.GetProfileById(userId) 
                 ?? throw new NotFoundException($"User with id: {userId}");
 
             if (trade.TradingLot.User.Id == user.Id)
@@ -74,7 +74,7 @@ namespace Auction.BusinessLogic.Services
             else
                 throw new AuctionException($"Your price should be greater than: {trade.LastPrice}");
 
-            Database.Users.UpdadeUser(user);
+            Database.UserProfiles.UpdateProfile(user);
             Database.Trades.UpdadeTrade(trade);
             Database.Save();
         }
@@ -107,7 +107,7 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradeDTO> GetUserLoseTrades(string userId)
         {
-            var user = Database.Users.GetUserById(userId);
+            var user = Database.UserProfiles.GetProfileById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -119,7 +119,7 @@ namespace Auction.BusinessLogic.Services
 
         public IEnumerable<TradeDTO> GetUserWinTrades(string userId)
         {
-            var user = Database.Users.GetUserById(userId);
+            var user = Database.UserProfiles.GetProfileById(userId);
 
             if (user == null)
                 throw new ArgumentNullException();
@@ -175,7 +175,7 @@ namespace Auction.BusinessLogic.Services
 
         private IQueryable<Trade> UserTrades(string userId)
         {
-            IEnumerable<int> userTradesId = Database.Users.GetUserById(userId).Trades.Select(t => t.Id);
+            IEnumerable<int> userTradesId = Database.UserProfiles.GetProfileById(userId).Trades.Select(t => t.Id);
             return Database.Trades.Entities.Where(t => userTradesId.Contains(t.Id));//check work maybe "contains" is a wrong method
         }
         #endregion

@@ -5,6 +5,6 @@ namespace Auction.DataAccess.Identity.Entities
 {
     public class AppUser : IdentityUser
     {
-        public virtual UserProfile User { get; set; }
+        public virtual UserProfile UserProfile { get; set; }
     }
 }

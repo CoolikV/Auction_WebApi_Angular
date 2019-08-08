@@ -32,7 +32,7 @@ namespace Auction.BusinessLogic.Services
                 throw new ArgumentNullException(nameof(lot));
 
             var lotPoco = Adapter.Adapt<TradingLot>(lot);
-            lotPoco.User = Database.Users.GetUserById(lot.User.Id);
+            lotPoco.User = Database.UserProfiles.GetProfileById(lot.User.Id);
             lotPoco.Category = lot.Category is null ? Database.Categories.GetCategoryById(1) : Database.Categories.GetCategoryById(lot.Category.Id);
 
             Database.TradingLots.AddTradingLot(lotPoco);

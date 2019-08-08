@@ -13,7 +13,7 @@ namespace Auction.DataAccess.Interfaces
         ITradingLotRepository TradingLots { get; }
         ITradeRepository Trades { get; }
         ICategoryRepository Categories { get; }
-        IUserRepository Users { get; }
+        IUserProfileRepository UserProfiles { get; }
         void Save();
     }
 }
