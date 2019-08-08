@@ -116,24 +116,88 @@ namespace Auction.DataAccess.EF
         {
             protected override void Seed(AuctionContext context)
             {
-                context.Roles.Add(new IdentityRole("user"));
-                context.Roles.Add(new IdentityRole("admin"));
-                context.Roles.Add(new IdentityRole("manager"));
-
-                //think how to seed appusers and their profiles to use it when creating a lots
-                var user = new AppUser() { UserName = "user1",  };
-                var user1 = new AppUser() { UserName = "user2" };
-                context.Users.Add(user);
-                context.Users.Add(user1);
+                var roles = new List<IdentityRole>()
+                {
+                    new IdentityRole("user"),
+                    new IdentityRole("admin"),
+                    new IdentityRole("manager")
+                };
+                context.Roles.Add(roles[0]);
+                context.Roles.Add(roles[1]);
+                context.Roles.Add(roles[2]);
+                context.SaveChanges();
 
                 var userProfiles = new List<UserProfile>()
                 {
-                    new UserProfile(){Id = user.Id, Name = "user1" , BirthDate = DateTime.Now , UserName = "userName1", Surname = "surname1"},
-                    new UserProfile() { Id = user1.Id, Name = "user2" , BirthDate = DateTime.Now , UserName = "userName2", Surname = "surname2"}
+                    new UserProfile(){ Name = "Admin", Surname = "Adminovich", BirthDate = new DateTime(1999,2,27) },
+                    new UserProfile(){ Name = "Manager", Surname = "Managerovich", BirthDate = new DateTime(1991,9,20) },
+                    new UserProfile(){ Name = "Вася", Surname = "Пупкин", BirthDate = new DateTime(1976,1,10) },
+                    new UserProfile(){ Name = "Андрей", Surname = "Баранов", BirthDate = new DateTime(1988,11,24) },
+                    new UserProfile(){ Name = "Антон", Surname = "Якушев", BirthDate = new DateTime(1994,6,13) },
+                    new UserProfile(){ Name = "Владимир", Surname = "Гусев", BirthDate = new DateTime(1965,3,12) },
+                    new UserProfile(){ Name = "Анатолий", Surname = "Коновалов", BirthDate = new DateTime(1987,4,23) },
+                    new UserProfile(){ Name = "Александр", Surname = "Туров", BirthDate = new DateTime(1983,9,26) },
+                    new UserProfile(){ Name = "Виктор", Surname = "Сафонов", BirthDate = new DateTime(1998,12,29) },
+                    new UserProfile(){ Name = "Иван", Surname = "Филиппов", BirthDate = new DateTime(1974,11,1) },
+                    new UserProfile(){ Name = "Александр", Surname = "Самсонов", BirthDate = new DateTime(1966,5,4) },
+                    new UserProfile(){ Name = "Даниил", Surname = "Родионов", BirthDate = new DateTime(1989,10,20) },
+                    new UserProfile(){ Name = "Юрий", Surname = "Евсеев", BirthDate = new DateTime(1999,10,21) },
                 };
 
+                var hasher = new Microsoft.AspNet.Identity.PasswordHasher();
+                var userAccounts = new List<AppUser>()
+                {
+                    new AppUser(){ UserName = "admin", Email = "admin@gmail.com", UserProfile = userProfiles[0], PasswordHash = hasher.HashPassword("admin1999ad") },
+                    new AppUser(){ UserName = "manager", Email = "manager@gmail.com", UserProfile = userProfiles[1], PasswordHash = hasher.HashPassword("manager1999man") },
+                    new AppUser(){ UserName = "vasya", Email = "v_pupkin@gmail.com", UserProfile = userProfiles[2], PasswordHash = hasher.HashPassword("pupkin12345") },
+                    new AppUser(){ UserName = "andrey", Email = "a_baranov@gmail.com", UserProfile = userProfiles[3], PasswordHash = hasher.HashPassword("baranov12345") },
+                    new AppUser(){ UserName = "anton", Email = "a_yakushev@gmail.com", UserProfile = userProfiles[4], PasswordHash = hasher.HashPassword("yakushev12345") },
+                    new AppUser(){ UserName = "vladimir", Email = "v_gusev@gmail.com", UserProfile = userProfiles[5], PasswordHash = hasher.HashPassword("gusev12345") },
+                    new AppUser(){ UserName = "anatoliy", Email = "a_konovalov@gmail.com", UserProfile = userProfiles[6], PasswordHash = hasher.HashPassword("konovalov12345") },
+                    new AppUser(){ UserName = "alex", Email = "a_turov@gmail.com", UserProfile = userProfiles[7], PasswordHash = hasher.HashPassword("turov12345") },
+                    new AppUser(){ UserName = "viktor", Email = "v_safonov@gmail.com", UserProfile = userProfiles[8], PasswordHash = hasher.HashPassword("safonov12345") },
+                    new AppUser(){ UserName = "ivan", Email = "i_filipov@gmail.com", UserProfile = userProfiles[9], PasswordHash = hasher.HashPassword("filipov12345") },
+                    new AppUser(){ UserName = "alexandr", Email = "a_samsonov@gmail.com", UserProfile = userProfiles[10], PasswordHash = hasher.HashPassword("samsonov12345") },
+                    new AppUser(){ UserName = "daniyl", Email = "d_rodionov@gmail.com", UserProfile = userProfiles[11], PasswordHash = hasher.HashPassword("rodionov12345") },
+                    new AppUser(){ UserName = "yuriy", Email = "y_eseev@gmail.com", UserProfile = userProfiles[12], PasswordHash = hasher.HashPassword("essev12345") }
+                };
+                //think how to seed appusers and their profiles to use it when creating a lots
+
+                //SEEDING ID`S AND USERNAMES
+
+                int ind = 0;
+                foreach (var profile in userProfiles)
+                {
+                    userAccounts[ind].SecurityStamp = Guid.NewGuid().ToString();
+                    context.Users.Add(userAccounts[ind]);
+
+                    profile.AppUser = userAccounts[ind];
+                    profile.UserName = userAccounts[ind].UserName;
+                    profile.Id = userAccounts[ind].Id;
+
+                    ind++;
+                }
                 context.UserProfiles.AddRange(userProfiles);
                 context.SaveChanges();
+
+                
+                //ADDING USERS TO ROLES
+
+                ind = 0;
+                string[] commands = new string[userAccounts.Count];
+                foreach(var user in userAccounts)
+                {
+                    if (ind == 0)
+                        context.Database.ExecuteSqlCommand($@"INSERT INTO [dbo].[AspNetUserRoles] ([UserId] ,[RoleId]) VALUES ('{userAccounts[ind].Id}', '{roles[1].Id}')");
+                    else if (ind == 1)
+                        context.Database.ExecuteSqlCommand($@"INSERT INTO [dbo].[AspNetUserRoles] ([UserId] ,[RoleId]) VALUES ('{userAccounts[ind].Id}', '{roles[2].Id}')");
+                    else
+                        context.Database.ExecuteSqlCommand($@"INSERT INTO [dbo].[AspNetUserRoles] ([UserId] ,[RoleId]) VALUES ('{userAccounts[ind].Id}', '{roles[0].Id}')");
+                    ind++;
+                }
+                    
+                context.SaveChanges();
+
 
                 List<Category> categories = new List<Category>()
                 {
@@ -235,8 +299,9 @@ namespace Auction.DataAccess.EF
                     new TradingLot(){ Name = "Garbage", Description = "Some shitty thing", Img = "/", Price = 10.2, TradeDuration = 3,
                         LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]}
                 };
-               
+
                 context.SaveChanges();
+
             }
         }
     }

@@ -75,7 +75,7 @@
     <Compile Include="Repositories\TradeRepository.cs" />
     <Compile Include="Repositories\TradingLotRepository.cs" />
     <Compile Include="Repositories\UnitOfWork.cs" />
-    <Compile Include="Repositories\UserRepository.cs" />
+    <Compile Include="Repositories\UserProfileRepository.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
