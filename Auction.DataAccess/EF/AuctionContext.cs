@@ -1,5 +1,6 @@
 ﻿using Auction.DataAccess.Entities;
 using Auction.DataAccess.Entities.Enums;
+using Auction.DataAccess.EntityConfigurations;
 using Auction.DataAccess.Identity.Entities;
 using Auction.DataAccess.Interfaces;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -20,89 +21,10 @@ namespace Auction.DataAccess.EF
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            #region Trading lot constraints
-            modelBuilder.Entity<TradingLot>()
-                .Property(t => t.Name)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            modelBuilder.Entity<TradingLot>()
-                .Property(t => t.Description)
-                .IsOptional()
-                .HasMaxLength(150);
-
-            modelBuilder.Entity<TradingLot>()
-                .Property(t => t.Img)
-                .IsRequired();
-
-            modelBuilder.Entity<TradingLot>()
-                .Property(t => t.Price)
-                .IsRequired();
-
-            modelBuilder.Entity<TradingLot>()
-                .Property(t => t.TradeDuration)
-                .IsRequired();
-
-            modelBuilder.Entity<TradingLot>()
-                .Property(t => t.LotStatus)
-                .IsRequired();
-
-            modelBuilder.Entity<TradingLot>()
-                .HasRequired(t => t.Category);
-
-            modelBuilder.Entity<TradingLot>()
-                .HasRequired(t => t.User);
-            #endregion
-
-            #region Category constraints
-            modelBuilder.Entity<Category>()
-                .Property(c => c.Name)
-                .IsRequired()
-                .HasMaxLength(50);
-            #endregion
-
-            #region Trade constraints
-            modelBuilder.Entity<Trade>()
-                .Property(t => t.TradeStart)
-                .IsRequired();
-
-            modelBuilder.Entity<Trade>()
-                .Property(t => t.TradeEnd)
-                .IsRequired();
-
-            //NOT SHURE IS THAT RIGHT
-            //modelBuilder.Entity<Trade>()
-            //    .HasOptional(t => t.LastRated)
-            //    .WithOptionalDependent();
-            //NOT SHURE IS THAT RIGHT
-
-            modelBuilder.Entity<Trade>()
-                .HasRequired(t => t.TradingLot);
-            #endregion
-
-            #region User profile constraints
-            modelBuilder.Entity<UserProfile>()
-                .Property(u => u.Name)
-                .HasMaxLength(50)
-                .IsRequired();
-
-            modelBuilder.Entity<UserProfile>()
-                .Property(u => u.Surname)
-                .HasMaxLength(50)
-                .IsRequired();
-
-            modelBuilder.Entity<UserProfile>()
-                .Property(u => u.UserName)
-                .HasMaxLength(20)
-                .IsRequired();
-
-            modelBuilder.Entity<UserProfile>()
-                .Property(u => u.BirthDate)
-                .IsRequired();
-
-            modelBuilder.Entity<UserProfile>()
-                .HasRequired(u => u.AppUser);
-            #endregion
+            modelBuilder.Configurations.Add(new TradingLotConfiguration());
+            modelBuilder.Configurations.Add(new CategoryConfiguration());
+            modelBuilder.Configurations.Add(new TradeConfiguration());
+            modelBuilder.Configurations.Add(new UserProfileConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
@@ -161,9 +83,6 @@ namespace Auction.DataAccess.EF
                     new AppUser(){ UserName = "daniyl", Email = "d_rodionov@gmail.com", UserProfile = userProfiles[11], PasswordHash = hasher.HashPassword("rodionov12345") },
                     new AppUser(){ UserName = "yuriy", Email = "y_eseev@gmail.com", UserProfile = userProfiles[12], PasswordHash = hasher.HashPassword("essev12345") }
                 };
-                //think how to seed appusers and their profiles to use it when creating a lots
-
-                //SEEDING ID`S AND USERNAMES
 
                 int ind = 0;
                 foreach (var profile in userProfiles)
@@ -179,9 +98,6 @@ namespace Auction.DataAccess.EF
                 }
                 context.UserProfiles.AddRange(userProfiles);
                 context.SaveChanges();
-
-                
-                //ADDING USERS TO ROLES
 
                 ind = 0;
                 string[] commands = new string[userAccounts.Count];
@@ -300,8 +216,8 @@ namespace Auction.DataAccess.EF
                         LotStatus = LotStatus.NotVerified, CategoryId = categories[0].Id, Category = categories[0], UserId = userProfiles[0].Id, User = userProfiles[0]}
                 };
 
+                context.TradingLots.AddRange(tradingLots);
                 context.SaveChanges();
-
             }
         }
     }
