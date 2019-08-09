@@ -21,28 +21,73 @@ namespace Auction.DataAccess.Repositories
 
         public IQueryable<UserProfile> Entities => dbSet;
 
+        public UserProfile GetProfileById(string id)
+        {
+            try
+            {
+                return dbSet.Find(id);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public void CreateProfile(UserProfile user)
         {
-            dbSet.Add(user);
+            try
+            {
+                dbSet.Add(user);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void UpdateProfile(UserProfile user)
+        {
+            try
+            {
+                dbSet.Attach(user);
+                Database.Entry(user).State = EntityState.Modified;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void DeleteProfile(UserProfile user)
         {
-            if (Database.Entry(user).State == EntityState.Detached)
-                dbSet.Attach(user);
+            try
+            {
+                if (Database.Entry(user).State == EntityState.Detached)
+                    dbSet.Attach(user);
 
-            dbSet.Remove(user);
+                dbSet.Remove(user);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void DeleteProfileById(string id)
         {
-            UserProfile user = dbSet.Find(id);
-            DeleteProfile(user);
+            try
+            {
+                UserProfile user = dbSet.Find(id);
+                DeleteProfile(user);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public IEnumerable<UserProfile> FindProfiles(Expression<Func<UserProfile, bool>> filter = null,
-            Func<IQueryable<UserProfile>, IOrderedQueryable<UserProfile>> orderBy = null,
-            string includeProperties = "")
+            Func<IQueryable<UserProfile>, IOrderedQueryable<UserProfile>> orderBy = null)
         {
             IQueryable<UserProfile> query = dbSet;
 
@@ -50,13 +95,6 @@ namespace Auction.DataAccess.Repositories
             {
                 query = query.Where(filter);
             }
-
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty);
-            }
-
             if (orderBy != null)
             {
                 return orderBy(query).ToList();
@@ -65,17 +103,6 @@ namespace Auction.DataAccess.Repositories
             {
                 return query.ToList();
             }
-        }
-
-        public UserProfile GetProfileById(string id)
-        {
-            return dbSet.Find(id);
-        }
-
-        public void UpdateProfile(UserProfile user)
-        {
-            dbSet.Attach(user);
-            Database.Entry(user).State = EntityState.Modified;
         }
 
         public void Dispose()

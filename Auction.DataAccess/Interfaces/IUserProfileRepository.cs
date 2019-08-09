@@ -13,8 +13,7 @@ namespace Auction.DataAccess.Interfaces
         void DeleteProfile(UserProfile user);
         void DeleteProfileById(string id);
         IEnumerable<UserProfile> FindProfiles(Expression<Func<UserProfile, bool>> filter = null,
-            Func<IQueryable<UserProfile>, IOrderedQueryable<UserProfile>> orderBy = null,
-            string includeProperties = "");
+            Func<IQueryable<UserProfile>, IOrderedQueryable<UserProfile>> orderBy = null);
         IQueryable<UserProfile> Entities { get; }
     }
 }
