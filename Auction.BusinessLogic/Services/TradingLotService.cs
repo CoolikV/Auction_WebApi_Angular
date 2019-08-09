@@ -44,10 +44,7 @@ namespace Auction.BusinessLogic.Services
             if (lot == null)
                 throw new ArgumentNullException(nameof(lot));
 
-            var tradingLot = Database.TradingLots.GetTradingLotById(lotId);
-
-            if (tradingLot == null)
-                throw new NotFoundException($"Trading lot with id : {lotId}");
+            var tradingLot = FindTradingLotById(lotId);
 
             //if (tradingLot.IsVerified)
             //    throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
@@ -60,14 +57,13 @@ namespace Auction.BusinessLogic.Services
             tradingLot.TradeDuration = lot.TradeDuration;
             tradingLot.Price = lot.Price;
 
-            Database.TradingLots.UpdadeTradingLot(tradingLot);
+            Database.TradingLots.UpdateTradingLot(tradingLot);
             Database.Save();
         }
 
         public void RemoveLotById(int lotId)
         {
-            TradingLot tradingLot = Database.TradingLots.GetTradingLotById(lotId)
-                ?? throw new NotFoundException($"Trading lot with id : {lotId}");
+            TradingLot tradingLot = FindTradingLotById(lotId);
 
             Database.TradingLots.DeleteTradingLotById(tradingLot.Id);
             Database.Save();
@@ -84,15 +80,14 @@ namespace Auction.BusinessLogic.Services
 
         public TradingLotDTO GetLotById(int lotId)
         {
-            var tradingLot = Database.TradingLots.GetTradingLotById(lotId)
-                ?? throw new NotFoundException($"Trading lot with id : {lotId}");
+            var tradingLot = FindTradingLotById(lotId);
 
             return Adapter.Adapt<TradingLotDTO>(tradingLot);
         }
 
         public void ChangeLotCategory(int lotId, int categoryId)
         {
-            TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
+            TradingLot lot = FindTradingLotById(lotId);
             Category category = Database.Categories.GetCategoryById(categoryId);
 
             if (lot == null || category == null)
@@ -100,18 +95,17 @@ namespace Auction.BusinessLogic.Services
 
             lot.Category = category;
 
-            Database.TradingLots.UpdadeTradingLot(lot);
+            Database.TradingLots.UpdateTradingLot(lot);
             Database.Save();
         }
 
         public void VerifyLot(int lotId)
         {
-            TradingLot lot = Database.TradingLots.GetTradingLotById(lotId)
-                ?? throw new NotFoundException($"Lot with id: {lotId}");
+            TradingLot lot = FindTradingLotById(lotId);
 
             //lot.IsVerified = true;
 
-            Database.TradingLots.UpdadeTradingLot(lot);
+            Database.TradingLots.UpdateTradingLot(lot);
             Database.Save();
         }
 
@@ -148,6 +142,12 @@ namespace Auction.BusinessLogic.Services
                 .AsEnumerable();
 
             return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsForPage);
+        }
+
+        private TradingLot FindTradingLotById(int id)
+        {
+            return Database.TradingLots.GetTradingLotById(id)
+                ?? throw new NotFoundException($"Lot with id: {id}");
         }
     }
 }

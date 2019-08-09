@@ -70,7 +70,7 @@ namespace Auction.BusinessLogic.Services
             tradingLots.ToList().ForEach(lot => {
                 lot.Category = defaultCat;
                 lot.CategoryId = defaultCat.Id;
-                Database.TradingLots.UpdadeTradingLot(lot);
+                Database.TradingLots.UpdateTradingLot(lot);
             } );
         }
 
@@ -90,7 +90,7 @@ namespace Auction.BusinessLogic.Services
 
             updatedCategory.TradingLots = linq.ToList();
 
-            Database.Categories.UpdadeCategory(updatedCategory);
+            Database.Categories.UpdateCategory(updatedCategory);
             Database.Save();
         }
 
@@ -104,7 +104,7 @@ namespace Auction.BusinessLogic.Services
 
             temp.Name = name;
 
-            Database.Categories.UpdadeCategory(temp);
+            Database.Categories.UpdateCategory(temp);
             Database.Save();
         }
 

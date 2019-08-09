@@ -75,7 +75,7 @@ namespace Auction.BusinessLogic.Services
                 throw new AuctionException($"Your price should be greater than: {trade.LastPrice}");
 
             Database.UserProfiles.UpdateProfile(user);
-            Database.Trades.UpdadeTrade(trade);
+            Database.Trades.UpdateTrade(trade);
             Database.Save();
         }
 
