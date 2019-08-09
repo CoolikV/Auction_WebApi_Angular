@@ -1,8 +1,6 @@
-﻿using Auction.DataAccess.EF;
-using Auction.DataAccess.Entities;
+﻿using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
