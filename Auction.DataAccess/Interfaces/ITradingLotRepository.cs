@@ -13,8 +13,6 @@ namespace Auction.DataAccess.Interfaces
         void UpdateTradingLot(TradingLot tradingLot);
         void DeleteTradingLotById(int id);
         void DeleteTradingLot(TradingLot tradingLot);
-        IEnumerable<TradingLot> FindTradingLots(Expression<Func<TradingLot, bool>> filter = null,
-            Func<IQueryable<TradingLot>, IOrderedQueryable<TradingLot>> orderBy = null);
-        IQueryable<TradingLot> Entities { get; }
+        IQueryable<TradingLot> FindTradingLots(Expression<Func<TradingLot, bool>> filter = null);
     }
 }

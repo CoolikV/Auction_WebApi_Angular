@@ -19,8 +19,6 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<UserProfile>();
         }
 
-        public IQueryable<UserProfile> Entities => dbSet;
-
         public UserProfile GetProfileById(string id)
         {
             try
@@ -86,23 +84,11 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public IEnumerable<UserProfile> FindProfiles(Expression<Func<UserProfile, bool>> filter = null,
-            Func<IQueryable<UserProfile>, IOrderedQueryable<UserProfile>> orderBy = null)
+        public IQueryable<UserProfile> FindProfiles(Expression<Func<UserProfile, bool>> filter = null)
         {
             IQueryable<UserProfile> query = dbSet;
 
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-            if (orderBy != null)
-            {
-                return orderBy(query).ToList();
-            }
-            else
-            {
-                return query.ToList();
-            }
+            return filter == null ? query : query.Where(filter);
         }
 
         public void Dispose()

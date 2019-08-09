@@ -14,8 +14,6 @@ namespace Auction.DataAccess.Interfaces
         void UpdateCategory(Category category);
         void DeleteCategoryById(int id);
         void DeleteCategory(Category category);
-        IEnumerable<Category> FindCategories(Expression<Func<Category, bool>> filter = null,
-            Func<IQueryable<Category>, IOrderedQueryable<Category>> orderBy = null);
-        IQueryable<Category> Entities { get; }
+        IQueryable<Category> FindCategories(Expression<Func<Category, bool>> filter = null);
     }
 }

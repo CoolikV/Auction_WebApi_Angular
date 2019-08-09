@@ -19,8 +19,6 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<Category>();
         }
 
-        public IQueryable<Category> Entities => dbSet;
-
         public Category GetCategoryById(int id)
         {
             try
@@ -57,6 +55,19 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
+        public void UpdateCategory(Category category)
+        {
+            try
+            {
+                dbSet.Attach(category);
+                Database.Entry(category).State = EntityState.Modified;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public void DeleteCategory(Category category)
         {
             try
@@ -84,36 +95,11 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public IEnumerable<Category> FindCategories(Expression<Func<Category, bool>> filter = null,
-            Func<IQueryable<Category>, IOrderedQueryable<Category>> orderBy = null)
+        public IQueryable<Category> FindCategories(Expression<Func<Category, bool>> filter = null)
         {
             IQueryable<Category> query = dbSet;
 
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-            if (orderBy != null)
-            {
-                return orderBy(query).ToList();
-            }
-            else
-            {
-                return query.ToList();
-            }
-        }
-
-        public void UpdateCategory(Category category)
-        {
-            try
-            {
-                dbSet.Attach(category);
-                Database.Entry(category).State = EntityState.Modified;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            return filter == null ? query : query.Where(filter);
         }
 
         public void Dispose()

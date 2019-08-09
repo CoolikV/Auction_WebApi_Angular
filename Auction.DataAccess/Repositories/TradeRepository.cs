@@ -20,8 +20,6 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<Trade>();
         }
 
-        public IQueryable<Trade> Entities => dbSet;
-
         public Trade GetTradeById(int id)
         {
             try
@@ -44,6 +42,20 @@ namespace Auction.DataAccess.Repositories
             {
                 throw ex;
             }
+        }
+
+        public void UpdateTrade(Trade trade)
+        {
+            try
+            {
+                dbSet.Attach(trade);
+                Database.Entry(trade).State = EntityState.Modified;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
         }
 
         public void DeleteTrade(Trade trade)
@@ -74,37 +86,11 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public IEnumerable<Trade> FindTrades(Expression<Func<Trade, bool>> filter = null,
-            Func<IQueryable<Trade>, IOrderedQueryable<Trade>> orderBy = null)
+        public IQueryable<Trade> FindTrades(Expression<Func<Trade, bool>> filter = null)
         {
             IQueryable<Trade> query = dbSet;
 
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-            if (orderBy != null)
-            {
-                return orderBy(query).ToList();
-            }
-            else
-            {
-                return query.ToList();
-            }
-        }
-
-        public void UpdateTrade(Trade trade)
-        {
-            try
-            {
-                dbSet.Attach(trade);
-                Database.Entry(trade).State = EntityState.Modified;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            
+            return filter == null ? query : query.Where(filter);
         }
 
         public void Dispose()

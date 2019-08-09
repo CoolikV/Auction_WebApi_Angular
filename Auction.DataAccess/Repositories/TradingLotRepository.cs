@@ -19,8 +19,6 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<TradingLot>();
         }
 
-        public IQueryable<TradingLot> Entities => dbSet;
-
         public TradingLot GetTradingLotById(int id)
         {
             try
@@ -40,6 +38,19 @@ namespace Auction.DataAccess.Repositories
                 dbSet.Add(tradingLot);
             }
             catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void UpdateTradingLot(TradingLot tradingLot)
+        {
+            try
+            {
+                dbSet.Attach(tradingLot);
+                Database.Entry(tradingLot).State = EntityState.Modified;
+            }
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -73,36 +84,11 @@ namespace Auction.DataAccess.Repositories
             }   
         }
 
-        public IEnumerable<TradingLot> FindTradingLots(Expression<Func<TradingLot, bool>> filter = null,
-            Func<IQueryable<TradingLot>, IOrderedQueryable<TradingLot>> orderBy = null)
+        public IQueryable<TradingLot> FindTradingLots(Expression<Func<TradingLot, bool>> filter = null)
         {
             IQueryable<TradingLot> query = dbSet;
 
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-            if (orderBy != null)
-            {
-                return orderBy(query).ToList();
-            }
-            else
-            {
-                return query.ToList();
-            }
-        }
-
-        public void UpdateTradingLot(TradingLot tradingLot)
-        {
-            try
-            {
-                dbSet.Attach(tradingLot);
-                Database.Entry(tradingLot).State = EntityState.Modified;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            return filter == null ? query : query.Where(filter);
         }
 
         public void Dispose()
