@@ -9,6 +9,7 @@ namespace Auction.WebApi.Models
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }
+        [Required]
         public string Img { get; set; }
 
         [Required]
@@ -18,9 +19,13 @@ namespace Auction.WebApi.Models
         [Required]
         public int TradeDuration { get; set; }
 
+        [Required]
         public string Owner { get; set; }
-        public bool IsVerified { get; set; }
+        [Required]
+        public string Status { get; set; }
+        [Required]
         public string Category { get; set; }
+        [Required]
         public int CategoryId { get; set; }
     }
 }

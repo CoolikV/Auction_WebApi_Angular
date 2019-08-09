@@ -30,6 +30,68 @@ namespace Auction.WebApi.Controllers
             this.categoryService = categoryService;
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("{id:int}")]
+        public IHttpActionResult GetTradingLot(int id)
+        {
+            TradingLotModel lot;
+            try
+            {
+                lot = _adapter.Adapt<TradingLotModel>(lotService.GetLotById(id));
+            }
+            catch(NotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok(lot);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("")]
+        public IHttpActionResult GetTradingLots([FromUri] PagingParameterModel pagingParameter, int? category)
+        {
+            IEnumerable<TradingLotDTO> lotsForPage;
+            try
+            {
+                lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1,
+                    pagingParameter?.PageSize ?? 10, category, out int pagesCount, out int totalItemsCount);
+
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter, 
+                    totalItemsCount,pagesCount));
+
+                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
+
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok(_adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage));
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("{lotId:int}/category")]
+        public IHttpActionResult GetCategoryByLotId(int lotId)
+        {
+            CategoryModel category;
+            try
+            {
+                var categoryDto = lotService.GetLotById(lotId).Category;
+                category = _adapter.Adapt<CategoryModel>(categoryDto);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok(category);
+        } 
+
         [HttpPost]
         [Route("")]
         public IHttpActionResult AddNewTradingLot(TradingLotModel newTradingLot)
@@ -99,66 +161,5 @@ namespace Auction.WebApi.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("{id:int}")]
-        public IHttpActionResult GetTradingLot(int id)
-        {
-            TradingLotModel lot;
-            try
-            {
-                lot = _adapter.Adapt<TradingLotModel>(lotService.GetLotById(id));
-            }
-            catch(NotFoundException)
-            {
-                return NotFound();
-            }
-
-            return Ok(lot);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("")]
-        public IHttpActionResult GetTradingLots([FromUri] PagingParameterModel pagingParameter, int? category)
-        {
-            IEnumerable<TradingLotDTO> lotsForPage;
-            try
-            {
-                lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1,
-                    pagingParameter?.PageSize ?? 10, category, out int pagesCount, out int totalItemsCount);
-
-                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter, 
-                    totalItemsCount,pagesCount));
-
-                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
-
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
-
-            return Ok(_adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage));
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("{lotId:int}/category")]
-        public IHttpActionResult GetCategoryByLotId(int lotId)
-        {
-            CategoryModel category;
-            try
-            {
-                var categoryDto = lotService.GetLotById(lotId).Category;
-                category = _adapter.Adapt<CategoryModel>(categoryDto);
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
-
-            return Ok(category);
-        } 
     }
 }

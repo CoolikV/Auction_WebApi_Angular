@@ -8,13 +8,8 @@
         public string Img { get; set; }
         public double Price { get; set; }
         public int TradeDuration { get; set; }
-        public bool IsVerified { get; set; }
+        public string Status { get; set; }
         public CategoryDTO Category { get; set; }
         public UserDTO User { get; set; }
-
-        public TradingLotDTO()
-        {
-            IsVerified = false;
-        }
     }
 }

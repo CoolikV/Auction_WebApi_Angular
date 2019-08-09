@@ -19,7 +19,9 @@ namespace Auction.BusinessLogic.Configs
                 //.Ignore(dest => dest.LastRateUserId);
 
             config.NewConfig<TradingLotDTO, TradingLot>().MaxDepth(4).IgnoreNullValues(true);
-            config.NewConfig<TradingLot, TradingLotDTO>().MaxDepth(5).IgnoreNullValues(true);
+            config.NewConfig<TradingLot, TradingLotDTO>()
+                .Map(dest => dest.Status, src => src.LotStatus)
+                .MaxDepth(5).IgnoreNullValues(true);
 
             config.NewConfig<UserDTO, UserProfile>()
                 .Ignore(dest => dest.Id);
