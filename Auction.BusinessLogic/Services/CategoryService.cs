@@ -26,6 +26,11 @@ namespace Auction.BusinessLogic.Services
             Database.Dispose();
         }
 
+        public bool IsCategoryExist(int id)
+        {
+            return Database.Categories.FindCategories(c => c.Id.Equals(id)).Any();
+        }
+
         public CategoryDTO GetCategoryById(int id)
         {
             var category = Database.Categories.GetCategoryById(id)
@@ -122,7 +127,7 @@ namespace Auction.BusinessLogic.Services
         //maybe change method equeals to more specified
         private bool IsCategoryNameFree(string name)
         {
-            return Database.Categories.Entities.FirstOrDefault(category => category.Name.Equals(name)) is null;
+            return Database.Categories.FindCategories().FirstOrDefault(category => category.Name.Equals(name)) is null;
         }
     }
 }

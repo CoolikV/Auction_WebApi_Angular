@@ -94,7 +94,7 @@ namespace Auction.BusinessLogic.Services
 
         private bool IsTradeForLotAlreadyStarted(int lotId)
         {
-            return Database.Trades.Entities.Any(t => t.LotId.Equals(lotId));
+            return Database.Trades.FindTrades().Any(t => t.LotId.Equals(lotId));
         }
 
         public TradeDTO GetTradeByLotId(int id)
@@ -145,7 +145,7 @@ namespace Auction.BusinessLogic.Services
                     source = UserTrades(userId);
                     break;
                 default:
-                    source = Database.Trades.Entities;
+                    source = Database.Trades.FindTrades();
                     break;
             };
 
@@ -165,7 +165,7 @@ namespace Auction.BusinessLogic.Services
         #region Queries
         private IQueryable<Trade> UserWinTrades(string userId)
         {
-            return Database.Trades.Entities.Where(t => t.LastRateUserId == userId && DateTime.Now.CompareTo(t.TradeEnd) >= 0);
+            return Database.Trades.FindTrades().Where(t => t.LastRateUserId == userId && DateTime.Now.CompareTo(t.TradeEnd) >= 0);
         }
 
         private IQueryable<Trade> UserLoseTrades(string userId)
@@ -176,7 +176,7 @@ namespace Auction.BusinessLogic.Services
         private IQueryable<Trade> UserTrades(string userId)
         {
             IEnumerable<int> userTradesId = Database.UserProfiles.GetProfileById(userId).Trades.Select(t => t.Id);
-            return Database.Trades.Entities.Where(t => userTradesId.Contains(t.Id));//check work maybe "contains" is a wrong method
+            return Database.Trades.FindTrades().Where(t => userTradesId.Contains(t.Id));//check work maybe "contains" is a wrong method
         }
         #endregion
     }

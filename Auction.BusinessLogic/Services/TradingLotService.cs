@@ -69,15 +69,6 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
-        //change 
-        public IEnumerable<TradingLotDTO> FindLotsByCategory(int? categoryId)
-        {
-            var query = categoryId.HasValue ? Database.TradingLots.FindTradingLots(l => l.CategoryId == categoryId.Value)
-                : Database.TradingLots.FindTradingLots().AsQueryable();
-
-            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(query);
-        }
-
         public TradingLotDTO GetLotById(int lotId)
         {
             var tradingLot = FindTradingLotById(lotId);
@@ -103,45 +94,50 @@ namespace Auction.BusinessLogic.Services
         {
             TradingLot lot = FindTradingLotById(lotId);
 
-            //lot.IsVerified = true;
+            lot.LotStatus = DataAccess.Entities.Enums.LotStatus.Verified;
 
             Database.TradingLots.UpdateTradingLot(lot);
             Database.Save();
         }
 
-        public IEnumerable<TradingLotDTO> FindLotsByCategoryName(string categoryName)
+        //add filtering
+        public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? categoryId,
+            double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
         {
-            if (string.IsNullOrEmpty(categoryName))
-                throw new ArgumentException("Category name is empty", nameof(categoryName));
-
-            var lotsInCategory = Database.TradingLots.FindTradingLots(lot => lot.Category.Name.Equals(categoryName),
-                orderBy: q => q.OrderBy(l => l.TradeDuration));
-
-            if (lotsInCategory.Any())
-                throw new NotFoundException($"Lots in category {categoryName}");
-
-            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsInCategory);
-        }
-
-        public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? category,
-            out int pagesCount, out int totalItemsCount)
-        {
-            var source = Database.TradingLots.Entities;
-
-            if (category.HasValue)
-                source = source.Where(l => l.Category.Id.Equals(category.Value));
+            var source = FilterLots(categoryId, minPrice, maxPrice, lotName);
 
             totalItemsCount = source.Count();
             if (totalItemsCount < 1)
                 throw new NotFoundException();
 
             pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
+
             var lotsForPage = source.OrderBy(l => l.TradeDuration)
                 .Skip((pageNum - 1) * pageSize)
                 .Take(pageSize)
                 .AsEnumerable();
 
             return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsForPage);
+        }
+
+        private IQueryable<TradingLot> FilterLots(int? categoryId, double? minPrice, double? maxPrice, string name)
+        {
+            //think how to use Expression<Func<T,bool>> predicate or use query extension methods
+            IQueryable<TradingLot> source = Database.TradingLots.FindTradingLots();
+
+            if (categoryId.HasValue)
+                source = source.Where(l => l.CategoryId == categoryId);
+            if (maxPrice.HasValue)
+                if (minPrice < maxPrice)
+                    source = source.Where(l => l.Price >= minPrice && l.Price <= maxPrice);
+                else
+                    source = source.Where(l => l.Price <= maxPrice);
+            else
+                source = source.Where(l => l.Price >= minPrice);
+            if (!string.IsNullOrEmpty(name))
+                source = source.Where(l => l.Name.ToLower().Contains(name));
+
+            return source;
         }
 
         private TradingLot FindTradingLotById(int id)
