@@ -51,13 +51,18 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("")]
-        public IHttpActionResult GetTradingLots([FromUri] PagingParameterModel pagingParameter, int? category)
+        public IHttpActionResult GetTradingLots([FromUri] PagingParameterModel pagingParameter, [FromUri] LotFilteringModel filterModel)
         {
             IEnumerable<TradingLotDTO> lotsForPage;
             try
             {
+                int? catId = filterModel.CategoryId;
+                if (!categoryService.IsCategoryExist(filterModel.CategoryId.GetValueOrDefault(0)))
+                    catId = null;
+
                 lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1,
-                    pagingParameter?.PageSize ?? 10, category, out int pagesCount, out int totalItemsCount);
+                    pagingParameter?.PageSize ?? 10,catId, filterModel.MinPrice,filterModel.MaxPrice,filterModel.LotName,
+                    out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter, 
                     totalItemsCount,pagesCount));

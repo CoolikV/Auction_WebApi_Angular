@@ -116,7 +116,7 @@ namespace Auction.WebApi.Controllers
             try
             {
                 lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1,
-                    pagingParameter?.PageSize ?? 10, id, out int pagesCount, out int totalItemsCount);
+                    pagingParameter?.PageSize ?? 10, id,null,null,null, out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
                 totalItemsCount, pagesCount));
