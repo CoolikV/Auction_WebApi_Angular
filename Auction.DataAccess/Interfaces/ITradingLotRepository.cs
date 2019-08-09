@@ -10,12 +10,11 @@ namespace Auction.DataAccess.Interfaces
     {
         TradingLot GetTradingLotById(int id);
         void AddTradingLot(TradingLot tradingLot);
-        void UpdadeTradingLot(TradingLot tradingLot);
+        void UpdateTradingLot(TradingLot tradingLot);
         void DeleteTradingLotById(int id);
         void DeleteTradingLot(TradingLot tradingLot);
         IEnumerable<TradingLot> FindTradingLots(Expression<Func<TradingLot, bool>> filter = null,
-            Func<IQueryable<TradingLot>, IOrderedQueryable<TradingLot>> orderBy = null,
-            string includeProperties = "");
+            Func<IQueryable<TradingLot>, IOrderedQueryable<TradingLot>> orderBy = null);
         IQueryable<TradingLot> Entities { get; }
     }
 }
