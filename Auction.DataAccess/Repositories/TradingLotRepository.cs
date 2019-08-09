@@ -21,28 +21,60 @@ namespace Auction.DataAccess.Repositories
 
         public IQueryable<TradingLot> Entities => dbSet;
 
+        public TradingLot GetTradingLotById(int id)
+        {
+            try
+            {
+                return dbSet.Find(id);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public void AddTradingLot(TradingLot tradingLot)
         {
-            dbSet.Add(tradingLot);
+            try
+            {
+                dbSet.Add(tradingLot);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void DeleteTradingLot(TradingLot tradingLot)
         {
-            if (Database.Entry(tradingLot).State == EntityState.Detached)
-                dbSet.Attach(tradingLot);
+            try
+            {
+                if (Database.Entry(tradingLot).State == EntityState.Detached)
+                    dbSet.Attach(tradingLot);
 
-            dbSet.Remove(tradingLot);
+                dbSet.Remove(tradingLot);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void DeleteTradingLotById(int id)
         {
-            TradingLot tradingLot = dbSet.Find(id);
-            DeleteTradingLot(tradingLot);
+            try
+            {
+                TradingLot tradingLot = dbSet.Find(id);
+                DeleteTradingLot(tradingLot);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }   
         }
 
         public IEnumerable<TradingLot> FindTradingLots(Expression<Func<TradingLot, bool>> filter = null,
-            Func<IQueryable<TradingLot>, IOrderedQueryable<TradingLot>> orderBy = null,
-            string includeProperties = "")
+            Func<IQueryable<TradingLot>, IOrderedQueryable<TradingLot>> orderBy = null)
         {
             IQueryable<TradingLot> query = dbSet;
 
@@ -50,13 +82,6 @@ namespace Auction.DataAccess.Repositories
             {
                 query = query.Where(filter);
             }
-
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty);
-            }
-
             if (orderBy != null)
             {
                 return orderBy(query).ToList();
@@ -67,15 +92,17 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public TradingLot GetTradingLotById(int id)
+        public void UpdateTradingLot(TradingLot tradingLot)
         {
-            return dbSet.Find(id);
-        }
-
-        public void UpdadeTradingLot(TradingLot tradingLot)
-        {
-            dbSet.Attach(tradingLot);
-            Database.Entry(tradingLot).State = EntityState.Modified;
+            try
+            {
+                dbSet.Attach(tradingLot);
+                Database.Entry(tradingLot).State = EntityState.Modified;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void Dispose()

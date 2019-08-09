@@ -22,28 +22,60 @@ namespace Auction.DataAccess.Repositories
 
         public IQueryable<Trade> Entities => dbSet;
 
+        public Trade GetTradeById(int id)
+        {
+            try
+            {
+                return dbSet.Find(id);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public void AddTrade(Trade trade)
         {
-            dbSet.Add(trade);
+            try
+            {
+                dbSet.Add(trade);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public void DeleteTrade(Trade trade)
         {
-            if (Database.Entry(trade).State == EntityState.Detached)
-                dbSet.Attach(trade);
+            try
+            {
+                if (Database.Entry(trade).State == EntityState.Detached)
+                    dbSet.Attach(trade);
 
-            dbSet.Remove(trade);
+                dbSet.Remove(trade);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }    
         }
 
         public void DeleteTradeById(int id)
         {
-            Trade trade = dbSet.Find(id);
-            DeleteTrade(trade);
+            try
+            {
+                Trade trade = dbSet.Find(id);
+                DeleteTrade(trade);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public IEnumerable<Trade> FindTrades(Expression<Func<Trade, bool>> filter = null,
-            Func<IQueryable<Trade>, IOrderedQueryable<Trade>> orderBy = null,
-            string includeProperties = "")
+            Func<IQueryable<Trade>, IOrderedQueryable<Trade>> orderBy = null)
         {
             IQueryable<Trade> query = dbSet;
 
@@ -51,13 +83,6 @@ namespace Auction.DataAccess.Repositories
             {
                 query = query.Where(filter);
             }
-
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty);
-            }
-
             if (orderBy != null)
             {
                 return orderBy(query).ToList();
@@ -68,15 +93,18 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
-        public Trade GetTradeById(int id)
+        public void UpdateTrade(Trade trade)
         {
-            return dbSet.Find(id);
-        }
-
-        public void UpdadeTrade(Trade trade)
-        {
-            dbSet.Attach(trade);
-            Database.Entry(trade).State = EntityState.Modified;
+            try
+            {
+                dbSet.Attach(trade);
+                Database.Entry(trade).State = EntityState.Modified;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            
         }
 
         public void Dispose()
