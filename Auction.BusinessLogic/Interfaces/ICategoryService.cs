@@ -13,5 +13,7 @@ namespace Auction.BusinessLogic.Interfaces
         void EditCategory(int id, CategoryDTO category);
         void ChangeCategoryName(int id, string name);
         void CreateCategory(CategoryDTO category);
+
+        bool IsCategoryExist(int id);
     }
 }
