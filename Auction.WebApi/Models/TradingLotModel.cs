@@ -2,30 +2,20 @@
 
 namespace Auction.WebApi.Models
 {
-    public class TradingLotModel
+    public class TradingLotModel : BaseTradingLotModel
     {
         public int Id { get; set; }
-        //Add validation
-        [Required]
-        public string Name { get; set; }
-        public string Description { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Required field")]
         public string Img { get; set; }
 
-        [Required]
-        [DataType(DataType.Currency)]
-        public double Price { get; set; }
-
-        [Required]
-        public int TradeDuration { get; set; }
-
-        [Required]
+        [Required(ErrorMessage = "Required field")]
         public string Owner { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Required field")]
         public string Status { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Required field")]
         public string Category { get; set; }
-        [Required]
-        public int CategoryId { get; set; }
     }
 }

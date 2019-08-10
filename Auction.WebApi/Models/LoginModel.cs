@@ -4,9 +4,10 @@ namespace Auction.WebApi.Models
 {
     public class LoginModel
     {
-        [Required]
+        [Required(ErrorMessage = "Required field", AllowEmptyStrings = false)]
         public string UserName { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Required field", AllowEmptyStrings = false)]
         [DataType(DataType.Password)]
         public string Password { get; set; }
     }
