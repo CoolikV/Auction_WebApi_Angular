@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auction.WebApi.Models
 {
@@ -9,7 +8,5 @@ namespace Auction.WebApi.Models
         [Required]
         [RegularExpression(@"^[A-Z,&/a-z\s?]{4,50}$")]
         public string Name { get; set; }
-
-        public ICollection<TradingLotModel> TradingLots { get; set; }
     }
 }

@@ -5,7 +5,7 @@ namespace Auction.WebApi.Models
     public class TradingLotModel
     {
         public int Id { get; set; }
-
+        //Add validation
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }

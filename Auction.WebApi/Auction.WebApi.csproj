@@ -224,6 +224,7 @@
     <Compile Include="Helpers\PaginationHelper.cs" />
     <Compile Include="Models\CategoryModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Models\LotFilteringModel.cs" />
     <Compile Include="Models\PagingParameterModel.cs" />
     <Compile Include="Models\RateModel.cs" />
     <Compile Include="Models\RegisterModel.cs" />

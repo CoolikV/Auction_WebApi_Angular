@@ -11,7 +11,7 @@
         {
             get
             {
-                return _categoryId.Value;
+                return _categoryId ?? null;
             }
             set
             {
