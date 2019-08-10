@@ -34,34 +34,46 @@ namespace Auction.BusinessLogic.Services
                 throw new ArgumentNullException(nameof(lot));
 
             var lotPoco = Adapter.Adapt<TradingLot>(lot);
-            lotPoco.User = Database.UserProfiles.GetProfileById(lot.User.Id);
-            lotPoco.Category = lot.Category is null ? Database.Categories.GetCategoryById(1) : Database.Categories.GetCategoryById(lot.Category.Id);
+            try
+            {
+                lotPoco.User = Database.UserProfiles.GetProfileById(lot.User.Id);
+                lotPoco.Category = lot.Category is null ? Database.Categories.GetCategoryById(1) 
+                    : Database.Categories.GetCategoryById(lot.Category.Id);
 
-            Database.TradingLots.AddTradingLot(lotPoco);
+                Database.TradingLots.AddTradingLot(lotPoco);
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
             Database.Save();
         }
 
+        //delete old image from app data and save new image, then set new img path
         public void EditLot(int lotId, TradingLotDTO lot)
         {
             try
             {
-                var tradingLot = FindTradingLotById(lotId);
-                if (tradingLot.LotStatus == LotStatus.OnSale)
+                if (!IsLotExists(lot.Id))
+                    throw new NotFoundException();
+
+                TradingLot lotPoco = Database.TradingLots.GetTradingLotById(lot.Id);
+                if (lotPoco.LotStatus == LotStatus.OnSale)
                     throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
                 //cant ignore null values in mapster
                 //tradingLot = Adapter.Adapt<TradingLot>(lot);
 
-                tradingLot.Name = lot.Name;
-                tradingLot.Description = lot.Description;
-                tradingLot.Img = lot.Img;
-                tradingLot.TradeDuration = lot.TradeDuration;
-                tradingLot.Price = lot.Price;
+                lotPoco.Name = lot.Name;
+                lotPoco.Description = lot.Description;
+                lotPoco.Img = lot.Img;
+                lotPoco.TradeDuration = lot.TradeDuration;
+                lotPoco.Price = lot.Price;
 
-                Database.TradingLots.UpdateTradingLot(tradingLot);
+                Database.TradingLots.UpdateTradingLot(lotPoco);
             }
-            catch(DatabaseException ex)
+            catch(Exception)
             {
-                throw ex;
+                throw new DatabaseException();
             }
             Database.Save();
         }
@@ -70,10 +82,12 @@ namespace Auction.BusinessLogic.Services
         {
             try
             {
-                var lot = FindTradingLotById(lotId);
+                if (!IsLotExists(lotId))
+                    throw new NotFoundException();
+
                 Database.TradingLots.DeleteTradingLotById(lotId);
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
                 throw new DatabaseException();
             }
@@ -82,35 +96,53 @@ namespace Auction.BusinessLogic.Services
 
         public TradingLotDTO GetLotById(int lotId)
         {
-            var tradingLot = FindTradingLotById(lotId);
-
-            return Adapter.Adapt<TradingLotDTO>(tradingLot);
+            if (!IsLotExists(lotId))
+                throw new NotFoundException();
+            try
+            {
+                return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetTradingLotById(lotId));
+            }
+            catch(Exception)
+            {
+                throw new DatabaseException();
+            }
         }
 
         public void ChangeLotCategory(int lotId, int categoryId)
         {
-            TradingLot lot = FindTradingLotById(lotId);
-            Category category = Database.Categories.GetCategoryById(categoryId);
-
-            if (lot == null || category == null)
-                throw new ArgumentNullException();
-
-            lot.Category = category;
-
-            Database.TradingLots.UpdateTradingLot(lot);
+            if (!IsLotExists(lotId) || !CategoryService.IsCategoryExist(categoryId))
+                throw new NotFoundException();
+            try
+            {
+                TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
+                Category category = Database.Categories.GetCategoryById(categoryId);
+                lot.Category = category;
+                lot.CategoryId = categoryId;
+                Database.TradingLots.UpdateTradingLot(lot);
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
             Database.Save();
         }
 
         public void VerifyLot(int lotId)
         {
-            TradingLot lot = FindTradingLotById(lotId);
-
-            lot.LotStatus = LotStatus.Verified;
-
-            Database.TradingLots.UpdateTradingLot(lot);
+            if (!IsLotExists(lotId))
+                throw new NotFoundException();
+            try
+            {
+                TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
+                lot.LotStatus = LotStatus.Verified;
+                Database.TradingLots.UpdateTradingLot(lot);
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
             Database.Save();
         }
-
         //add ordering
         public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? categoryId,
             double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
@@ -151,19 +183,16 @@ namespace Auction.BusinessLogic.Services
             return source;
         }
 
-        private TradingLot FindTradingLotById(int id)
+        private bool IsLotExists(int id)
         {
-            TradingLot lotPoco;
             try
             {
-                lotPoco = Database.TradingLots.GetTradingLotById(id)
-                    ?? throw new NotFoundException($"Lot with id: {id}");
+                return Database.TradingLots.FindTradingLots(l => l.Id == id).Any();
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
                 throw new DatabaseException();
             }
-            return lotPoco;
         }
     }
 }
