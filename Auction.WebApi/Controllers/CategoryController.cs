@@ -30,15 +30,19 @@ namespace Auction.WebApi.Controllers
 
         [HttpPost]
         [Route("")]
-        //[Authorize(Roles ="manager,admin")]
+        [Authorize(Roles ="manager,admin")]
         public IHttpActionResult AddNewCategory(CategoryModel category)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid data");
+                return BadRequest(ModelState);
 
             try
             {
                 categoryService.CreateCategory(_adapter.Adapt<CategoryDTO>(category));
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
             catch (AuctionException ex)
             {
@@ -50,26 +54,34 @@ namespace Auction.WebApi.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
-        //[Authorize(Roles ="manager,admin")]
+        [Authorize(Roles ="manager,admin")]
         public IHttpActionResult UpdateCategoryName(int id, CategoryModel category)
         {
             if (!ModelState.IsValid)
-                return BadRequest("Invalid data");
+                return BadRequest(ModelState);
 
             try
             {
                 categoryService.ChangeCategoryName(id, category.Name);
             }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
             catch (NotFoundException)
             {
                 return NotFound();
+            }
+            catch(AuctionException ex)
+            {
+                return BadRequest(ex.Message);
             }
 
             return Ok();
         }
  
         [HttpDelete]
-        //[Authorize(Roles ="manager,admin")]
+        [Authorize(Roles ="manager,admin")]
         [Route("{id:int}")]
         public IHttpActionResult DeleteCategory(int id)
         {
@@ -77,13 +89,17 @@ namespace Auction.WebApi.Controllers
             {
                 categoryService.RemoveCategoryById(id);
             }
-            catch (AuctionException ex)
+            catch (DatabaseException)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
             catch (NotFoundException)
             {
                 return NotFound();
+            }
+            catch (AuctionException ex)
+            {
+                return BadRequest(ex.Message);
             }
 
             return StatusCode(HttpStatusCode.NoContent);
@@ -99,6 +115,10 @@ namespace Auction.WebApi.Controllers
             {
                 category = categoryService.GetCategoryById(id).Adapt<CategoryModel>();
             }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
             catch (NotFoundException)
             {
                 return NotFound();
@@ -110,13 +130,14 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("{id:int}/lots")]
-        public IHttpActionResult GetLotsForCategory(int id, [FromUri] PagingParameterModel pagingParameter)
+        public IHttpActionResult GetLotsForCategory(int id, [FromUri] PagingParameterModel pagingParameter, [FromUri] LotFilteringModel filterModel)
         {
             IEnumerable<TradingLotDTO> lotsForPage;
             try
             {
-                lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1,
-                    pagingParameter?.PageSize ?? 10, id,null,null,null, out int pagesCount, out int totalItemsCount);
+                lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1, pagingParameter?.PageSize ?? 10,
+                    id, filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName,
+                    out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
                 totalItemsCount, pagesCount));
@@ -140,6 +161,10 @@ namespace Auction.WebApi.Controllers
             try
             {
                 lotDto = categoryService.GetLotFromCategory(id, lotId);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
             catch (NotFoundException)
             {

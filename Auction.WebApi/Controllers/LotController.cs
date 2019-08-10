@@ -101,22 +101,22 @@ namespace Auction.WebApi.Controllers
 
         [HttpPost]
         [Route("")]
-        public IHttpActionResult AddNewTradingLot(TradingLotModel lotModel)
+        public IHttpActionResult AddNewTradingLot(BaseTradingLotModel lotModel)
         {
-            //ADD MODEL VALIDATION ERRORS TO BadRequest();
             if (!ModelState.IsValid)
-                return BadRequest("Invalid data");
+                return BadRequest(ModelState);
 
             try
             {
                 //REFACTORING and add pictures saving to app_data/static/pictures
                 var lotDto = _adapter.Adapt<TradingLotDTO>(lotModel);
-
                 lotDto.Category = categoryService.GetCategoryById(lotModel.CategoryId);
-
                 lotDto.User = userManager.GetUserByName(User.Identity.Name);
-
                 lotService.CreateLot(lotDto);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
             catch (NotFoundException)
             {
@@ -134,9 +134,8 @@ namespace Auction.WebApi.Controllers
         [Route("{id:int}")]
         public IHttpActionResult UpdateTradingLot(int id, [FromBody]TradingLotModel model)
         {
-            //ADD MODEL VALIDATION ERRORS TO BadRequest();
             if (!ModelState.IsValid)
-                return BadRequest("Invalid data");
+                return BadRequest(ModelState);
 
             try
             {
