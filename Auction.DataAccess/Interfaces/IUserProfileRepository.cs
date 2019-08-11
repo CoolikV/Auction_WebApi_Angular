@@ -7,6 +7,7 @@ namespace Auction.DataAccess.Interfaces
     public interface IUserProfileRepository : IDisposable
     {
         UserProfile GetProfileById(string id);
+        UserProfile GetProfileByUserName(string userName);
         void CreateProfile(UserProfile user);
         void UpdateProfile(UserProfile user);
         void DeleteProfile(UserProfile user);

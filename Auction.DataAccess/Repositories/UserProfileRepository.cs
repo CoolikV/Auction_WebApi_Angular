@@ -30,6 +30,18 @@ namespace Auction.DataAccess.Repositories
             }
         }
 
+        public UserProfile GetProfileByUserName(string userName)
+        {
+            try
+            {
+                return dbSet.Where(u => u.UserName.Equals(userName)).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public void CreateProfile(UserProfile user)
         {
             try
