@@ -14,5 +14,7 @@ namespace Auction.BusinessLogic.Interfaces
         TradingLotDTO GetLotById(int id);
         void ChangeLotCategory(int lotId, int categoryId);
         void VerifyLot(int lotId);
+
+        bool IsLotExists(int id);
     }
 }

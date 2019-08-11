@@ -183,7 +183,7 @@ namespace Auction.BusinessLogic.Services
             return source;
         }
 
-        private bool IsLotExists(int id)
+        public bool IsLotExists(int id)
         {
             try
             {

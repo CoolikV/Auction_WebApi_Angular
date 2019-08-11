@@ -2,6 +2,7 @@
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
+using Auction.DataAccess.Entities.Enums;
 using Auction.DataAccess.Interfaces;
 using Mapster;
 using System;
@@ -14,11 +15,13 @@ namespace Auction.BusinessLogic.Services
     {
         IAdapter Adapter { get; set; }
         IUnitOfWork Database { get; set; }
+        ITradingLotService LotService { get; set; }
 
-        public TradeService(IUnitOfWork uow, IAdapter adapter)
+        public TradeService(IUnitOfWork uow, IAdapter adapter, ITradingLotService lotService)
         {
             Database = uow;
             Adapter = adapter;
+            LotService = lotService;
         }
 
         public void Dispose()
@@ -28,22 +31,34 @@ namespace Auction.BusinessLogic.Services
         //add methods to find trades and use it instead database.trades.gettdaebyid(int id) and etc...
         public void StartTrade(int lotId)
         {
-            var lot = Database.TradingLots.GetTradingLotById(lotId)
-                ?? throw new NotFoundException($"Lot with id: {lotId}");
-
-            if (IsTradeForLotAlreadyStarted(lotId))
-                throw new AuctionException($"Trade for lot: {lot.Name} has already began");
-
-            //if (!lot.IsVerified)
-            //    throw new AuctionException("Lot is not verified");
-
-            Database.Trades.AddTrade(new Trade
+            try
             {
-                LotId = lotId,
-                TradingLot = lot,
-                TradeStart = DateTime.Now,
-                TradeEnd = DateTime.Now.AddDays(lot.TradeDuration)
-            });
+                if (!LotService.IsLotExists(lotId))
+                    throw new NotFoundException();
+                if (IsTradeForLotAlreadyStarted(lotId))
+                    throw new AuctionException($"Trade for this lot has already began");
+                //maybe add method to get TradingLot from db in LotService
+                var lot = Database.TradingLots.GetTradingLotById(lotId);
+
+                if (lot.LotStatus == LotStatus.NotVerified)
+                    throw new AuctionException("Lot is not verified");
+
+                Database.Trades.AddTrade(new Trade
+                {
+                    LotId = lotId,
+                    TradingLot = lot,
+                    TradeStart = DateTime.Now,
+                    TradeEnd = DateTime.Now.AddDays(lot.TradeDuration)
+                });
+            }
+            catch(NotFoundException ex)
+            {
+                throw ex;
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
 
             Database.Save();
         }
@@ -86,15 +101,17 @@ namespace Auction.BusinessLogic.Services
 
         public TradeDTO GetTradeById(int id)
         {
-            var lot = Database.Trades.GetTradeById(id)
-                ?? throw new NotFoundException($"Trade with id: {id}");
+            if (!IsTradeExist(id))
+                throw new NotFoundException();
 
-            return Adapter.Adapt<TradeDTO>(lot);
-        }
-
-        private bool IsTradeForLotAlreadyStarted(int lotId)
-        {
-            return Database.Trades.FindTrades().Any(t => t.LotId.Equals(lotId));
+            try
+            {
+                return Adapter.Adapt<TradeDTO>(Database.Trades.GetTradeById(id));
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
         }
 
         public TradeDTO GetTradeByLotId(int id)
@@ -160,6 +177,20 @@ namespace Auction.BusinessLogic.Services
                 .AsEnumerable();
 
             return Adapter.Adapt<IEnumerable<TradeDTO>>(tradesForPage);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private bool IsTradeExist(int id)
+        {
+            return Database.Trades.FindTrades(t => t.Id == id).Any();
+        }
+
+        private bool IsTradeForLotAlreadyStarted(int lotId)
+        {
+            return Database.Trades.FindTrades().Any(t => t.LotId.Equals(lotId));
         }
 
         #region Queries
