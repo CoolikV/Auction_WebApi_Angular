@@ -244,7 +244,7 @@ namespace Auction.BusinessLogic.Services
 
         private IQueryable<Trade> FilterByLotName(IQueryable<Trade> source, string lotName)
         {
-            return source.Where(t => t.TradingLot.Name.Contains(lotName));
+            return source.Where(t => t.TradingLot.Name.ToLower().Contains(lotName.ToLower()));
         }
 
         private IQueryable<Trade> FilterByDate(IQueryable<Trade> source, DateTime startDate, DateTime endDate)

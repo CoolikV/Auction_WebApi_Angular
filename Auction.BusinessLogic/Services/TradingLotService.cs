@@ -147,29 +147,26 @@ namespace Auction.BusinessLogic.Services
         public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? categoryId,
             double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
         {
-            IQueryable<TradingLot> source = FilterLots(categoryId, minPrice, maxPrice, lotName);
-
-            totalItemsCount = source.Count();
-            if (totalItemsCount < 1)
-                throw new NotFoundException();
-
-            pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
-
-            var lotsForPage = source.OrderBy(l => l.TradeDuration)
-                .Skip((pageNum - 1) * pageSize)
-                .Take(pageSize)
-                .AsEnumerable();
-
-            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsForPage);
+            return FilterLotsForPage(string.Empty, pageNum, pageSize, categoryId, minPrice, maxPrice, lotName, out pagesCount, out totalItemsCount);
         }
 
-        private IQueryable<TradingLot> FilterLots(int? categoryId, double? minPrice, double? maxPrice, string name)
+        public IEnumerable<TradingLotDTO> GetLotsForUser(string userId, int pageNum, int pageSize, int? categoryId,
+            double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
         {
-            //think how to use Expression<Func<T,bool>> predicate or use query extension methods
+            return FilterLotsForPage(userId, pageNum, pageSize, categoryId, minPrice, maxPrice, lotName, out pagesCount, out totalItemsCount);
+        }
+
+        //add ordering
+        private IEnumerable<TradingLotDTO> FilterLotsForPage(string userId, int pageNum, int pageSize, int? categoryId,
+            double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
+        {
             IQueryable<TradingLot> source = Database.TradingLots.FindTradingLots();
+            if (!string.IsNullOrWhiteSpace(userId))
+                source = source.Where(l => l.UserId == userId);
 
             if (categoryId.HasValue && CategoryService.IsCategoryExist(categoryId.Value))
                 source = source.Where(l => l.CategoryId == categoryId);
+
             if (maxPrice.HasValue)
                 if (minPrice < maxPrice)
                     source = source.Where(l => l.Price >= minPrice && l.Price <= maxPrice);
@@ -177,10 +174,21 @@ namespace Auction.BusinessLogic.Services
                     source = source.Where(l => l.Price <= maxPrice);
             else
                 source = source.Where(l => l.Price >= minPrice);
-            if (!string.IsNullOrEmpty(name))
-                source = source.Where(l => l.Name.ToLower().Contains(name));
 
-            return source;
+            if (!string.IsNullOrWhiteSpace(lotName))
+                source = source.Where(l => l.Name.ToLower().Contains(lotName.ToLower()));
+
+            totalItemsCount = source.Count();
+            if (totalItemsCount < 1)
+                throw new NotFoundException();
+
+            pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
+            var lotsForPage = source.OrderBy(l => l.Name)
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .AsEnumerable();
+
+            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsForPage);
         }
 
         public bool IsLotExists(int id)
