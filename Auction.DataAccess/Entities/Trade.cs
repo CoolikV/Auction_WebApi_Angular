@@ -10,7 +10,6 @@ namespace Auction.DataAccess.Entities
         public double LastPrice { get; set; }
 
         public string LastRateUserId { get; set; }
-        //public virtual UserProfile LastRated { get; set;}
 
         public int LotId { get; set; }
         public virtual TradingLot TradingLot { get; set; }
