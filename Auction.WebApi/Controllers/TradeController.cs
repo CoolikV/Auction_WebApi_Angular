@@ -22,7 +22,8 @@ namespace Auction.WebApi.Controllers
         readonly IUserManager userManager;
         readonly ICategoryService categoryService;
 
-        public TradeController(IAdapter adapter, ITradeService tradeService, ITradingLotService lotService, IUserManager userManager, ICategoryService categoryService)
+        public TradeController(IAdapter adapter, ITradeService tradeService, ITradingLotService lotService, IUserManager userManager,
+            ICategoryService categoryService)
         {
             _adapter = adapter;
             this.tradeService = tradeService;
@@ -100,6 +101,9 @@ namespace Auction.WebApi.Controllers
         [Authorize]
         public IHttpActionResult Rate([FromBody] RateModel rate)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var userId = userManager.GetUserByName(User.Identity.Name).Id;

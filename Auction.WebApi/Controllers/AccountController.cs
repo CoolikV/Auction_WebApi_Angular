@@ -29,7 +29,7 @@ namespace Auction.WebApi.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest("Invalid data");
+                return BadRequest(ModelState);
             }
 
             var newUserDto = _adapter.Adapt<UserDTO>(registerModel);
@@ -47,6 +47,9 @@ namespace Auction.WebApi.Controllers
         [Route("{id}")]
         public IHttpActionResult UpdateUserProfile(string id, UserProfileModel userModel)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var adapt = _adapter.Adapt<UserDTO>(userModel);
