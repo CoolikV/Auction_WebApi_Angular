@@ -16,28 +16,25 @@ namespace Auction.BusinessLogic.Services
         IAdapter Adapter { get; set; }
         IUnitOfWork Database { get; set; }
         ITradingLotService LotService { get; set; }
+        IUserManager UserManager { get; set; }
 
-        public TradeService(IUnitOfWork uow, IAdapter adapter, ITradingLotService lotService)
+        public TradeService(IUnitOfWork uow, IAdapter adapter, ITradingLotService lotService, IUserManager userManager)
         {
             Database = uow;
             Adapter = adapter;
             LotService = lotService;
+            UserManager = userManager;
         }
 
-        public void Dispose()
-        {
-            Database.Dispose();
-        }
-        //add methods to find trades and use it instead database.trades.gettdaebyid(int id) and etc...
         public void StartTrade(int lotId)
         {
+            if (!LotService.IsLotExists(lotId))
+                throw new NotFoundException();
             try
             {
-                if (!LotService.IsLotExists(lotId))
-                    throw new NotFoundException();
                 if (IsTradeForLotAlreadyStarted(lotId))
                     throw new AuctionException($"Trade for this lot has already began");
-                //maybe add method to get TradingLot from db in LotService
+
                 var lot = Database.TradingLots.GetTradingLotById(lotId);
 
                 if (lot.LotStatus == LotStatus.NotVerified)
@@ -51,7 +48,7 @@ namespace Auction.BusinessLogic.Services
                     TradeEnd = DateTime.Now.AddDays(lot.TradeDuration)
                 });
             }
-            catch(NotFoundException ex)
+            catch(AuctionException ex)
             {
                 throw ex;
             }
@@ -63,47 +60,55 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
-        public void RateTradingLot(int tradeId, string userId, double price)
+        public void RateTradingLot(int tradeId, string userName, double price)
         {
-            Trade trade = Database.Trades.GetTradeById(tradeId)
-                ?? throw new NotFoundException($"Trade with id: {tradeId}");
-
-            UserProfile user = Database.UserProfiles.GetProfileById(userId) 
-                ?? throw new NotFoundException($"User with id: {userId}");
-
-            if (trade.TradingLot.User.Id == user.Id)
-                throw new AuctionException("This is your lot");
-
-            if (DateTime.Now.CompareTo(trade.TradeEnd) >= 0)
-                throw new AuctionException("This trade is over");
-
-            bool isNew = user.Trades.All(t => !t.Id.Equals(trade.Id));
-
-            if (trade.LastPrice < price)
+            if(!IsTradeExist(tradeId))
+                throw new NotFoundException($"Trade with id: {tradeId}");
+            if(!UserManager.IsUserProfileExist(userName))
+                throw new NotFoundException($"User with user name: {userName}");
+            try
             {
-                trade.LastPrice = price;
-                trade.LastRateUserId = userId;
-                if (isNew)
-                    user.Trades.Add(trade);
+                Trade trade = Database.Trades.GetTradeById(tradeId);
+                UserProfile user = Database.UserProfiles.GetProfileByUserName(userName);
+
+                if (trade.TradingLot.User.Id == user.Id)
+                    throw new AuctionException("This is your lot");
+                if (DateTime.Now.CompareTo(trade.TradeEnd) >= 0)
+                    throw new AuctionException("This trade is over");
+                if (IsUserAlreadyHaveMaxBet(tradeId, user.Id))
+                    throw new AuctionException("You already have max bet on this lot");
+
+                bool isNew = user.Trades.All(t => !t.Id.Equals(trade.Id));
+
+                if (trade.LastPrice < price)
+                {
+                    trade.LastPrice = price;
+                    trade.LastRateUserId = user.Id;
+                    if (isNew)
+                        user.Trades.Add(trade);
+                }
+                else
+                    throw new AuctionException($"Your price should be greater than: {trade.LastPrice}");
+
+                Database.UserProfiles.UpdateProfile(user);
+                Database.Trades.UpdateTrade(trade);
             }
-            else
-                throw new AuctionException($"Your price should be greater than: {trade.LastPrice}");
+            catch(AuctionException ex)
+            {
+                throw ex;
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
 
-            Database.UserProfiles.UpdateProfile(user);
-            Database.Trades.UpdateTrade(trade);
             Database.Save();
-        }
-
-        public IEnumerable<TradeDTO> GetAllTrades()
-        {
-            return Adapter.Adapt<List<TradeDTO>>(Database.Trades.FindTrades());
         }
 
         public TradeDTO GetTradeById(int id)
         {
             if (!IsTradeExist(id))
                 throw new NotFoundException();
-
             try
             {
                 return Adapter.Adapt<TradeDTO>(Database.Trades.GetTradeById(id));
@@ -113,58 +118,41 @@ namespace Auction.BusinessLogic.Services
                 throw new DatabaseException();
             }
         }
-
-        public TradeDTO GetTradeByLotId(int id)
+        //Remove if not gonna use
+        public TradeDTO GetTradeByLotId(int lotId)
         {
-            var tradePoco = Database.Trades.FindTrades(t => t.LotId == id).FirstOrDefault();
-
-            var a = Adapter.Adapt<TradeDTO>(tradePoco);
-            return a;
-        }
-
-        public IEnumerable<TradeDTO> GetUserLoseTrades(string userId)
-        {
-            var user = Database.UserProfiles.GetProfileById(userId);
-
-            if (user == null)
-                throw new ArgumentNullException();
-
-            var list = user.Trades.Where(x => DateTime.Now.CompareTo(x.TradeEnd) >= 0 && x.LastRateUserId != user.Id);
-
-            return Adapter.Adapt<List<TradeDTO>>(list);
-        }
-
-        public IEnumerable<TradeDTO> GetUserWinTrades(string userId)
-        {
-            var user = Database.UserProfiles.GetProfileById(userId);
-
-            if (user == null)
-                throw new ArgumentNullException();
-
-            var list = user.Trades.Where(x => DateTime.Now.CompareTo(x.TradeEnd) >= 0 && x.LastRateUserId == user.Id);
-
-            return Adapter.Adapt<List<TradeDTO>>(list);
-        }
-        //maybe break this method for smaller but more informative such as GetUserWinTrades...
-        public IEnumerable<TradeDTO> GetTradesForPage(string userId, int pageNum, int pageSize, string tradeState,
-            out int pagesCount, out int totalItemsCount)
-        {
-            IQueryable<Trade> source;
-            switch (tradeState)
+            // maybe change Is...Exist methods to throw not found exceptions...
+            if (!LotService.IsLotExists(lotId))
+                throw new NotFoundException();
+            try
             {
-                case "won":
-                    source = UserWinTrades(userId);
-                    break;
-                case "lose":
-                    source = UserLoseTrades(userId);
-                    break;
-                case "all":
-                    source = UserTrades(userId);
-                    break;
-                default:
-                    source = Database.Trades.FindTrades();
-                    break;
-            };
+                return Adapter.Adapt<TradeDTO>(Database.Trades.FindTrades(t => t.LotId == lotId).FirstOrDefault());
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
+        }
+
+        public IEnumerable<TradeDTO> GetUserTrades(string userId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
+            DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount)
+        {
+            return FilterLotsForPage(userId, pageNum, pageSize, tradesState, startDate, endDate, maxBet, lotName, out pagesCount, out totalItemsCount);
+        }
+
+        private IEnumerable<TradeDTO> FilterLotsForPage(string userId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
+            DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount)
+        {
+            IQueryable<Trade> source = Database.Trades.FindTrades();
+
+            if (!string.IsNullOrWhiteSpace(userId) && !string.IsNullOrWhiteSpace(tradesState))
+                source = FilterForUserByState(source, userId, tradesState);
+            if (maxBet.HasValue)
+                source = FilterByMaxBet(source, maxBet.Value);
+            if (!string.IsNullOrWhiteSpace(lotName))
+                source = FilterByLotName(source, lotName);
+            if (startDate.HasValue || endDate.HasValue)
+                source = FilterByDate(source, startDate.GetValueOrDefault(DateTime.MinValue), endDate.GetValueOrDefault(DateTime.MaxValue));
 
             totalItemsCount = source.Count();
             if (totalItemsCount < 1)
@@ -178,6 +166,19 @@ namespace Auction.BusinessLogic.Services
 
             return Adapter.Adapt<IEnumerable<TradeDTO>>(tradesForPage);
         }
+
+        public IEnumerable<TradeDTO> GetTradesForPage(int pageNum, int pageSize, DateTime? startDate,
+            DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount)
+        {
+            return FilterLotsForPage(string.Empty, pageNum, pageSize, string.Empty, startDate, endDate, maxBet, lotName, out pagesCount, out totalItemsCount);
+        }
+
+        public void Dispose()
+        {
+            Database.Dispose();
+        }
+
+        #region Condition check methods
         /// <summary>
         /// 
         /// </summary>
@@ -192,6 +193,12 @@ namespace Auction.BusinessLogic.Services
         {
             return Database.Trades.FindTrades().Any(t => t.LotId.Equals(lotId));
         }
+
+        private bool IsUserAlreadyHaveMaxBet(int tradeId, string userId)
+        {
+            return Database.Trades.FindTrades(t => t.Id == tradeId && t.LastRateUserId.Equals(userId)).Any();
+        }
+        #endregion
 
         #region Queries
         private IQueryable<Trade> UserWinTrades(string userId)
@@ -208,6 +215,41 @@ namespace Auction.BusinessLogic.Services
         {
             IEnumerable<int> userTradesId = Database.UserProfiles.GetProfileById(userId).Trades.Select(t => t.Id);
             return Database.Trades.FindTrades().Where(t => userTradesId.Contains(t.Id));//check work maybe "contains" is a wrong method
+        }
+        #endregion
+
+        #region Filter methods
+        private IQueryable<Trade> FilterForUserByState(IQueryable<Trade> source, string userId, string tradesState)
+        {
+            switch (tradesState)
+            {
+                case "won":
+                    source = UserWinTrades(userId);
+                    break;
+                case "lose":
+                    source = UserLoseTrades(userId);
+                    break;
+                default:
+                    source = UserTrades(userId);
+                    break;
+            };
+
+            return source;
+        }
+
+        private IQueryable<Trade> FilterByMaxBet(IQueryable<Trade> source, double maxBet)
+        {
+            return source.Where(t => t.LastPrice <= maxBet);
+        }
+
+        private IQueryable<Trade> FilterByLotName(IQueryable<Trade> source, string lotName)
+        {
+            return source.Where(t => t.TradingLot.Name.Contains(lotName));
+        }
+
+        private IQueryable<Trade> FilterByDate(IQueryable<Trade> source, DateTime startDate, DateTime endDate)
+        {
+            return source.Where(t => t.TradeStart >= startDate && t.TradeEnd <= endDate);
         }
         #endregion
     }

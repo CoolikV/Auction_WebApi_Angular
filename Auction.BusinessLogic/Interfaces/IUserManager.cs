@@ -19,5 +19,7 @@ namespace Auction.BusinessLogic.Interfaces
         IEnumerable<string> GetAllRoles();
         Task<OperationDetails> DeleteUserAccount(string userId);
         void EditUserProfile(string userId, UserDTO user);
+
+        bool IsUserProfileExist(string userName);
     }
 }

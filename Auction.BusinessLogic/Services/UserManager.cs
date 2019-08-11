@@ -154,6 +154,10 @@ namespace Auction.BusinessLogic.Services
             Database.UserProfiles.UpdateProfile(userProfile);
         }
 
+        public bool IsUserProfileExist(string userName)
+        {
+            return Database.UserProfiles.FindProfiles(u => u.UserName.Equals(userName)).Any();
+        }
         #region Helper methods
         private AppUser FindUserByName(string name)
         {
