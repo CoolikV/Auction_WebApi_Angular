@@ -6,6 +6,7 @@ using Auction.WebApi.Models;
 using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Net;
 using System.Web;
 using System.Web.Http;
 
@@ -42,6 +43,10 @@ namespace Auction.WebApi.Controllers
             {
                 tradeDto = tradeService.GetTradeById(id);
             }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
             catch (NotFoundException)
             {
                 return NotFound();
@@ -53,13 +58,14 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [Route("")]
         [AllowAnonymous]
-        public IHttpActionResult GetTrades([FromUri] PagingParameterModel pagingParameter, int category)
+        public IHttpActionResult GetTrades([FromUri] PagingParameterModel pagingParameter, [FromUri] TradeFilteringModel filter)
         {
             IEnumerable<TradeDTO> tradesForPage;
             try
             {
-                tradesForPage = tradeService.GetTradesForPage(null,pagingParameter?.PageNumber ?? 1,
-                    pagingParameter?.PageSize ?? 10, null, out int pagesCount, out int totalItemsCount);
+                tradesForPage = tradeService.GetTradesForPage(pagingParameter?.PageNumber ?? 1,
+                    pagingParameter?.PageSize ?? 10, filter.TradeStarts, filter.TradeEnds, filter.MaxPrice,
+                    filter.LotName, out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
                 totalItemsCount, pagesCount));
@@ -84,6 +90,10 @@ namespace Auction.WebApi.Controllers
                 lotService.VerifyLot(lotId);
                 tradeService.StartTrade(lotId);
             }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
             catch (NotFoundException)
             {
                 return NotFound();
@@ -106,8 +116,7 @@ namespace Auction.WebApi.Controllers
 
             try
             {
-                var userId = userManager.GetUserByName(User.Identity.Name).Id;
-                tradeService.RateTradingLot(rate.TradeId, userId, rate.Sum);
+                tradeService.RateTradingLot(rate.TradeId, User.Identity.Name, rate.Sum);
             }
             catch (NotFoundException)
             {

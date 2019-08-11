@@ -229,6 +229,7 @@
     <Compile Include="Models\PagingParameterModel.cs" />
     <Compile Include="Models\RateModel.cs" />
     <Compile Include="Models\RegisterModel.cs" />
+    <Compile Include="Models\TradeFilteringModel.cs" />
     <Compile Include="Models\TradeModel.cs" />
     <Compile Include="Models\TradingLotModel.cs" />
     <Compile Include="Models\UserProfileModel.cs" />
