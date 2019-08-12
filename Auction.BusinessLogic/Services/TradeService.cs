@@ -64,7 +64,7 @@ namespace Auction.BusinessLogic.Services
         {
             if(!IsTradeExist(tradeId))
                 throw new NotFoundException($"Trade with id: {tradeId}");
-            if(!UserManager.IsUserProfileExist(userName))
+            if(!UserManager.IsUserWithUserNameExist(userName))
                 throw new NotFoundException($"User with user name: {userName}");
             try
             {

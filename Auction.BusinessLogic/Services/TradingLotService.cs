@@ -143,7 +143,7 @@ namespace Auction.BusinessLogic.Services
             }
             Database.Save();
         }
-        //add ordering
+
         public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? categoryId,
             double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
         {

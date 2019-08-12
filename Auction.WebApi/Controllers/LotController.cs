@@ -55,16 +55,15 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("")]
-        public IHttpActionResult GetTradingLots([FromUri] PagingParameterModel pagingParameter, [FromUri] LotFilteringModel filterModel)
+        public IHttpActionResult GetTradingLots([FromUri] PagingParameterModel paging, [FromUri] LotFilteringModel filterModel)
         {
             IEnumerable<TradingLotDTO> lotsForPage;
             try
             {
-                lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1, pagingParameter?.PageSize ?? 10,
-                    filterModel.CategoryId, filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName,
-                    out int pagesCount, out int totalItemsCount);
+                lotsForPage = lotService.GetLotsForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, filterModel.CategoryId, 
+                    filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName, out int pagesCount, out int totalItemsCount);
 
-                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter, 
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging, 
                     totalItemsCount,pagesCount));
 
                 HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
@@ -111,7 +110,7 @@ namespace Auction.WebApi.Controllers
                 //REFACTORING and add pictures saving to app_data/static/pictures
                 var lotDto = _adapter.Adapt<TradingLotDTO>(lotModel);
                 lotDto.Category = categoryService.GetCategoryById(lotModel.CategoryId);
-                lotDto.User = userManager.GetUserByName(User.Identity.Name);
+                lotDto.User = userManager.GetUserByUserName(User.Identity.Name);
                 lotService.CreateLot(lotDto);
             }
             catch (DatabaseException)
