@@ -41,12 +41,12 @@ namespace Auction.BusinessLogic.Services
                     : Database.Categories.GetCategoryById(lot.Category.Id);
 
                 Database.TradingLots.AddTradingLot(lotPoco);
+                Database.Save();
             }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
-            Database.Save();
         }
 
         //delete old image from app data and save new image, then set new img path
@@ -70,12 +70,12 @@ namespace Auction.BusinessLogic.Services
                 lotPoco.Price = lot.Price;
 
                 Database.TradingLots.UpdateTradingLot(lotPoco);
+                Database.Save();
             }
             catch(Exception)
             {
                 throw new DatabaseException();
             }
-            Database.Save();
         }
 
         public void RemoveLotById(int lotId)
@@ -86,12 +86,12 @@ namespace Auction.BusinessLogic.Services
                     throw new NotFoundException();
 
                 Database.TradingLots.DeleteTradingLotById(lotId);
+                Database.Save();
             }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
-            Database.Save();
         }
 
         public TradingLotDTO GetLotById(int lotId)
@@ -119,12 +119,12 @@ namespace Auction.BusinessLogic.Services
                 lot.Category = category;
                 lot.CategoryId = categoryId;
                 Database.TradingLots.UpdateTradingLot(lot);
+                Database.Save();
             }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
-            Database.Save();
         }
 
         public void VerifyLot(int lotId)
@@ -136,12 +136,12 @@ namespace Auction.BusinessLogic.Services
                 TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
                 lot.LotStatus = LotStatus.Verified;
                 Database.TradingLots.UpdateTradingLot(lot);
+                Database.Save();
             }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
-            Database.Save();
         }
 
         public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? categoryId,

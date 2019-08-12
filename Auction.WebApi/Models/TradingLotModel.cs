@@ -7,9 +7,6 @@ namespace Auction.WebApi.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Required field")]
-        public string Img { get; set; }
-
-        [Required(ErrorMessage = "Required field")]
         public string Owner { get; set; }
 
         [Required(ErrorMessage = "Required field")]

@@ -102,9 +102,6 @@ namespace Auction.WebApi.Controllers
         [Route("")]
         public IHttpActionResult AddNewTradingLot(BaseTradingLotModel lotModel)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             try
             {
                 //REFACTORING and add pictures saving to app_data/static/pictures
@@ -133,9 +130,6 @@ namespace Auction.WebApi.Controllers
         [Route("{id:int}")]
         public IHttpActionResult UpdateTradingLot(int id, [FromBody]TradingLotModel model)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             try
             {
                 lotService.EditLot(id, _adapter.Adapt<TradingLotDTO>(model));
