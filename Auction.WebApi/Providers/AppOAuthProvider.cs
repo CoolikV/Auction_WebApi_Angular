@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
@@ -27,8 +28,15 @@ namespace Auction.WebApi.Providers
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
-
-            var claim = await _userManager.Authenticate(context.UserName, context.Password);
+            System.Security.Claims.ClaimsIdentity claim = null;
+            try
+            {
+                claim = await _userManager.Authenticate(context.UserName, context.Password);
+            }
+            catch (NotFoundException ex)
+            {
+                context.Response.Headers.Add("Authetication Error", new string[1] { ex.Message });
+            }
 
             AuthenticationProperties properties = CreateProperties(context.UserName);
             AuthenticationTicket ticket = new AuthenticationTicket(claim, properties);
