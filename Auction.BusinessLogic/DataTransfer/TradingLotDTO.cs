@@ -9,6 +9,7 @@
         public double Price { get; set; }
         public int TradeDuration { get; set; }
         public string Status { get; set; }
+        public int CategoryId { get; set; }
         public CategoryDTO Category { get; set; }
         public UserDTO User { get; set; }
     }
