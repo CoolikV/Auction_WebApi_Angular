@@ -7,7 +7,7 @@ namespace Auction.BusinessLogic.Exceptions
         public NotFoundException() : base("Items not found.")
         { }
 
-        public NotFoundException(string message) : base(message + " does not exist.")
+        public NotFoundException(string message) : base(message)
         { }
     }
 }
