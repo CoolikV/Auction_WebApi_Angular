@@ -91,12 +91,12 @@ namespace Auction.WebApi.Controllers
 
         [HttpDelete]
         [Authorize(Roles = "admin")]
-        [Route("{id}")]
-        public IHttpActionResult DeleteUserAccount(string id)
+        [Route("{userName}")]
+        public IHttpActionResult DeleteUserAccount(string userName)
         {
             try
             {
-                userManager.DeleteUserAccount(id);
+                userManager.DeleteUserAccount(userName);
             }
             catch (NotFoundException)
             {

@@ -76,7 +76,7 @@ namespace Auction.BusinessLogic.Services
         public async Task<ClaimsIdentity> Authenticate(string userName, string password)
         {
             var appUser = await Database.UserManager.FindAsync(userName, password)
-                ?? throw new NotFoundException("The user name or password is incorrect.");
+                ?? throw new NotFoundException("The user name or password is incorrect");
 
             ClaimsIdentity claim = await Database.UserManager.CreateIdentityAsync(appUser, OAuthDefaults.AuthenticationType);
 
@@ -110,21 +110,21 @@ namespace Auction.BusinessLogic.Services
             return new OperationDetails(true, $"Role for user {appUser.UserName} was changed from {currentUserRole} to {newRoleName}", string.Empty);
         }
 
-        public async Task<OperationDetails> DeleteUserAccount(string userId)
+        public async Task<OperationDetails> DeleteUserAccount(string userName)
         {
-            if (!IsUserByIdExist(userId))
-                throw new NotFoundException($"User with id: {userId}");
+            if (!IsUserWithUserNameExist(userName))
+                throw new NotFoundException($"User with name: {userName}");
             //var userProfile = FindUserById(userId).UserProfile;
 
             //Database.UserProfiles.DeleteProfile(userProfile);
-            var operationResult = await Database.UserManager.DeleteAsync(Database.UserManager.FindById(userId));
+            var operationResult = await Database.UserManager.DeleteAsync(Database.UserManager.FindByName(userName));
 
             if (operationResult.Errors.Any())
                 return new OperationDetails(false, operationResult.Errors.FirstOrDefault(), "");
 
             await Database.SaveAsync();
 
-            return new OperationDetails(true, $"User account with id: {userId} was successfuly deleted", string.Empty);
+            return new OperationDetails(true, $"User account {userName} was successfuly deleted", string.Empty);
         }
 
         public UserDTO GetUserProfileByUserName(string userName)
