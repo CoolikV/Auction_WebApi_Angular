@@ -27,13 +27,6 @@ namespace Auction.BusinessLogic.Configs
                 .Ignore(dest => dest.Id);
 
             config.NewConfig<UserProfile, UserDTO>();
-
-            //config.NewConfig<CategoryDTO, Category>().PreserveReference(true).TwoWays();
-            //config.NewConfig<TradeDTO, Trade>().PreserveReference(true).TwoWays();
-            //config.NewConfig<TradingLot, TradingLotDTO>()
-            //    .IgnoreAttribute(typeof(Category))
-            //    .PreserveReference(true).TwoWays();
-            //config.NewConfig<UserDTO, User>().PreserveReference(true).TwoWays();
         }
     }
 }

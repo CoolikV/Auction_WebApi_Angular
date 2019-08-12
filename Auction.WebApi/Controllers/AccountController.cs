@@ -1,15 +1,19 @@
 ﻿using Auction.BusinessLogic.DataTransfer;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
+using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
 using Mapster;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 
 namespace Auction.WebApi.Controllers
 {
-    [RoutePrefix("api/account")]
+    [RoutePrefix("api/accounts")]
     public class AccountController : ApiController
     {
         readonly IUserManager userManager;
@@ -22,6 +26,30 @@ namespace Auction.WebApi.Controllers
             _adapter = adapter;
         }
 
+        [HttpGet]
+        [Authorize(Roles ="admin")]
+        [Route("")]
+        public IHttpActionResult GetUsersList([FromUri] PagingParameterModel paging, [FromUri] string name)
+        {
+            IEnumerable<UserDTO> usersForPage;
+
+            try
+            {
+                usersForPage = userManager.GetUsersForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, name, out int pagesCount, out int totalItemsCount);
+
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
+                totalItemsCount, pagesCount));
+
+                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
+            }
+            catch (NotFoundException ex)
+            {
+                HttpContext.Current.Response.Headers.Add("Error message", ex.Message);
+                return NotFound();
+            }
+            return Ok(_adapter.Adapt<UserProfileModel>(usersForPage));
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [Route("register")]
@@ -31,10 +59,7 @@ namespace Auction.WebApi.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-            var newUserDto = _adapter.Adapt<UserDTO>(registerModel);
-
-            var result = await userManager.CreateUserAsync(newUserDto);
+            var result = await userManager.CreateUserAsync(_adapter.Adapt<UserDTO>(registerModel));
 
             if (!result.Succedeed)
                 return BadRequest(result.Message);
@@ -80,5 +105,8 @@ namespace Auction.WebApi.Controllers
 
             return StatusCode(HttpStatusCode.NoContent);
         }
+
+        //add put update delete methods...
+
     }
 }

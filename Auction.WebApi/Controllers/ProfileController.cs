@@ -30,7 +30,7 @@ namespace Auction.WebApi.Controllers
 
         UserDTO CurrentUser
         {
-            get => userManager.GetUserProfileByEmail(User.Identity.Name);
+            get => userManager.GetUserProfileByUserName(User.Identity.Name);
         }
 
         [HttpGet]
@@ -42,23 +42,38 @@ namespace Auction.WebApi.Controllers
 
         [HttpGet]
         [Route("lots")]
-        public IEnumerable<TradingLotModel> GetUserLots(PagingParameterModel pagingParameter)
+        public IHttpActionResult GetUserLots([FromUri]PagingParameterModel paging, [FromUri] LotFilteringModel filter)
         {
-            return _adapter.Adapt<IEnumerable<TradingLotModel>>(CurrentUser.TradingLots);
+            IEnumerable<TradingLotDTO> lotsForPage;
+            try
+            {
+                lotsForPage = lotService.GetLotsForUser(CurrentUser.Id, paging?.PageNumber ?? 1, paging?.PageSize ?? 10,
+                    filter.CategoryId, filter.MinPrice, filter.MaxPrice, filter.LotName, out int pagesCount, out int totalItemsCount);
+
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
+                totalItemsCount, pagesCount));
+
+                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok(_adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage));
         }
 
-        //add filtering model and use it to display all/win/loose/active trades
         [HttpGet]
         [Route("trades")]
-        public IHttpActionResult GetTrades(PagingParameterModel pagingParameter, string state)
+        public IHttpActionResult GetTrades([FromUri] PagingParameterModel paging, [FromUri] TradeFilteringModel filter, string state)
         {
             IEnumerable<TradeDTO> tradesForPage;
             try
             {
-                tradesForPage = tradeService.GetTradesForPage(CurrentUser.Id, pagingParameter?.PageNumber ?? 1,
-                    pagingParameter?.PageSize ?? 10, state, out int pagesCount, out int totalItemsCount);
+                tradesForPage = tradeService.GetUserTrades(CurrentUser.Id, paging?.PageNumber ?? 1, paging?.PageSize ?? 10,
+                    state, filter.TradeStarts, filter.TradeEnds, filter.MaxPrice, filter.LotName, out int pagesCount, out int totalItemsCount);
 
-                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
                 totalItemsCount, pagesCount));
 
                 HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
@@ -70,5 +85,7 @@ namespace Auction.WebApi.Controllers
 
             return Ok(_adapter.Adapt<IEnumerable<TradeModel>>(tradesForPage));
         }
+
+        //add put update delete methods...
     }
 }
