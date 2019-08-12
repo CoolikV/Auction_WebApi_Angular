@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
-using Auction.BusinessLogic.Exceptions;
+﻿using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Auction.WebApi.Providers
 {
