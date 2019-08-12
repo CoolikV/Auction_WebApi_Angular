@@ -15,13 +15,22 @@ namespace Auction.BusinessLogic.Configs
                 .Map(dest => dest.LotId, src => src.TradingLot.Id);
 
             config.NewConfig<Trade, TradeDTO>().MaxDepth(3);
-                //.IgnoreIf((src, dest) => !string.IsNullOrEmpty(src.LastRateUserId), dest => dest.LastRateUserId);
-                //.Ignore(dest => dest.LastRateUserId);
+            //.IgnoreIf((src, dest) => !string.IsNullOrEmpty(src.LastRateUserId), dest => dest.LastRateUserId);
+            //.Ignore(dest => dest.LastRateUserId);
 
-            config.NewConfig<TradingLotDTO, TradingLot>().MaxDepth(4).IgnoreNullValues(true);
+            config.NewConfig<TradingLotDTO, TradingLot>()
+                .Map(d => d.Description, s => s.Description)
+                .Map(d => d.Name, s => s.Name)
+                .Map(d => d.Price, s => s.Price)
+                .Map(d => d.Img, s => s.Img)
+                .Map(d => d.TradeDuration, s => s.TradeDuration)
+                .IgnoreNonMapped(true)
+                .IgnoreNullValues(true);
+                //.MaxDepth(4).IgnoreNullValues(true);
+
             config.NewConfig<TradingLot, TradingLotDTO>()
-                .Map(dest => dest.Status, src => src.LotStatus)
-                .MaxDepth(5).IgnoreNullValues(true);
+                .Map(dest => dest.Status, src => src.LotStatus);
+                //.MaxDepth(5).IgnoreNullValues(true);
 
             config.NewConfig<UserDTO, UserProfile>()
                 .Ignore(dest => dest.Id);

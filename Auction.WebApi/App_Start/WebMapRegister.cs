@@ -13,17 +13,24 @@ namespace Auction.WebApi.App_Start
 
             config.NewConfig<TradingLotDTO, TradingLotModel>()
                 .Map(dest => dest.Owner, src => src.User.UserName)
-                .Map(d => d.Category, s => s.Category.Name);
+                .Map(d => d.Category, s => s.Category.Name)
+                .Ignore(d => d.ImgBytes);
 
-            config.NewConfig<TradingLotModel, TradingLotDTO>()
-                .Ignore(dest => dest.Category);
+            config.NewConfig<TradingLotModel, TradingLotDTO>();
 
+            config.NewConfig<BaseTradingLotModel, TradingLotDTO>()
+                .Map(d => d.Name, s => s.Name)
+                .Map(d => d.Img, s => s.Img)
+                .Map(d => d.Price, s => s.Price)
+                .Map(d => d.TradeDuration, s => s.TradeDuration)
+                .Map(d => d.Description, s => s.Description)
+                .Map(d => d.CategoryId, s => s.CategoryId)
+                .IgnoreNonMapped(true);
+            
             config.NewConfig<RegisterModel, UserDTO>()
                 .Map(dest => dest.Role, src => "user");
 
-            config.NewConfig<CategoryModel, CategoryDTO>().MaxDepth(4);
-
-            config.NewConfig<CategoryDTO, CategoryModel>().MaxDepth(4);
+            config.NewConfig<CategoryModel, CategoryDTO>().TwoWays();
 
             config.NewConfig<TradeDTO, TradeModel>()
                 .Map(dest => dest.DaysLeft, src => src.TradeEnd.Subtract(src.TradeStart).Days);
