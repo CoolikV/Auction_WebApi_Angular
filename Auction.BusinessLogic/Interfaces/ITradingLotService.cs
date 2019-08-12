@@ -7,7 +7,7 @@ namespace Auction.BusinessLogic.Interfaces
     public interface ITradingLotService : IDisposable
     {
         void CreateLot(TradingLotDTO lot);
-        void EditLot(int lotId, TradingLotDTO lot);
+        void EditLot(int lotId, TradingLotDTO lot, bool isManager);
         void RemoveLotById(int id);
         IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? categoryId,
             double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount);

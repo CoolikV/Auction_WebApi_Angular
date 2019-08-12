@@ -39,6 +39,7 @@ namespace Auction.BusinessLogic.Services
                 lotPoco.User = Database.UserProfiles.GetProfileById(lot.User.Id);
                 lotPoco.Category = lot.Category is null ? Database.Categories.GetCategoryById(1) 
                     : Database.Categories.GetCategoryById(lot.Category.Id);
+                lotPoco.LotStatus = LotStatus.NotVerified;
 
                 Database.TradingLots.AddTradingLot(lotPoco);
                 Database.Save();
@@ -50,27 +51,33 @@ namespace Auction.BusinessLogic.Services
         }
 
         //delete old image from app data and save new image, then set new img path
-        public void EditLot(int lotId, TradingLotDTO lot)
+        public void EditLot(int lotId, TradingLotDTO lotDto, bool isManager)
         {
             try
             {
-                if (!IsLotExists(lot.Id))
-                    throw new NotFoundException();
+                if (!IsLotExists(lotId))
+                    throw new NotFoundException($"Lot with id: {lotId}");
 
-                TradingLot lotPoco = Database.TradingLots.GetTradingLotById(lot.Id);
+                TradingLot lotPoco = Database.TradingLots.GetTradingLotById(lotId);
                 if (lotPoco.LotStatus == LotStatus.OnSale)
                     throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
-                //cant ignore null values in mapster
-                //tradingLot = Adapter.Adapt<TradingLot>(lot);
+                if (isManager && lotPoco.CategoryId != lotDto.CategoryId)
+                {
+                    if (CategoryService.IsCategoryExist(lotDto.CategoryId) )
+                    {
+                        lotPoco.CategoryId = lotDto.CategoryId;
+                        lotPoco.Category = Database.Categories.GetCategoryById(lotDto.CategoryId);
+                    }
+                }
 
-                lotPoco.Name = lot.Name;
-                lotPoco.Description = lot.Description;
-                lotPoco.Img = lot.Img;
-                lotPoco.TradeDuration = lot.TradeDuration;
-                lotPoco.Price = lot.Price;
+                lotDto.Adapt(lotPoco);
 
                 Database.TradingLots.UpdateTradingLot(lotPoco);
                 Database.Save();
+            }
+            catch(AuctionException ex)
+            {
+                throw ex;
             }
             catch(Exception)
             {
