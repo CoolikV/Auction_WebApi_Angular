@@ -128,11 +128,15 @@ namespace Auction.WebApi.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
-        public IHttpActionResult UpdateTradingLot(int id, [FromBody]TradingLotModel model)
+        public IHttpActionResult UpdateTradingLot(int id, [FromBody]BaseTradingLotModel model)
         {
             try
             {
-                lotService.EditLot(id, _adapter.Adapt<TradingLotDTO>(model));
+                lotService.EditLot(id, _adapter.Adapt<TradingLotDTO>(model), User.IsInRole("manager"));
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
             catch (NotFoundException)
             {
