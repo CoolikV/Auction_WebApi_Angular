@@ -4,7 +4,7 @@ namespace Auction.WebApi.Models
 {
     public class BaseTradingLotModel
     {
-        [Required(ErrorMessage = "Fill in the name field", AllowEmptyStrings = false)]
+        [Required(ErrorMessage = "Fill the name field", AllowEmptyStrings = false)]
         [RegularExpression(@"^[\s0-9a-zA-Z]+$")]
         [MaxLength(100)]
         [MinLength(4)]
@@ -17,7 +17,7 @@ namespace Auction.WebApi.Models
         [Required(ErrorMessage = "Required field")]
         public string Img { get; set; }  
 
-        [Required(ErrorMessage = "Upload the lot picture")]
+        //[Required(ErrorMessage = "Upload the lot picture")] //change when release image saving on server
         public byte[] ImgBytes { get; set; }
 
         [Required(ErrorMessage = "Set the price", AllowEmptyStrings = false)]
