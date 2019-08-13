@@ -2,23 +2,25 @@
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
+using Auction.DataAccess.Entities.Enums;
 using Auction.DataAccess.Interfaces;
 using Mapster;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace Auction.BusinessLogic.Services
 {
     public class TradingLotService : ITradingLotService
     {
         IAdapter Adapter { get; set; }
         IUnitOfWork Database { get; set; }
+        ICategoryService CategoryService { get; set; }
 
-        public TradingLotService(IUnitOfWork uow, IAdapter adapter)
+        public TradingLotService(IUnitOfWork uow, IAdapter adapter, ICategoryService categoryService)
         {
             Database = uow;
             Adapter = adapter;
+            CategoryService = categoryService;
         }
 
         public void Dispose()
@@ -32,121 +34,180 @@ namespace Auction.BusinessLogic.Services
                 throw new ArgumentNullException(nameof(lot));
 
             var lotPoco = Adapter.Adapt<TradingLot>(lot);
-            lotPoco.User = Database.Users.GetUserById(lot.User.Id);
-            lotPoco.Category = lot.Category is null ? Database.Categories.GetCategoryById(1) : Database.Categories.GetCategoryById(lot.Category.Id);
+            try
+            {
+                lotPoco.User = Database.UserProfiles.GetProfileById(lot.User.Id);
+                lotPoco.Category = lot.Category is null ? Database.Categories.GetCategoryById(1) 
+                    : Database.Categories.GetCategoryById(lot.Category.Id);
+                lotPoco.LotStatus = LotStatus.NotVerified;
 
-            Database.TradingLots.AddTradingLot(lotPoco);
-            Database.Save();
+                Database.TradingLots.AddTradingLot(lotPoco);
+                Database.Save();
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
         }
 
-        public void EditLot(int lotId, TradingLotDTO lot)
+        //delete old image from app data and save new image, then set new img path
+        public void EditLot(int lotId, TradingLotDTO lotDto, bool isManager)
         {
-            if (lot == null)
-                throw new ArgumentNullException(nameof(lot));
+            try
+            {
+                if (!IsLotExists(lotId))
+                    throw new NotFoundException($"Lot with id: {lotId}");
 
-            var tradingLot = Database.TradingLots.GetTradingLotById(lotId);
+                TradingLot lotPoco = Database.TradingLots.GetTradingLotById(lotId);
+                if (lotPoco.LotStatus == LotStatus.OnSale)
+                    throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
+                if (isManager && lotPoco.CategoryId != lotDto.CategoryId)
+                {
+                    if (CategoryService.IsCategoryExist(lotDto.CategoryId) )
+                    {
+                        lotPoco.CategoryId = lotDto.CategoryId;
+                        lotPoco.Category = Database.Categories.GetCategoryById(lotDto.CategoryId);
+                    }
+                }
 
-            if (tradingLot == null)
-                throw new NotFoundException($"Trading lot with id : {lotId}");
+                lotDto.Adapt(lotPoco);
 
-            if (tradingLot.IsVerified)
-                throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
-            //cant ignore null values in mapster
-            //tradingLot = Adapter.Adapt<TradingLot>(lot);
-
-            tradingLot.Name = lot.Name;
-            tradingLot.Description = lot.Description;
-            tradingLot.Img = lot.Img;
-            tradingLot.TradeDuration = lot.TradeDuration;
-            tradingLot.Price = lot.Price;
-
-            Database.TradingLots.UpdadeTradingLot(tradingLot);
-            Database.Save();
+                Database.TradingLots.UpdateTradingLot(lotPoco);
+                Database.Save();
+            }
+            catch(AuctionException ex)
+            {
+                throw ex;
+            }
+            catch(Exception)
+            {
+                throw new DatabaseException();
+            }
         }
 
         public void RemoveLotById(int lotId)
         {
-            TradingLot tradingLot = Database.TradingLots.GetTradingLotById(lotId)
-                ?? throw new NotFoundException($"Trading lot with id : {lotId}");
+            try
+            {
+                if (!IsLotExists(lotId))
+                    throw new NotFoundException();
 
-            Database.TradingLots.DeleteTradingLotById(tradingLot.Id);
-            Database.Save();
-        }
-
-        //change 
-        public IEnumerable<TradingLotDTO> FindLotsByCategory(int? categoryId)
-        {
-            var query = categoryId.HasValue ? Database.TradingLots.FindTradingLots(l => l.CategoryId == categoryId.Value)
-                : Database.TradingLots.FindTradingLots().AsQueryable();
-
-            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(query);
+                Database.TradingLots.DeleteTradingLotById(lotId);
+                Database.Save();
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
         }
 
         public TradingLotDTO GetLotById(int lotId)
         {
-            var tradingLot = Database.TradingLots.GetTradingLotById(lotId)
-                ?? throw new NotFoundException($"Trading lot with id : {lotId}");
-
-            return Adapter.Adapt<TradingLotDTO>(tradingLot);
+            if (!IsLotExists(lotId))
+                throw new NotFoundException();
+            try
+            {
+                return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetTradingLotById(lotId));
+            }
+            catch(Exception)
+            {
+                throw new DatabaseException();
+            }
         }
 
         public void ChangeLotCategory(int lotId, int categoryId)
         {
-            TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
-            Category category = Database.Categories.GetCategoryById(categoryId);
-
-            if (lot == null || category == null)
-                throw new ArgumentNullException();
-
-            lot.Category = category;
-
-            Database.TradingLots.UpdadeTradingLot(lot);
-            Database.Save();
+            if (!IsLotExists(lotId) || !CategoryService.IsCategoryExist(categoryId))
+                throw new NotFoundException();
+            try
+            {
+                TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
+                Category category = Database.Categories.GetCategoryById(categoryId);
+                lot.Category = category;
+                lot.CategoryId = categoryId;
+                Database.TradingLots.UpdateTradingLot(lot);
+                Database.Save();
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
         }
 
         public void VerifyLot(int lotId)
         {
-            TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
-
-            if (lot == null)
-                throw new ArgumentNullException(nameof(lot));
-
-            lot.IsVerified = true;
-
-            Database.TradingLots.UpdadeTradingLot(lot);
-            Database.Save();
+            if (!IsLotExists(lotId))
+                throw new NotFoundException("Can`t found this lot");
+            try
+            {
+                TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
+                lot.LotStatus = LotStatus.Verified;
+                Database.TradingLots.UpdateTradingLot(lot);
+                Database.Save();
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
         }
 
-        public IEnumerable<TradingLotDTO> FindLotsByCategoryName(string categoryName)
+        public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? categoryId,
+            double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
         {
-            if (string.IsNullOrEmpty(categoryName))
-                throw new ArgumentException("Category name is empty", nameof(categoryName));
-
-            var lotsInCategory = Database.TradingLots.FindTradingLots(lot => lot.Category.Name.Equals(categoryName),
-                orderBy: q => q.OrderBy(l => l.TradeDuration));
-
-            if (lotsInCategory.Any())
-                throw new NotFoundException($"Lots in category {categoryName}");
-
-            return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsInCategory);
+            return FilterLotsForPage(string.Empty, pageNum, pageSize, categoryId, minPrice, maxPrice, lotName, out pagesCount, out totalItemsCount);
         }
 
-        public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, string category,
-            out int pagesCount, out int totalItemsCount)
+        public IEnumerable<TradingLotDTO> GetLotsForUser(string userId, int pageNum, int pageSize, int? categoryId,
+            double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
         {
-            var source = Database.TradingLots.Entities;
+            return FilterLotsForPage(userId, pageNum, pageSize, categoryId, minPrice, maxPrice, lotName, out pagesCount, out totalItemsCount);
+        }
 
-            if (!string.IsNullOrEmpty(category))
-                source = source.Where(l => l.Category.Name.Equals(category));
+        //add ordering
+        private IEnumerable<TradingLotDTO> FilterLotsForPage(string userId, int pageNum, int pageSize, int? categoryId,
+            double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
+        {
+            IQueryable<TradingLot> source = Database.TradingLots.FindTradingLots();
+            if (!string.IsNullOrWhiteSpace(userId))
+                source = source.Where(l => l.UserId == userId);
+            
+            if (categoryId.HasValue && CategoryService.IsCategoryExist(categoryId.Value))
+                source = source.Where(l => l.CategoryId == categoryId);
+
+            if (maxPrice.HasValue)
+                if (minPrice < maxPrice)
+                    source = source.Where(l => l.Price >= minPrice && l.Price <= maxPrice);
+                else
+                    source = source.Where(l => l.Price <= maxPrice);
+            else
+                source = source.Where(l => l.Price >= minPrice);
+
+            if (!string.IsNullOrWhiteSpace(lotName))
+                source = source.Where(l => l.Name.ToLower().Contains(lotName.ToLower()));
 
             totalItemsCount = source.Count();
+            if (totalItemsCount < 1)
+                throw new NotFoundException();
+
             pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
-            var lotsForPage = source.OrderBy(l => l.TradeDuration)
+            var lotsForPage = source.OrderBy(l => l.Name)
                 .Skip((pageNum - 1) * pageSize)
                 .Take(pageSize)
                 .AsEnumerable();
 
             return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsForPage);
+        }
+
+        public bool IsLotExists(int id)
+        {
+            try
+            {
+                return Database.TradingLots.FindTradingLots(l => l.Id == id).Any();
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
         }
     }
 }

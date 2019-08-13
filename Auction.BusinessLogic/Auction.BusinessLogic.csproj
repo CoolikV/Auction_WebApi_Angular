@@ -72,6 +72,7 @@
     <Compile Include="DataTransfer\TradingLotDTO.cs" />
     <Compile Include="DataTransfer\UserDTO.cs" />
     <Compile Include="Exceptions\AuctionException.cs" />
+    <Compile Include="Exceptions\DatabaseException.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="IdentityDetails\OperationDetails.cs" />
     <Compile Include="Interfaces\ICategoryService.cs" />

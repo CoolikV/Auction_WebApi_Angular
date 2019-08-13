@@ -1,7 +1,6 @@
 ﻿using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
@@ -19,68 +18,87 @@ namespace Auction.DataAccess.Repositories
             dbSet = context.Set<Category>();
         }
 
-        public IQueryable<Category> Entities => dbSet;
-
-        public void AddCategory(Category category)
-        {
-            dbSet.Add(category);
-        }
-
-        public void DeleteCategory(Category category)
-        {
-            if (Database.Entry(category).State == EntityState.Detached)
-                dbSet.Attach(category);
-
-            dbSet.Remove(category);
-        }
-
-        public void DeleteCategoryById(int id)
-        {
-            Category category = dbSet.Find(id);
-            DeleteCategory(category);
-        }
-
-        public IEnumerable<Category> FindCategories(Expression<Func<Category, bool>> filter = null,
-            Func<IQueryable<Category>, IOrderedQueryable<Category>> orderBy = null,
-            string includeProperties = "")
-        {
-            IQueryable<Category> query = dbSet;
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty);
-            }
-
-            if (orderBy != null)
-            {
-                return orderBy(query).ToList();
-            }
-            else
-            {
-                return query.ToList();
-            }
-        }
-
         public Category GetCategoryById(int id)
         {
-            return dbSet.Find(id);
+            try
+            {
+                return dbSet.Find(id);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public Category GetCategoryByName(string name)
         {
-            return dbSet.Where(category => category.Name.Equals(name)).SingleOrDefault();
+            try
+            {
+                return dbSet.Where(category => category.Name.Equals(name)).SingleOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        public void UpdadeCategory(Category category)
+        public void AddCategory(Category category)
         {
-            dbSet.Attach(category);
-            Database.Entry(category).State = EntityState.Modified;
+            try
+            {
+                dbSet.Add(category);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void UpdateCategory(Category category)
+        {
+            try
+            {
+                dbSet.Attach(category);
+                Database.Entry(category).State = EntityState.Modified;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void DeleteCategory(Category category)
+        {
+            try
+            {
+                if (Database.Entry(category).State == EntityState.Detached)
+                    dbSet.Attach(category);
+                dbSet.Remove(category);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void DeleteCategoryById(int id)
+        {
+            try
+            {
+                Category category = dbSet.Find(id);
+                DeleteCategory(category);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public IQueryable<Category> FindCategories(Expression<Func<Category, bool>> filter = null)
+        {
+            IQueryable<Category> query = dbSet;
+
+            return filter == null ? query : query.Where(filter);
         }
 
         public void Dispose()

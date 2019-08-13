@@ -14,7 +14,7 @@ namespace Auction.DataAccess.Repositories
         private ITradingLotRepository _tradingLotRepository;
         private ITradeRepository _tradeRepository;
         private ICategoryRepository _categoryRepository;
-        private IUserRepository _userRepository;
+        private IUserProfileRepository _userRepository;
         
         private AppUserManager _userManager;
         private UserRoleManager _userRoleManager;
@@ -24,12 +24,12 @@ namespace Auction.DataAccess.Repositories
             _context = new AuctionContext(connectionString);
         }
 
-        public IUserRepository Users
+        public IUserProfileRepository UserProfiles
         {
             get
             {
                 if (_userRepository == null)
-                    _userRepository = new UserRepository(_context);
+                    _userRepository = new UserProfileRepository(_context);
                 return _userRepository;
             }
         }

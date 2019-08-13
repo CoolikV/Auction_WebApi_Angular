@@ -10,8 +10,6 @@ namespace Auction.WebApi
     {
         public void Configuration(IAppBuilder app)
         {
-            //HttpConfiguration config = new HttpConfiguration();
-
             ConfigureAuth(app);
 
             app.UseWebApi(GlobalConfiguration.Configuration);

@@ -8,6 +8,7 @@ using Auction.DataAccess.Interfaces;
 using Mapster;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security.OAuth;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -28,99 +29,169 @@ namespace Auction.BusinessLogic.Services
 
         public async Task<OperationDetails> CreateUserAsync(UserDTO userDto)
         {
-            var user = await Database.UserManager.FindByEmailAsync(userDto.Email);
-            if (user == null)
+            if (IsUserWithEmailExist(userDto.Email))
+                return new OperationDetails(false, "User with such email already exists, please log in", nameof(userDto.Email));
+            if(IsUserWithUserNameExist(userDto.UserName))
+                return new OperationDetails(false, $"User name {userDto.UserName} is already taken, please take another", nameof(userDto.UserName));
+            try
             {
-                user = new AppUser { Email = userDto.Email, UserName = userDto.Email };
-                var result = await Database.UserManager.CreateAsync(user, userDto.Password);
+                AppUser user = Adapter.Adapt<AppUser>(userDto);
+                var createUserResult = await Database.UserManager.CreateAsync(user, userDto.Password);
 
-                if (result.Errors.Count() > 0)
-                    return new OperationDetails(false, result.Errors.FirstOrDefault(), "");
+                if (createUserResult.Errors.Any()) 
+                    return new OperationDetails(false, createUserResult.Errors.FirstOrDefault(), string.Empty);
 
-                await Database.UserManager.AddToRoleAsync(user.Id, "user");
+                var addToRoleResult = await Database.UserManager.AddToRoleAsync(user.Id, "user");
+
+                if (addToRoleResult.Errors.Any())
+                    return new OperationDetails(false, addToRoleResult.Errors.FirstOrDefault(), string.Empty);
 
                 var clientProfile = Adapter.Adapt<UserProfile>(userDto);
                 clientProfile.Id = user.Id;
 
-                Database.Users.AddUser(clientProfile);
+                Database.UserProfiles.CreateProfile(clientProfile);
                 await Database.SaveAsync();
-                return new OperationDetails(true, "Регистрация успешно пройдена", "");
             }
-            else
+            catch (Exception)
             {
-                return new OperationDetails(false, "Пользователь с таким логином уже существует", "Email");
+                throw new DatabaseException();
             }
+
+            return new OperationDetails(true, "Registration successful", string.Empty);
         }
 
-        public IEnumerable<UserDTO> GetAllUsers()
+        public IEnumerable<UserDTO> GetUsersForPage(int pageNum, int pageSize, string userName, out int pagesCount, out int totalItemsCount)
         {
-            var appUsers = Database.UserManager.Users.ToList();
-            //var list = new List<UserDTO>();
+            IQueryable<UserProfile> source = Database.UserProfiles.FindProfiles();
+            if (!string.IsNullOrWhiteSpace(userName))
+                source = source.Where(user => user.UserName.ToLower().Contains(userName.ToLower()));
 
-            //if (appUsers != null)
-            //    foreach (var appUser in appUsers)
-            //        list.Add(CreateUserDTO(appUser));
+            totalItemsCount = source.Count();
+            if (totalItemsCount < 1)
+                throw new NotFoundException();
 
-            return Adapter.Adapt<IEnumerable<UserDTO>>(appUsers);
+            pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
+            var usersForPage = source.OrderBy(l => l.UserName)
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .AsEnumerable();
+
+            return Adapter.Adapt<IEnumerable<UserDTO>>(usersForPage);
         }
 
         public async Task<ClaimsIdentity> Authenticate(string userName, string password)
         {
-            ClaimsIdentity claim = null;
-            // находим пользователя
             var appUser = await Database.UserManager.FindAsync(userName, password)
-                ?? throw new NotFoundException("The user name or password is incorrect.");
+                ?? throw new NotFoundException("The user name or password is incorrect");
 
-            // авторизуем его и возвращаем объект ClaimsIdentity (Bearer token)
-            if (appUser != null)
-                claim = await Database.UserManager.CreateIdentityAsync(appUser,
-                                            OAuthDefaults.AuthenticationType);
+            ClaimsIdentity claim = await Database.UserManager.CreateIdentityAsync(appUser, OAuthDefaults.AuthenticationType);
 
             return claim;
         }
 
-        public UserDTO GetUserByName(string name)
+        public UserDTO GetUserByUserName(string userName)
         {
-            var appUser = Database.UserManager.FindByName(name) 
-                ?? throw new NotFoundException($"User with name {name}");
+            if (!IsUserWithUserNameExist(userName))
+                throw new NotFoundException($"User with user name: {userName}");
 
-            return Adapter.Adapt<UserDTO>(appUser);
+            return Adapter.Adapt<UserDTO>(Database.UserManager.FindByName(userName));
+        }
+        //maybe change
+        public async Task<OperationDetails> EditUserRoleAsync(string userId, string newRoleName)
+        {
+            if (!IsUserByIdExist(userId))
+                throw new NotFoundException("Selected user");
+            var appUser = await Database.UserManager.FindByIdAsync(userId);
+
+            string currentUserRole = GetRoleNameForUser(appUser);
+
+            if (currentUserRole.Equals(newRoleName))
+                return new OperationDetails(false,"User already in this role", nameof(newRoleName));
+            
+            await Database.UserManager.RemoveFromRoleAsync(userId, currentUserRole);
+            await Database.UserManager.AddToRoleAsync(userId, newRoleName);
+
+            await Database.UserManager.UpdateAsync(appUser);
+
+            return new OperationDetails(true, $"Role for user {appUser.UserName} was changed from {currentUserRole} to {newRoleName}", string.Empty);
         }
 
-        public async Task EditUserRoleAsync(string userId, string newRoleName)
+        public async Task<OperationDetails> DeleteUserAccount(string userName)
         {
-            var appUser = await Database.UserManager.FindByIdAsync(userId)
-                ?? throw new NotFoundException();
+            if (!IsUserWithUserNameExist(userName))
+                throw new NotFoundException($"User with name: {userName}");
+            //var userProfile = FindUserById(userId).UserProfile;
 
-            var currentUserRole = GetRoleNameForUser(userId);
+            //Database.UserProfiles.DeleteProfile(userProfile);
+            var operationResult = await Database.UserManager.DeleteAsync(Database.UserManager.FindByName(userName));
 
-            if (!currentUserRole.Equals(newRoleName))
+            if (operationResult.Errors.Any())
+                return new OperationDetails(false, operationResult.Errors.FirstOrDefault(), "");
+
+            await Database.SaveAsync();
+
+            return new OperationDetails(true, $"User account {userName} was successfuly deleted", string.Empty);
+        }
+
+        public UserDTO GetUserProfileByUserName(string userName)
+        {
+            if (!IsUserWithUserNameExist(userName))
+                throw new NotFoundException($"User with user name: {userName}");
+            return Adapter.Adapt<UserDTO>(Database.UserManager.FindByName(userName).UserProfile);
+        }
+
+        public void EditUserProfile(string userId, UserDTO userDto)
+        {
+            if (!IsUserByIdExist(userId))
+                throw new NotFoundException($"User with id: {userId}");
+
+            try
             {
-                await Database.UserManager.RemoveFromRoleAsync(userId, currentUserRole);
-                await Database.UserManager.AddToRoleAsync(userId, newRoleName);
+                var userProfile = Database.UserProfiles.GetProfileById(userId);
+                userProfile = Adapter.Adapt<UserProfile>(userDto);
 
-                await Database.UserManager.UpdateAsync(appUser);
+                Database.UserProfiles.UpdateProfile(userProfile);
             }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
+            Database.Save();
         }
 
-        public IEnumerable<string> GetAllRoles()
+        public IEnumerable<string> GetAllRoleNames()
         {
             return Database.UserRoleManager.Roles.Select(r => r.Name);
         }
 
-        private string GetRoleNameForUser(string userId)
+        private string GetRoleNameForUser(AppUser user)
         {
-            var user = Database.UserManager.FindById(userId);
-            var roleId = user.Roles.Where(x => x.UserId == user.Id).Single().RoleId;
-            var role = Database.UserRoleManager.Roles.Where(x => x.Id == roleId).Single().Name;
+            var roleId = user.Roles.Where(role => role.UserId == user.Id).Single().RoleId;
+            var roleName = Database.UserRoleManager.Roles.Where(role => role.Id == roleId).Single().Name;
 
-            return role;
+            return roleName;
         }
+        
+        #region Condition check methods
+        public bool IsUserWithUserNameExist(string userName)
+        {
+            return Database.UserManager.FindByName(userName) != null;
+        }
+
+        private bool IsUserWithEmailExist(string email)
+        {
+            return Database.UserManager.FindByEmail(email) != null;
+        }
+
+        private bool IsUserByIdExist(string id)
+        {
+            return Database.UserManager.FindById(id) != null;
+        }
+        #endregion
 
         public void Dispose()
         {
             Database.Dispose();
         }
-
     }
 }

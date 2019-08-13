@@ -7,11 +7,12 @@ namespace Auction.BusinessLogic.Interfaces
     public interface ITradeService : IDisposable
     {
         void StartTrade(int lotId);
-        void RateTradingLot(int tradeId, string userId, double price);
+        void RateTradingLot(int tradeId, string userName, double price);
         TradeDTO GetTradeById(int id);
-        IEnumerable<TradeDTO> GetAllTrades();
         TradeDTO GetTradeByLotId(int lotId);
-        IEnumerable<TradeDTO> GetUserLoseTrades(string userId);
-        IEnumerable<TradeDTO> GetUserWinTrades(string userId);
+        IEnumerable<TradeDTO> GetTradesForPage(int pageNum, int pageSize, DateTime? startDate,
+            DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount);
+        IEnumerable<TradeDTO> GetUserTrades(string userId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
+            DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount);
     }
 }

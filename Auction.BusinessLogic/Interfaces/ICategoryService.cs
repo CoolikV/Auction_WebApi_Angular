@@ -1,15 +1,16 @@
 ﻿using Auction.BusinessLogic.DataTransfer;
 using System;
-using System.Collections.Generic;
 
 namespace Auction.BusinessLogic.Interfaces
 {
     public interface ICategoryService : IDisposable
     {
         CategoryDTO GetCategoryById(int id);
-        IEnumerable<CategoryDTO> GetAllCategories();
+        TradingLotDTO GetLotFromCategory(int categoryId, int lotId);
         void RemoveCategoryById(int id);
-        void EditCategory(CategoryDTO category);
+        void ChangeCategoryName(int id, string name);
         void CreateCategory(CategoryDTO category);
+
+        bool IsCategoryExist(int id);
     }
 }
