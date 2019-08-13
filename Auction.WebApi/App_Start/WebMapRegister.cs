@@ -36,6 +36,13 @@ namespace Auction.WebApi.App_Start
                 .Map(dest => dest.DaysLeft, src => src.TradeEnd.Subtract(src.TradeStart).Days);
 
             config.NewConfig<UserProfileModel, UserDTO>();
+
+            config.NewConfig<UserDTO, UserProfileModel>()
+                .Map(d => d.Name, s => s.Name)
+                .Map(d => d.Surname, s => s.Surname)
+                .Map(d => d.BirthDate, s => s.BirthDate)
+                .Map(d => d.UserName, s => s.UserName)
+                .IgnoreNonMapped(true);
         }
     }
 }
