@@ -7,7 +7,7 @@ namespace Auction.WebApi.Models
         private DateTime? _startDate;
         private DateTime? _endDate;
 
-        public DateTime? TradeEnds
+        public DateTime? EndsOn
         {
             get
             {
@@ -18,7 +18,7 @@ namespace Auction.WebApi.Models
                 _endDate = value;
             }
         }
-        public DateTime? TradeStarts
+        public DateTime? StartsOn
         {
             get
             {
