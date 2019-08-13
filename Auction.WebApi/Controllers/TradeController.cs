@@ -64,7 +64,7 @@ namespace Auction.WebApi.Controllers
             try
             {
                 tradesForPage = tradeService.GetTradesForPage(pagingParameter?.PageNumber ?? 1,
-                    pagingParameter?.PageSize ?? 10, filter.TradeStarts, filter.TradeEnds, filter.MaxPrice,
+                    pagingParameter?.PageSize ?? 10, filter.StartsOn, filter.EndsOn, filter.MaxPrice,
                     filter.LotName, out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
@@ -81,14 +81,13 @@ namespace Auction.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("{lotId:int}")]
-        [Authorize()]
-        public IHttpActionResult VerifyLotAndStartTrade(int lotId)
+        [Route("")]
+        [Authorize]
+        public IHttpActionResult StartTrade(StartTradeModel tradeModel)
         {
             try
             {
-                lotService.VerifyLot(lotId);
-                tradeService.StartTrade(lotId);
+                tradeService.StartTrade(tradeModel.LotId);
             }
             catch (DatabaseException)
             {
@@ -111,9 +110,6 @@ namespace Auction.WebApi.Controllers
         [Authorize]
         public IHttpActionResult Rate([FromBody] RateModel rate)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             try
             {
                 tradeService.RateTradingLot(rate.TradeId, User.Identity.Name, rate.Sum);
