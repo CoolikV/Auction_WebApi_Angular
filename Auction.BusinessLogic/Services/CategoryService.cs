@@ -81,27 +81,6 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
-        //doesn`t work correctly remove or change
-        public void EditCategory(int id, CategoryDTO category)
-        {
-            if (category == null)
-                throw new ArgumentNullException(nameof(category));
-            var temp = Database.Categories.GetCategoryById(id) 
-                ?? throw new NotFoundException($"Category with id: {id}");
-
-            //temp.Name = category.Name;
-            var updatedCategory = Adapter.Adapt<Category>(category);
-
-            var linq = from dto in category.TradingLots
-                       join db in temp.TradingLots on dto.Id equals db.Id
-                       select Adapter.Adapt<TradingLot>(db);
-
-            updatedCategory.TradingLots = linq.ToList();
-
-            Database.Categories.UpdateCategory(updatedCategory);
-            Database.Save();
-        }
-
         public void ChangeCategoryName(int id, string name)
         {
             if(!IsCategoryExist(id))

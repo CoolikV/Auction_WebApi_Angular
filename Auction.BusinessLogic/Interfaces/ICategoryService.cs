@@ -8,7 +8,6 @@ namespace Auction.BusinessLogic.Interfaces
         CategoryDTO GetCategoryById(int id);
         TradingLotDTO GetLotFromCategory(int categoryId, int lotId);
         void RemoveCategoryById(int id);
-        void EditCategory(int id, CategoryDTO category);
         void ChangeCategoryName(int id, string name);
         void CreateCategory(CategoryDTO category);
 
