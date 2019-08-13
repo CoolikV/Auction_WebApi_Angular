@@ -28,83 +28,6 @@ namespace Auction.WebApi.Controllers
             this.categoryService = categoryService;
         }
 
-        [HttpPost]
-        [Route("")]
-        [Authorize(Roles ="manager,admin")]
-        public IHttpActionResult AddNewCategory(CategoryModel category)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                categoryService.CreateCategory(_adapter.Adapt<CategoryDTO>(category));
-            }
-            catch (DatabaseException)
-            {
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-            catch (AuctionException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-            return StatusCode(HttpStatusCode.Created);
-        }
-
-        [HttpPut]
-        [Route("{id:int}")]
-        [Authorize(Roles ="manager,admin")]
-        public IHttpActionResult UpdateCategoryName(int id, CategoryModel category)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                categoryService.ChangeCategoryName(id, category.Name);
-            }
-            catch (DatabaseException)
-            {
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
-            catch(AuctionException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-            return Ok();
-        }
- 
-        [HttpDelete]
-        [Authorize(Roles ="manager,admin")]
-        [Route("{id:int}")]
-        public IHttpActionResult DeleteCategory(int id)
-        {
-            try
-            {
-                categoryService.RemoveCategoryById(id);
-            }
-            catch (DatabaseException)
-            {
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
-            catch (AuctionException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
         [HttpGet]
         [AllowAnonymous]
         [Route("{id:int}")]
@@ -172,6 +95,77 @@ namespace Auction.WebApi.Controllers
             }
 
             return Ok(_adapter.Adapt<TradingLotModel>(lotDto));
+        }
+
+        [HttpPost]
+        [Route("")]
+        [Authorize(Roles ="manager,admin")]
+        public IHttpActionResult AddNewCategory(CategoryModel category)
+        {
+            try
+            {
+                categoryService.CreateCategory(_adapter.Adapt<CategoryDTO>(category));
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+            catch (AuctionException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return StatusCode(HttpStatusCode.Created);
+        }
+
+        [HttpPut]
+        [Route("{id:int}")]
+        [Authorize(Roles ="manager,admin")]
+        public IHttpActionResult UpdateCategoryName(int id, CategoryModel category)
+        {
+            try
+            {
+                categoryService.ChangeCategoryName(id, category.Name);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+            catch(AuctionException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
+        }
+ 
+        [HttpDelete]
+        [Authorize(Roles ="manager,admin")]
+        [Route("{id:int}")]
+        public IHttpActionResult DeleteCategory(int id)
+        {
+            try
+            {
+                categoryService.RemoveCategoryById(id);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+            catch (AuctionException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return StatusCode(HttpStatusCode.NoContent);
         }
     }
 }

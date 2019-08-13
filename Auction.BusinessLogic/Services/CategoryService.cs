@@ -44,17 +44,13 @@ namespace Auction.BusinessLogic.Services
 
         public TradingLotDTO GetLotFromCategory(int categoryId, int lotId)
         {
+            if (!IsCategoryContainLot(categoryId, lotId))
+                throw new NotFoundException($"Category doesn`t contain lot with id: {lotId}");
+
             try
             {
-                CategoryDTO category = GetCategoryById(categoryId);
-                TradingLotDTO tradingLot = category.TradingLots.FirstOrDefault(lot => lot.Id == lotId)
-                    ?? throw new NotFoundException($"Lot with id: {lotId} in {category.Name}");
-
-                return tradingLot;
-            }
-            catch(NotFoundException ex)
-            {
-                throw ex;
+                return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.FindTradingLots(l => l.Id == lotId 
+                && l.CategoryId == categoryId).Single());
             }
             catch (Exception)
             {
@@ -77,12 +73,12 @@ namespace Auction.BusinessLogic.Services
                     MoveLotsToCategory(categoryToDelete.TradingLots);
 
                 Database.Categories.DeleteCategoryById(categoryToDelete.Id);
+                Database.Save();
             }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
-            Database.Save();
         }
 
         //doesn`t work correctly remove or change
@@ -111,21 +107,21 @@ namespace Auction.BusinessLogic.Services
             if(!IsCategoryExist(id))
                 throw new NotFoundException($"Category with id: {id}");
             if(!IsCategoryNameFree(name))
-                throw new AuctionException($"Category {name} already exists.");
+                throw new AuctionException($"Category with name {name} is already exists");
 
             try
             {
-                var temp = Database.Categories.GetCategoryById(id);
+                var categoryToUpdate = Database.Categories.GetCategoryById(id);
 
-                temp.Name = name;
+                categoryToUpdate.Name = name;
 
-                Database.Categories.UpdateCategory(temp);
+                Database.Categories.UpdateCategory(categoryToUpdate);
+                Database.Save();
             }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
-            Database.Save();
         }
 
         public void CreateCategory(CategoryDTO category)
@@ -136,14 +132,14 @@ namespace Auction.BusinessLogic.Services
             try
             {
                 Database.Categories.AddCategory(new Category { Name = category.Name });
+                Database.Save();
             }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
-            Database.Save();
         }
-
+        #region Condition check methods
         /// <summary>
         /// Сhecks if there is a category with given name in the database 
         /// </summary>
@@ -163,6 +159,16 @@ namespace Auction.BusinessLogic.Services
             return Database.Categories.FindCategories(c => c.Id.Equals(id)).Any();
         }
         /// <summary>
+        /// Сhecks is category contain lot with given id 
+        /// </summary>
+        /// <param name="categoryId">Category id</param>
+        /// <param name="lotId">Lot Id</param>
+        /// <returns>True if category with specified id contains lot with given id</returns>
+        private bool IsCategoryContainLot(int categoryId, int lotId)
+        {
+            return Database.TradingLots.FindTradingLots(l => l.CategoryId == categoryId && l.Id == lotId).Any();
+        }
+        /// <summary>
         /// Change category of given lots in collection to category with given id
         /// </summary>
         /// <param name="tradingLots">Collection of lots, which category will be changed</param>
@@ -176,5 +182,6 @@ namespace Auction.BusinessLogic.Services
                 Database.TradingLots.UpdateTradingLot(lot);
             });
         }
+        #endregion
     }
 }
