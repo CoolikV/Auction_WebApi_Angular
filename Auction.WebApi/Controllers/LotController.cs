@@ -44,7 +44,7 @@ namespace Auction.WebApi.Controllers
             {
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
-            catch(NotFoundException)
+            catch (NotFoundException)
             {
                 return NotFound();
             }
@@ -60,11 +60,11 @@ namespace Auction.WebApi.Controllers
             IEnumerable<TradingLotDTO> lotsForPage;
             try
             {
-                lotsForPage = lotService.GetLotsForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, filterModel.CategoryId, 
+                lotsForPage = lotService.GetLotsForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, filterModel.CategoryId,
                     filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName, out int pagesCount, out int totalItemsCount);
 
-                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging, 
-                    totalItemsCount,pagesCount));
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
+                    totalItemsCount, pagesCount));
 
                 HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
             }
@@ -96,7 +96,7 @@ namespace Auction.WebApi.Controllers
             }
 
             return Ok(category);
-        } 
+        }
 
         [HttpPost]
         [Route("")]
@@ -148,6 +148,26 @@ namespace Auction.WebApi.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpPatch]
+        [Route("{id:int}")]
+        [Authorize(Roles ="manager,admin")]
+        public IHttpActionResult VerifyLot(int id)
+        {
+            try
+            {
+                lotService.VerifyLot(id);
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+            catch (NotFoundException ex)
+            {
+                return Content(HttpStatusCode.NotFound, ex.Message);
+            }
         }
 
         [HttpDelete]
