@@ -7,12 +7,12 @@ namespace Auction.WebApi.Models
     public class RegisterModel
     {
         [Required(ErrorMessage = "Required field")]
-        [RegularExpression(@"^[a-ZA-Z\s]+$", ErrorMessage = "Name cannot contain numbers and special symbols")]
+        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Name cannot contain numbers and special symbols")]
         [MaxLength(50, ErrorMessage = "Name must be less 50 symbols")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Required field")]
-        [RegularExpression(@"^[a-ZA-Z\s]+$", ErrorMessage = "Surname cannot contain numbers and special symbols")]
+        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Surname cannot contain numbers and special symbols")]
         [MaxLength(50, ErrorMessage = "Surname must be less 50 symbols")]
         public string Surname { get; set; }
 

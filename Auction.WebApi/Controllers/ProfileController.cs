@@ -104,6 +104,24 @@ namespace Auction.WebApi.Controllers
             return Ok(_adapter.Adapt<IEnumerable<TradeModel>>(tradesForPage));
         }
 
+        [HttpPut]
+        [Authorize]
+        [Route("")]
+        public IHttpActionResult UpdateUserProfile(UserProfileModel userModel)
+        {
+            try
+            {
+                var adapt = _adapter.Adapt<UserDTO>(userModel);
+
+                userManager.EditUserProfile(CurrentUser.Id, adapt);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
         //add put update delete methods...
     }
 }
