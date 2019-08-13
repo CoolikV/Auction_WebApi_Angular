@@ -170,7 +170,7 @@ namespace Auction.BusinessLogic.Services
             IQueryable<TradingLot> source = Database.TradingLots.FindTradingLots();
             if (!string.IsNullOrWhiteSpace(userId))
                 source = source.Where(l => l.UserId == userId);
-
+            
             if (categoryId.HasValue && CategoryService.IsCategoryExist(categoryId.Value))
                 source = source.Where(l => l.CategoryId == categoryId);
 

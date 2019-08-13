@@ -6,6 +6,7 @@ using Auction.WebApi.Models;
 using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Net;
 using System.Web;
 using System.Web.Http;
 
@@ -30,14 +31,31 @@ namespace Auction.WebApi.Controllers
 
         UserDTO CurrentUser
         {
-            get => userManager.GetUserProfileByUserName(User.Identity.Name);
+            get
+            {
+                try
+                {
+                    return userManager.GetUserProfileByUserName(User.Identity.Name);
+                }
+                catch (NotFoundException)
+                {
+                    throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                }
+            }
         }
 
         [HttpGet]
         [Route("")]
         public IHttpActionResult GetProfileInfo()
         {
-            return Ok(_adapter.Adapt<UserProfileModel>(CurrentUser));
+            try
+            {
+                return Ok(_adapter.Adapt<UserProfileModel>(CurrentUser));
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet]
