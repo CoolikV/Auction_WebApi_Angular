@@ -33,32 +33,38 @@ namespace Auction.BusinessLogic.Services
                 return new OperationDetails(false, "User with such email already exists, please log in", nameof(userDto.Email));
             if(IsUserWithUserNameExist(userDto.UserName))
                 return new OperationDetails(false, $"User name {userDto.UserName} is already taken, please take another", nameof(userDto.UserName));
-            //add mapping and ignore not mapped
-            AppUser user = new AppUser { Email = userDto.Email, UserName = userDto.UserName };
-            var createUserResult = await Database.UserManager.CreateAsync(user, userDto.Password);
+            try
+            {
+                AppUser user = Adapter.Adapt<AppUser>(userDto);
+                var createUserResult = await Database.UserManager.CreateAsync(user, userDto.Password);
 
-            if (createUserResult.Errors.Any()) 
-                return new OperationDetails(false, createUserResult.Errors.FirstOrDefault(), string.Empty);
+                if (createUserResult.Errors.Any()) 
+                    return new OperationDetails(false, createUserResult.Errors.FirstOrDefault(), string.Empty);
 
-            var addToRoleResult = await Database.UserManager.AddToRoleAsync(user.Id, "user");
+                var addToRoleResult = await Database.UserManager.AddToRoleAsync(user.Id, "user");
 
-            if (addToRoleResult.Errors.Any())
-                return new OperationDetails(false, addToRoleResult.Errors.FirstOrDefault(), string.Empty);
+                if (addToRoleResult.Errors.Any())
+                    return new OperationDetails(false, addToRoleResult.Errors.FirstOrDefault(), string.Empty);
 
-            var clientProfile = Adapter.Adapt<UserProfile>(userDto);
-            clientProfile.Id = user.Id;
+                var clientProfile = Adapter.Adapt<UserProfile>(userDto);
+                clientProfile.Id = user.Id;
 
-            Database.UserProfiles.CreateProfile(clientProfile);
-            await Database.SaveAsync();
+                Database.UserProfiles.CreateProfile(clientProfile);
+                await Database.SaveAsync();
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
 
             return new OperationDetails(true, "Registration successful", string.Empty);
         }
 
-        public IEnumerable<UserDTO> GetUsersForPage(int pageNum, int pageSize, string name, out int pagesCount, out int totalItemsCount)
+        public IEnumerable<UserDTO> GetUsersForPage(int pageNum, int pageSize, string userName, out int pagesCount, out int totalItemsCount)
         {
-            IQueryable<AppUser> source = Database.UserManager.Users;
-            if (!string.IsNullOrWhiteSpace(name))
-                source = source.Where(user => user.UserName.ToLower().Contains(name.ToLower()));
+            IQueryable<UserProfile> source = Database.UserProfiles.FindProfiles();
+            if (!string.IsNullOrWhiteSpace(userName))
+                source = source.Where(user => user.UserName.ToLower().Contains(userName.ToLower()));
 
             totalItemsCount = source.Count();
             if (totalItemsCount < 1)
