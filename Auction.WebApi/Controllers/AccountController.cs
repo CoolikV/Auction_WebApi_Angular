@@ -29,13 +29,14 @@ namespace Auction.WebApi.Controllers
         [HttpGet]
         [Authorize(Roles ="admin")]
         [Route("")]
-        public IHttpActionResult GetUsersList([FromUri] PagingParameterModel paging, [FromUri] string name)
+        public IHttpActionResult GetUsersList([FromUri] PagingParameterModel paging, [FromUri] string userName = "")
         {
             IEnumerable<UserDTO> usersForPage;
 
             try
             {
-                usersForPage = userManager.GetUsersForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, name, out int pagesCount, out int totalItemsCount);
+                usersForPage = userManager.GetUsersForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10,
+                    userName, out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
                 totalItemsCount, pagesCount));
@@ -44,10 +45,9 @@ namespace Auction.WebApi.Controllers
             }
             catch (NotFoundException ex)
             {
-                HttpContext.Current.Response.Headers.Add("Error message", ex.Message);
-                return NotFound();
+                return Content(HttpStatusCode.NotFound, ex.Message);
             }
-            return Ok(_adapter.Adapt<UserProfileModel>(usersForPage));
+            return Ok(_adapter.Adapt<IEnumerable<UserProfileModel>>(usersForPage));
         }
 
         [HttpPost]
@@ -55,40 +55,20 @@ namespace Auction.WebApi.Controllers
         [Route("register")]
         public async Task<IHttpActionResult> Register(RegisterModel registerModel)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
             var result = await userManager.CreateUserAsync(_adapter.Adapt<UserDTO>(registerModel));
 
             if (!result.Succedeed)
                 return BadRequest(result.Message);
-
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
             return Ok();
         }
-
-        [HttpPatch]
-        [Authorize]
-        [Route("{id}")]
-        public IHttpActionResult UpdateUserProfile(string id, UserProfileModel userModel)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                var adapt = _adapter.Adapt<UserDTO>(userModel);
-
-                userManager.EditUserProfile(id, adapt);
-            }
-            catch(NotFoundException)
-            {
-                return NotFound();
-            }
-
-            return Ok();
-        }
-
+        
         [HttpDelete]
         [Authorize(Roles = "admin")]
         [Route("{userName}")]
