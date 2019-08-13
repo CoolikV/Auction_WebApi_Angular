@@ -131,7 +131,6 @@ namespace Auction.BusinessLogic.Services
         {
             if (!IsUserWithUserNameExist(userName))
                 throw new NotFoundException($"User with user name: {userName}");
-
             return Adapter.Adapt<UserDTO>(Database.UserManager.FindByName(userName).UserProfile);
         }
 

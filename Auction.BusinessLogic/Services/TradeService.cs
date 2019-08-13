@@ -38,7 +38,7 @@ namespace Auction.BusinessLogic.Services
                 var lot = Database.TradingLots.GetTradingLotById(lotId);
 
                 if (lot.LotStatus == LotStatus.NotVerified)
-                    throw new AuctionException("Lot is not verified");
+                    throw new AuctionException("Lot is not verified, please wait while the manager verifies it.");
 
                 Database.Trades.AddTrade(new Trade
                 {
@@ -47,6 +47,7 @@ namespace Auction.BusinessLogic.Services
                     TradeStart = DateTime.Now,
                     TradeEnd = DateTime.Now.AddDays(lot.TradeDuration)
                 });
+                Database.Save();
             }
             catch(AuctionException ex)
             {
@@ -57,7 +58,6 @@ namespace Auction.BusinessLogic.Services
                 throw new DatabaseException();
             }
 
-            Database.Save();
         }
 
         public void RateTradingLot(int tradeId, string userName, double price)
@@ -213,8 +213,7 @@ namespace Auction.BusinessLogic.Services
 
         private IQueryable<Trade> UserTrades(string userId)
         {
-            IEnumerable<int> userTradesId = Database.UserProfiles.GetProfileById(userId).Trades.Select(t => t.Id);
-            return Database.Trades.FindTrades().Where(t => userTradesId.Contains(t.Id));//check work maybe "contains" is a wrong method
+            return Database.UserProfiles.GetProfileById(userId).Trades.AsQueryable();
         }
         #endregion
 

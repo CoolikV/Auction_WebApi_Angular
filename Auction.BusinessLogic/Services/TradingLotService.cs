@@ -137,7 +137,7 @@ namespace Auction.BusinessLogic.Services
         public void VerifyLot(int lotId)
         {
             if (!IsLotExists(lotId))
-                throw new NotFoundException();
+                throw new NotFoundException("Can`t found this lot");
             try
             {
                 TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
