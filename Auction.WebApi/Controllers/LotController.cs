@@ -1,4 +1,4 @@
-﻿using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.DTOs.TradingLot;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Helpers;
@@ -35,10 +35,9 @@ namespace Auction.WebApi.Controllers
         [Route("{id:int}")]
         public IHttpActionResult GetTradingLot(int id)
         {
-            TradingLotModel lot;
             try
             {
-                lot = _adapter.Adapt<TradingLotModel>(lotService.GetLotById(id));
+                return Ok(lotService.GetLotById(id));
             }
             catch (DatabaseException)
             {
@@ -48,8 +47,6 @@ namespace Auction.WebApi.Controllers
             {
                 return NotFound();
             }
-
-            return Ok(lot);
         }
 
         [HttpGet]
@@ -58,22 +55,16 @@ namespace Auction.WebApi.Controllers
         public IHttpActionResult GetTradingLots([FromUri] PagingParameterModel paging, [FromUri] LotFilteringModel filterModel)
         {
             IEnumerable<TradingLotDTO> lotsForPage;
-            try
-            {
-                lotsForPage = lotService.GetLotsForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, filterModel.CategoryId,
-                    filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName, out int pagesCount, out int totalItemsCount);
 
-                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
-                    totalItemsCount, pagesCount));
+            lotsForPage = lotService.GetLotsForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, filterModel.CategoryId,
+                filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName, out int pagesCount, out int totalItemsCount);
 
-                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
+            string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
+                totalItemsCount, pagesCount));
 
-            return Ok(_adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage));
+            HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
+
+            return Ok(lotsForPage);
         }
 
         [HttpGet]
@@ -81,10 +72,9 @@ namespace Auction.WebApi.Controllers
         [Route("{lotId:int}/category")]
         public IHttpActionResult GetCategoryByLotId(int lotId)
         {
-            CategoryModel category;
             try
             {
-                category = _adapter.Adapt<CategoryModel>(lotService.GetLotById(lotId).Category);
+                return Ok(lotService.GetLotById(lotId).Category);
             }
             catch (DatabaseException)
             {
@@ -94,21 +84,17 @@ namespace Auction.WebApi.Controllers
             {
                 return NotFound();
             }
-
-            return Ok(category);
         }
 
         [HttpPost]
         [Route("")]
-        public IHttpActionResult AddNewTradingLot(BaseTradingLotModel lotModel)
+        public IHttpActionResult AddNewTradingLot([FromBody]NewTradingLotDTO newTradingLot)
         {
             try
             {
                 //REFACTORING and add pictures saving to app_data/static/pictures
-                var lotDto = _adapter.Adapt<TradingLotDTO>(lotModel);
-                lotDto.Category = categoryService.GetCategoryById(lotModel.CategoryId);
-                lotDto.User = userManager.GetUserByUserName(User.Identity.Name);
-                lotService.CreateLot(lotDto);
+                lotService.CreateLot(newTradingLot, User.Identity.Name);
+                return StatusCode(HttpStatusCode.Created);
             }
             catch (DatabaseException)
             {
@@ -122,17 +108,16 @@ namespace Auction.WebApi.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
-            return StatusCode(HttpStatusCode.Created);
         }
 
         [HttpPut]
         [Route("{id:int}")]
-        public IHttpActionResult UpdateTradingLot(int id, [FromBody]BaseTradingLotModel model)
+        public IHttpActionResult UpdateTradingLot(int id, [FromBody]NewTradingLotDTO newTradingLot)
         {
             try
             {
-                lotService.EditLot(id, _adapter.Adapt<TradingLotDTO>(model), User.IsInRole("manager"));
+                lotService.EditLot(id, newTradingLot, User.IsInRole("manager"));
+                return Ok();
             }
             catch (DatabaseException)
             {
@@ -146,8 +131,6 @@ namespace Auction.WebApi.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
-            return Ok();
         }
 
         [HttpPatch]
@@ -177,6 +160,7 @@ namespace Auction.WebApi.Controllers
             try
             {
                 lotService.RemoveLotById(id);
+                return StatusCode(HttpStatusCode.NoContent);
             }
             catch (NotFoundException)
             {
@@ -186,8 +170,6 @@ namespace Auction.WebApi.Controllers
             {
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
-
-            return StatusCode(HttpStatusCode.NoContent);
         }
     }
 }

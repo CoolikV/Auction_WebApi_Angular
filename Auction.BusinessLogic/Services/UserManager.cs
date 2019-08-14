@@ -1,4 +1,5 @@
-﻿using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.DTOs.Authorization;
+using Auction.BusinessLogic.DTOs.UserProfile;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.IdentityDetails;
 using Auction.BusinessLogic.Interfaces;
@@ -27,7 +28,7 @@ namespace Auction.BusinessLogic.Services
             Adapter = adapter;
         }
 
-        public async Task<OperationDetails> CreateUserAsync(UserDTO userDto)
+        public async Task<OperationDetails> CreateUserAsync(UserRegisterDTO userDto)
         {
             if (IsUserWithEmailExist(userDto.Email))
                 return new OperationDetails(false, "User with such email already exists, please log in", nameof(userDto.Email));
@@ -67,8 +68,6 @@ namespace Auction.BusinessLogic.Services
                 source = source.Where(user => user.UserName.ToLower().Contains(userName.ToLower()));
 
             totalItemsCount = source.Count();
-            if (totalItemsCount < 1)
-                throw new NotFoundException();
 
             pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
             var usersForPage = source.OrderBy(l => l.UserName)
@@ -89,6 +88,20 @@ namespace Auction.BusinessLogic.Services
             return claim;
         }
 
+        public UserProfileDTO GetUserProfileByUserName(string userName)
+        {
+            if (!IsUserWithUserNameExist(userName))
+                throw new NotFoundException($"User with user name: {userName}");
+            return Adapter.Adapt<UserProfileDTO>(Database.UserManager.FindByName(userName).UserProfile);
+        }
+
+        public UserProfileDTO GetUserProfileById(string userId)
+        {
+            if (!IsUserWithIdExist(userId))
+                throw new NotFoundException($"User with id: {userId}");
+            return Adapter.Adapt<UserProfileDTO>(Database.UserManager.FindById(userId).UserProfile);
+        }
+
         public UserDTO GetUserByUserName(string userName)
         {
             if (!IsUserWithUserNameExist(userName))
@@ -99,7 +112,7 @@ namespace Auction.BusinessLogic.Services
         //maybe change
         public async Task<OperationDetails> EditUserRoleAsync(string userId, string newRoleName)
         {
-            if (!IsUserByIdExist(userId))
+            if (!IsUserWithIdExist(userId))
                 throw new NotFoundException("Selected user");
             var appUser = await Database.UserManager.FindByIdAsync(userId);
 
@@ -133,22 +146,15 @@ namespace Auction.BusinessLogic.Services
             return new OperationDetails(true, $"User account {userName} was successfuly deleted", string.Empty);
         }
 
-        public UserDTO GetUserProfileByUserName(string userName)
+        public void EditUserProfile(string userId, NewUserProfileDTO profileDto)
         {
-            if (!IsUserWithUserNameExist(userName))
-                throw new NotFoundException($"User with user name: {userName}");
-            return Adapter.Adapt<UserDTO>(Database.UserManager.FindByName(userName).UserProfile);
-        }
-
-        public void EditUserProfile(string userId, UserDTO userDto)
-        {
-            if (!IsUserByIdExist(userId))
+            if (!IsUserWithIdExist(userId))
                 throw new NotFoundException($"User with id: {userId}");
 
             try
             {
                 var userProfile = Database.UserProfiles.GetProfileById(userId);
-                userProfile = Adapter.Adapt<UserProfile>(userDto);
+                userProfile = Adapter.Adapt<UserProfile>(profileDto);
 
                 Database.UserProfiles.UpdateProfile(userProfile);
             }
@@ -183,7 +189,7 @@ namespace Auction.BusinessLogic.Services
             return Database.UserManager.FindByEmail(email) != null;
         }
 
-        private bool IsUserByIdExist(string id)
+        public bool IsUserWithIdExist(string id)
         {
             return Database.UserManager.FindById(id) != null;
         }

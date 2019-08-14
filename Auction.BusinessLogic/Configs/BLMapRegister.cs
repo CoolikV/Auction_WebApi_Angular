@@ -1,4 +1,8 @@
-﻿using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.DTOs.Authorization;
+using Auction.BusinessLogic.DTOs.Category;
+using Auction.BusinessLogic.DTOs.Trade;
+using Auction.BusinessLogic.DTOs.TradingLot;
+using Auction.BusinessLogic.DTOs.UserProfile;
 using Auction.DataAccess.Entities;
 using Auction.DataAccess.Identity.Entities;
 using Mapster;
@@ -16,7 +20,9 @@ namespace Auction.BusinessLogic.Configs
                 .Ignore(d => d.Id)
                 .Map(dest => dest.LotId, src => src.TradingLot.Id);
 
-            config.NewConfig<Trade, TradeDTO>().MaxDepth(3);
+            config.NewConfig<Trade, TradeDTO>()
+                .Map(d => d.DaysLeft, src => src.TradeEnd.Subtract(src.TradeStart).Days)
+                .MaxDepth(3);
 
             config.NewConfig<TradingLotDTO, TradingLot>()
                 .Map(d => d.Description, s => s.Description)
@@ -28,18 +34,21 @@ namespace Auction.BusinessLogic.Configs
                 .IgnoreNullValues(true);
 
             config.NewConfig<TradingLot, TradingLotDTO>()
-                .Map(dest => dest.Status, src => src.LotStatus);
+                .Map(dest => dest.Status, src => src.LotStatus)
+                .Map(d => d.Owner, src => src.User.UserName);
 
             config.NewConfig<UserDTO, UserProfile>()
                 .Ignore(dest => dest.Id);
 
-            config.NewConfig<UserProfile, UserDTO>();
+            config.NewConfig<UserProfile, UserDTO>()
+                .Map(d => d.Email, s => s.AppUser.Email);
 
-            config.NewConfig<UserDTO, AppUser>()
+            config.NewConfig<UserRegisterDTO, AppUser>()
                 .Map(d => d.Email, s => s.Email)
                 .Map(d => d.UserName, s => s.UserName)
                 .Map(d => d.Id, s => Guid.NewGuid().ToString())
                 .IgnoreNonMapped(true);
+
         }
     }
 }

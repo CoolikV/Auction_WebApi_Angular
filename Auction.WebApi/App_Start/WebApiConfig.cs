@@ -3,7 +3,6 @@ using Mapster;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using System.Reflection;
 using System.Web.Http;
 
 namespace Auction.WebApi
@@ -21,7 +20,9 @@ namespace Auction.WebApi
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
             //Mapster configuration
-            TypeAdapterConfig.GlobalSettings.Scan(typeof(BLMapRegister).Assembly, Assembly.GetExecutingAssembly());
+            TypeAdapterConfig.GlobalSettings.Default.IgnoreNullValues(true);
+            TypeAdapterConfig.GlobalSettings.Default.MaxDepth(3);
+            TypeAdapterConfig.GlobalSettings.Scan(typeof(BLMapRegister).Assembly);
 
             // Web API routes
             config.MapHttpAttributeRoutes();
