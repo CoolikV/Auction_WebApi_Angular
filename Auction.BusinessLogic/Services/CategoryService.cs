@@ -1,4 +1,5 @@
-﻿using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.DTOs.Category;
+using Auction.BusinessLogic.DTOs.TradingLot;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
@@ -103,7 +104,7 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
-        public void CreateCategory(CategoryDTO category)
+        public void CreateCategory(NewCategoryDTO category)
         {
             if (!IsCategoryNameFree(category.Name))
                 throw new AuctionException($"Category {category.Name} already exists.");

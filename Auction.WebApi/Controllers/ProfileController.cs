@@ -1,4 +1,6 @@
-﻿using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.DTOs.Trade;
+using Auction.BusinessLogic.DTOs.TradingLot;
+using Auction.BusinessLogic.DTOs.UserProfile;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Helpers;
@@ -6,51 +8,34 @@ using Auction.WebApi.Models;
 using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Net;
 using System.Web;
 using System.Web.Http;
 
 namespace Auction.WebApi.Controllers
 {
-    [RoutePrefix("api/profile")]
+    [RoutePrefix("api/profiles")]
     [Authorize]
     public class ProfileController : ApiController
     {
         readonly IUserManager userManager;
         readonly ITradeService tradeService;
         readonly ITradingLotService lotService;
-        readonly IAdapter _adapter;
 
         public ProfileController(IAdapter adapter, ITradingLotService lotService, IUserManager userManager, ITradeService tradeService)
         {
-            _adapter = adapter;
             this.lotService = lotService;
             this.userManager = userManager;
             this.tradeService = tradeService;
         }
 
-        UserDTO CurrentUser
-        {
-            get
-            {
-                try
-                {
-                    return userManager.GetUserProfileByUserName(User.Identity.Name);
-                }
-                catch (NotFoundException)
-                {
-                    throw new HttpResponseException(HttpStatusCode.Unauthorized);
-                }
-            }
-        }
-
+        
         [HttpGet]
-        [Route("")]
-        public IHttpActionResult GetProfileInfo()
+        [Route("{id}")]
+        public IHttpActionResult GetProfileInfo(string id)
         {
             try
             {
-                return Ok(_adapter.Adapt<UserProfileModel>(CurrentUser));
+                return Ok(userManager.GetUserProfileById(id));
             }
             catch (NotFoundException)
             {
@@ -59,69 +44,65 @@ namespace Auction.WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("lots")]
-        public IHttpActionResult GetUserLots([FromUri]PagingParameterModel paging, [FromUri] LotFilteringModel filter)
+        [Route("{id}/lots")]
+        public IHttpActionResult GetUserLots(string id, [FromUri]PagingParameterModel paging, [FromUri] LotFilteringModel filter)
         {
             IEnumerable<TradingLotDTO> lotsForPage;
             try
             {
-                lotsForPage = lotService.GetLotsForUser(CurrentUser.Id, paging?.PageNumber ?? 1, paging?.PageSize ?? 10,
+                lotsForPage = lotService.GetLotsForUser(id, paging?.PageNumber ?? 1, paging?.PageSize ?? 10,
                     filter.CategoryId, filter.MinPrice, filter.MaxPrice, filter.LotName, out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
                 totalItemsCount, pagesCount));
 
                 HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
 
-            return Ok(_adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage));
+                return Ok(lotsForPage);
+            }
+            catch (AuctionException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
-        [Route("trades")]
-        public IHttpActionResult GetTrades([FromUri] PagingParameterModel paging, [FromUri] TradeFilteringModel filter, string state)
+        [Route("{id}/trades")]
+        public IHttpActionResult GetTrades(string id, [FromUri] PagingParameterModel paging, [FromUri] TradeFilteringModel filter, string state = "all")
         {
             IEnumerable<TradeDTO> tradesForPage;
             try
             {
-                tradesForPage = tradeService.GetUserTrades(CurrentUser.Id, paging?.PageNumber ?? 1, paging?.PageSize ?? 10,
+                tradesForPage = tradeService.GetUserTrades(id, paging?.PageNumber ?? 1, paging?.PageSize ?? 10,
                     state, filter.StartsOn, filter.EndsOn, filter.MaxPrice, filter.LotName, out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
                 totalItemsCount, pagesCount));
 
                 HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
 
-            return Ok(_adapter.Adapt<IEnumerable<TradeModel>>(tradesForPage));
+                return Ok(tradesForPage);
+            }
+            catch (AuctionException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut]
         [Authorize]
-        [Route("")]
-        public IHttpActionResult UpdateUserProfile(UserProfileModel userModel)
+        [Route("id")]
+        public IHttpActionResult UpdateUserProfile(string id, NewUserProfileDTO profileDto)
         {
             try
             {
-                var adapt = _adapter.Adapt<UserDTO>(userModel);
-
-                userManager.EditUserProfile(CurrentUser.Id, adapt);
+                userManager.EditUserProfile(id, profileDto);
+                return Ok();
             }
             catch (NotFoundException)
             {
                 return NotFound();
             }
-
-            return Ok();
         }
-        //add put update delete methods...
     }
 }

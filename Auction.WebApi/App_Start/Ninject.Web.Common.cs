@@ -3,19 +3,18 @@
 
 namespace Auction.WebApi.App_Start
 {
-    using System;
-    using System.Web;
-    using System.Web.Http;
     using Auction.BusinessLogic.Configs;
     using Auction.BusinessLogic.Interfaces;
     using Auction.BusinessLogic.Services;
     using Mapster;
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
-
     using Ninject;
     using Ninject.Web.Common;
     using Ninject.Web.Common.WebHost;
     using Ninject.Web.WebApi;
+    using System;
+    using System.Web;
+    using System.Web.Http;
 
     public static class NinjectWebCommon 
     {
