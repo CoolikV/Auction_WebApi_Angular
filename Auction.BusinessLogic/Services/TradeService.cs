@@ -1,4 +1,4 @@
-﻿using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.DTOs.Trade;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
@@ -60,29 +60,30 @@ namespace Auction.BusinessLogic.Services
 
         }
 
-        public void RateTradingLot(int tradeId, string userName, double price)
+        public void RateTradingLot(RateDTO rate, string userName)
         {
-            if(!IsTradeExist(tradeId))
-                throw new NotFoundException($"Trade with id: {tradeId}");
-            if(!UserManager.IsUserWithUserNameExist(userName))
-                throw new NotFoundException($"User with user name: {userName}");
             try
             {
-                Trade trade = Database.Trades.GetTradeById(tradeId);
+                if (!IsTradeExist(rate.TradeId))
+                    throw new NotFoundException($"Trade with id: {rate.TradeId}");
+                if (!UserManager.IsUserWithUserNameExist(userName))
+                    throw new NotFoundException($"User with user name: {userName}");
+
+                Trade trade = Database.Trades.GetTradeById(rate.TradeId);
                 UserProfile user = Database.UserProfiles.GetProfileByUserName(userName);
 
                 if (trade.TradingLot.User.Id == user.Id)
                     throw new AuctionException("This is your lot");
                 if (DateTime.Now.CompareTo(trade.TradeEnd) >= 0)
                     throw new AuctionException("This trade is over");
-                if (IsUserAlreadyHaveMaxBet(tradeId, user.Id))
+                if (IsUserAlreadyHaveMaxBet(rate.TradeId, user.Id))
                     throw new AuctionException("You already have max bet on this lot");
 
                 bool isNew = user.Trades.All(t => !t.Id.Equals(trade.Id));
 
-                if (trade.LastPrice < price)
+                if (trade.LastPrice < rate.Sum)
                 {
-                    trade.LastPrice = price;
+                    trade.LastPrice = rate.Sum;
                     trade.LastRateUserId = user.Id;
                     if (isNew)
                         user.Trades.Add(trade);
@@ -92,6 +93,10 @@ namespace Auction.BusinessLogic.Services
 
                 Database.UserProfiles.UpdateProfile(user);
                 Database.Trades.UpdateTrade(trade);
+            }
+            catch(NotFoundException ex)
+            {
+                throw ex;
             }
             catch(AuctionException ex)
             {
@@ -144,9 +149,13 @@ namespace Auction.BusinessLogic.Services
             DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount)
         {
             IQueryable<Trade> source = Database.Trades.FindTrades();
-
+            
             if (!string.IsNullOrWhiteSpace(userId) && !string.IsNullOrWhiteSpace(tradesState))
+            {
+                if (!UserManager.IsUserWithIdExist(userId))
+                    throw new AuctionException("User with this id does`t exist, check user id and try again");
                 source = FilterForUserByState(source, userId, tradesState);
+            }
             if (maxBet.HasValue)
                 source = FilterByMaxBet(source, maxBet.Value);
             if (!string.IsNullOrWhiteSpace(lotName))
@@ -155,8 +164,6 @@ namespace Auction.BusinessLogic.Services
                 source = FilterByDate(source, startDate.GetValueOrDefault(DateTime.MinValue), endDate.GetValueOrDefault(DateTime.MaxValue));
 
             totalItemsCount = source.Count();
-            if (totalItemsCount < 1)
-                throw new NotFoundException();
 
             pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
             var tradesForPage = source.OrderBy(t => t.TradeEnd)

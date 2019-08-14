@@ -56,6 +56,7 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -67,10 +68,17 @@
   <ItemGroup>
     <Compile Include="Configs\BLMapRegister.cs" />
     <Compile Include="Configs\ConnectionModule.cs" />
-    <Compile Include="DataTransfer\CategoryDTO.cs" />
-    <Compile Include="DataTransfer\TradeDTO.cs" />
-    <Compile Include="DataTransfer\TradingLotDTO.cs" />
-    <Compile Include="DataTransfer\UserDTO.cs" />
+    <Compile Include="DTO`s\Authorization\UserRegisterDTO.cs" />
+    <Compile Include="DTO`s\Category\CategoryDTO.cs" />
+    <Compile Include="DTO`s\Category\NewCategoryDTO.cs" />
+    <Compile Include="DTO`s\Trade\NewTradeDTO.cs" />
+    <Compile Include="DTO`s\Trade\RateDTO.cs" />
+    <Compile Include="DTO`s\Trade\TradeDTO.cs" />
+    <Compile Include="DTO`s\TradingLot\NewTradingLotDTO.cs" />
+    <Compile Include="DTO`s\TradingLot\TradingLotDTO.cs" />
+    <Compile Include="DTO`s\UserProfile\NewUserProfileDTO.cs" />
+    <Compile Include="DTO`s\UserProfile\UserDTO.cs" />
+    <Compile Include="DTO`s\UserProfile\UserProfileDTO.cs" />
     <Compile Include="Exceptions\AuctionException.cs" />
     <Compile Include="Exceptions\DatabaseException.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
@@ -84,6 +92,7 @@
     <Compile Include="Services\TradeService.cs" />
     <Compile Include="Services\TradingLotService.cs" />
     <Compile Include="Services\UserManager.cs" />
+    <Compile Include="ValidationAttributes\Adult.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

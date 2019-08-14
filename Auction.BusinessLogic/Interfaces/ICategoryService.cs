@@ -1,4 +1,5 @@
-﻿using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.DTOs.Category;
+using Auction.BusinessLogic.DTOs.TradingLot;
 using System;
 
 namespace Auction.BusinessLogic.Interfaces
@@ -9,7 +10,7 @@ namespace Auction.BusinessLogic.Interfaces
         TradingLotDTO GetLotFromCategory(int categoryId, int lotId);
         void RemoveCategoryById(int id);
         void ChangeCategoryName(int id, string name);
-        void CreateCategory(CategoryDTO category);
+        void CreateCategory(NewCategoryDTO category);
 
         bool IsCategoryExist(int id);
     }

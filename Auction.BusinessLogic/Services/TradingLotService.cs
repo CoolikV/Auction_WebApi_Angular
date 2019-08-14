@@ -1,4 +1,4 @@
-﻿using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.DTOs.TradingLot;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
@@ -8,6 +8,7 @@ using Mapster;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace Auction.BusinessLogic.Services
 {
     public class TradingLotService : ITradingLotService
@@ -15,12 +16,14 @@ namespace Auction.BusinessLogic.Services
         IAdapter Adapter { get; set; }
         IUnitOfWork Database { get; set; }
         ICategoryService CategoryService { get; set; }
+        IUserManager UserManager { get; set; }
 
-        public TradingLotService(IUnitOfWork uow, IAdapter adapter, ICategoryService categoryService)
+        public TradingLotService(IUnitOfWork uow, IAdapter adapter, ICategoryService categoryService, IUserManager userManager)
         {
             Database = uow;
             Adapter = adapter;
             CategoryService = categoryService;
+            UserManager = userManager;
         }
 
         public void Dispose()
@@ -28,17 +31,13 @@ namespace Auction.BusinessLogic.Services
             Database.Dispose();
         }
 
-        public void CreateLot(TradingLotDTO lot)
+        public void CreateLot(NewTradingLotDTO lot, string userName)
         {
-            if (lot == null || lot.User == null)
-                throw new ArgumentNullException(nameof(lot));
-
             var lotPoco = Adapter.Adapt<TradingLot>(lot);
             try
             {
-                lotPoco.User = Database.UserProfiles.GetProfileById(lot.User.Id);
-                lotPoco.Category = lot.Category is null ? Database.Categories.GetCategoryById(1) 
-                    : Database.Categories.GetCategoryById(lot.Category.Id);
+                lotPoco.User = Database.UserProfiles.GetProfileByUserName(userName);
+                lotPoco.Category = Database.Categories.GetCategoryById(lot.CategoryId);
                 lotPoco.LotStatus = LotStatus.NotVerified;
 
                 Database.TradingLots.AddTradingLot(lotPoco);
@@ -51,7 +50,7 @@ namespace Auction.BusinessLogic.Services
         }
 
         //delete old image from app data and save new image, then set new img path
-        public void EditLot(int lotId, TradingLotDTO lotDto, bool isManager)
+        public void EditLot(int lotId, NewTradingLotDTO lotDto, bool isManager)
         {
             try
             {
@@ -94,6 +93,10 @@ namespace Auction.BusinessLogic.Services
 
                 Database.TradingLots.DeleteTradingLotById(lotId);
                 Database.Save();
+            }
+            catch(NotFoundException ex)
+            {
+                throw ex;
             }
             catch (Exception)
             {
@@ -169,8 +172,12 @@ namespace Auction.BusinessLogic.Services
         {
             IQueryable<TradingLot> source = Database.TradingLots.FindTradingLots();
             if (!string.IsNullOrWhiteSpace(userId))
+            {
+                if(!UserManager.IsUserWithIdExist(userId))
+                    throw new AuctionException("User with this id does`t exist, check user id and try again");
                 source = source.Where(l => l.UserId == userId);
-            
+            }
+
             if (categoryId.HasValue && CategoryService.IsCategoryExist(categoryId.Value))
                 source = source.Where(l => l.CategoryId == categoryId);
 
@@ -186,8 +193,6 @@ namespace Auction.BusinessLogic.Services
                 source = source.Where(l => l.Name.ToLower().Contains(lotName.ToLower()));
 
             totalItemsCount = source.Count();
-            if (totalItemsCount < 1)
-                throw new NotFoundException();
 
             pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
             var lotsForPage = source.OrderBy(l => l.Name)

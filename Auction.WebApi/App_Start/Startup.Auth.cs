@@ -21,10 +21,8 @@ namespace Auction.WebApi
             {
                 TokenEndpointPath = new PathString("/Token"),
                 Provider = new AppOAuthProvider(userManager),
-                AuthorizeEndpointPath = new PathString("/api/account/login"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(2),
                 AllowInsecureHttp = true,
-                ApplicationCanDisplayErrors = true
             };
 
             app.UseOAuthAuthorizationServer(OAuthOptions);
