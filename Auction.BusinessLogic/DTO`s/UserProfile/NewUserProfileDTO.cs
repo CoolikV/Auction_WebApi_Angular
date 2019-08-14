@@ -1,6 +1,4 @@
-﻿using Auction.BusinessLogic.ValidationAttributes;
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auction.BusinessLogic.DTOs.UserProfile
 {
