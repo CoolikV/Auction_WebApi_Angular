@@ -1,4 +1,5 @@
-﻿using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.DTOs.Category;
+using Auction.BusinessLogic.DTOs.TradingLot;
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Helpers;
@@ -33,10 +34,9 @@ namespace Auction.WebApi.Controllers
         [Route("{id:int}")]
         public IHttpActionResult GetCategoryById(int id)
         {
-            CategoryModel category;
             try
             {
-                category = categoryService.GetCategoryById(id).Adapt<CategoryModel>();
+                return Ok(categoryService.GetCategoryById(id));
             }
             catch (DatabaseException)
             {
@@ -46,8 +46,6 @@ namespace Auction.WebApi.Controllers
             {
                 return NotFound();
             }
-
-            return Ok(category);
         }
 
         [HttpGet]
@@ -56,23 +54,17 @@ namespace Auction.WebApi.Controllers
         public IHttpActionResult GetLotsForCategory(int id, [FromUri] PagingParameterModel pagingParameter, [FromUri] LotFilteringModel filterModel)
         {
             IEnumerable<TradingLotDTO> lotsForPage;
-            try
-            {
-                lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1, pagingParameter?.PageSize ?? 10,
-                    id, filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName,
-                    out int pagesCount, out int totalItemsCount);
 
-                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
-                totalItemsCount, pagesCount));
+            lotsForPage = lotService.GetLotsForPage(pagingParameter?.PageNumber ?? 1, pagingParameter?.PageSize ?? 10,
+                id, filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName,
+                out int pagesCount, out int totalItemsCount);
 
-                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
+            string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
+            totalItemsCount, pagesCount));
 
-            return Ok(_adapter.Adapt<IEnumerable<TradingLotModel>>(lotsForPage));
+            HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
+            
+            return Ok(lotsForPage);
         }
 
         [HttpGet]
@@ -94,17 +86,17 @@ namespace Auction.WebApi.Controllers
                 return NotFound();
             }
 
-            return Ok(_adapter.Adapt<TradingLotModel>(lotDto));
+            return Ok(lotDto);
         }
 
         [HttpPost]
         [Route("")]
         [Authorize(Roles ="manager,admin")]
-        public IHttpActionResult AddNewCategory(CategoryModel category)
+        public IHttpActionResult AddNewCategory(NewCategoryDTO category)
         {
             try
             {
-                categoryService.CreateCategory(_adapter.Adapt<CategoryDTO>(category));
+                categoryService.CreateCategory(category);
             }
             catch (DatabaseException)
             {
@@ -121,7 +113,7 @@ namespace Auction.WebApi.Controllers
         [HttpPut]
         [Route("{id:int}")]
         [Authorize(Roles ="manager,admin")]
-        public IHttpActionResult UpdateCategoryName(int id, CategoryModel category)
+        public IHttpActionResult UpdateCategoryName(int id, NewCategoryDTO category)
         {
             try
             {
