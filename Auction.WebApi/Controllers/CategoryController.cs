@@ -50,6 +50,25 @@ namespace Auction.WebApi.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [Route("")]
+        public IHttpActionResult GetCategories()
+        {
+            try
+            {
+                return Ok(categoryService.GetCategories());
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
         [Route("{id:int}/lots")]
         public IHttpActionResult GetLotsForCategory(int id, [FromUri] PagingParameterModel pagingParameter, [FromUri] LotFilteringModel filterModel)
         {

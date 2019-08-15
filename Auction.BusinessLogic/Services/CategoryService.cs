@@ -43,6 +43,18 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
+        public IEnumerable<CategoryDTO> GetCategories()
+        {
+            try
+            {
+                return Adapter.Adapt<IEnumerable<CategoryDTO>>(Database.Categories.FindCategories().AsEnumerable());
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
+        }
+
         public TradingLotDTO GetLotFromCategory(int categoryId, int lotId)
         {
             if (!IsCategoryContainLot(categoryId, lotId))
