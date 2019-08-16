@@ -1,1 +1,19 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+mat-grid-tile {
+  background: lightblue;
+}
+
+.col-md-4 {
+  background: lightblue
+}
+
+.wrapper {
+  width: 1600px;
+  margin: 0 auto;
+}
+
+.row.category-menu {
+  padding-top: 50px;
+}
