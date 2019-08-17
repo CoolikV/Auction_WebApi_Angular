@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { TradingLot } from 'src/app/models/trading-lot/trading-lot';
 
 @Component({
   selector: 'app-trading-lot-item',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./trading-lot-item.component.css']
 })
 export class TradingLotItemComponent implements OnInit {
+  @Input()
+  lot: TradingLot;
 
   constructor() { }
 

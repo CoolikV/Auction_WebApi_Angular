@@ -57,6 +57,14 @@ export class HttpInternalService {
     return this.http.put<T>(this.buildUrl(url), payload, { headers: this.getHeaders(), observe: 'response' });
   }
 
+  public patchRequest<T>(url: string, payload?: object): Observable<T> {
+    return this.http.patch<T>(this.buildUrl(url), payload, { headers: this.getHeaders() });
+  }
+
+  public patchFullRequest<T>(url: string, payload?: object): Observable<HttpResponse<T>> {
+    return this.http.patch<T>(this.buildUrl(url), payload, { headers: this.getHeaders(), observe: 'response' });
+  }
+
   public deleteRequest<T>(url: string, httpParams?: any): Observable<T> {
     return this.http.delete<T>(this.buildUrl(url), { headers: this.getHeaders(), params: httpParams });
   }

@@ -1,3 +1,11 @@
-<p>
-  trading-lot-item works!
-</p>
+  <div class="col-9">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title"> {{lot.Name}}</h5>
+        <p class="card-text">{{lot.Description}}</p>
+      </div>
+      <div class="card-footer">
+        <a class="btn btn-primary" [routerLink]="[ '/lots', lot.Id ]">Details</a>
+      </div>
+    </div>
+  </div>

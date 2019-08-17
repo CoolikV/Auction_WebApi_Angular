@@ -21,22 +21,22 @@ export class CategoryService {
   }
 
   public getLotsFromCategory(id: number, pageSize: number, pageNumber: number, minPrice: number, maxPrice: number, lotName: string) {
-    this.httpService.getFullRequest<TradingLot[]>(`${this.routePrefix}/${id}/lots`, { pageSize, pageNumber, minPrice, maxPrice, lotName });
+    return this.httpService.getFullRequest<TradingLot[]>(`${this.routePrefix}/${id}/lots`, { pageSize, pageNumber, minPrice, maxPrice, lotName });
   }
 
   public getLotFromCategory(id: number, lotId: number) {
-    this.httpService.getFullRequest<TradingLot>(`${this.routePrefix}/${id}/lots`, { lotId })
+    return this.httpService.getFullRequest<TradingLot>(`${this.routePrefix}/${id}/lots`, { lotId })
   }
 
   public createCategory(category: NewCategoryDto) {
-    this.httpService.postFullRequest(`${this.routePrefix}`, category);
+    return this.httpService.postFullRequest(`${this.routePrefix}`, category);
   }
 
   public changeCategoryName(id: number, newName: string) {
-    this.httpService.putFullRequest(`${this.routePrefix}/${id}`, <NewCategoryDto>{ name: newName })
+    return this.httpService.putFullRequest(`${this.routePrefix}/${id}`, <NewCategoryDto>{ name: newName })
   }
 
   public deleteCategory(id: number) {
-    this.httpService.deleteFullRequest(`${this.routePrefix}/${id}`);
+    return this.httpService.deleteFullRequest(`${this.routePrefix}/${id}`);
   }
 }
