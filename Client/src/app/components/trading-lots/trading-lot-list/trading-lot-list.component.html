@@ -1,8 +1,21 @@
-  <div class="row main-content">
+  <div class="row h-100">
     <div class="col-2">
-      <app-category-list></app-category-list>
+      <div class="sticky-top category-list">
+        <app-category-list></app-category-list>
+      </div>
     </div>
-    <div class="col-10">
+    <div class="col-8 main-content">
       <app-trading-lot-item *ngFor="let lot of tradingLots" [lot]='lot'></app-trading-lot-item>
+    </div>
+    <div class="col-2">
+      <div class="sticky-top filter">
+        <app-lot-filter></app-lot-filter>
+        <button class="btn btn-primary" type="button">Apply filter</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <app-pagination [pagination]="pagination"></app-pagination>
+      </div>
     </div>
   </div>

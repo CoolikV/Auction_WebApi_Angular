@@ -1,8 +1,8 @@
-export interface UserRegisterDto {
+export interface UserRegister {
     name: string;
     surname: string;
     userName: string;
-    bithDate: Date;
+    birthDate: Date;
     email: string;
     password: string;
     confirmPassword: string;

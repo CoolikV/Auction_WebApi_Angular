@@ -1,0 +1,18 @@
+.col-centered {
+  float: none;
+  margin: 0 auto;
+
+  padding-top: 65px;
+}
+
+.error-block {
+  padding-top: 10px;
+  float: none;
+  margin: 0 auto;
+  font-size: large;
+  margin-bottom: -2rem;
+}
+
+.btn {
+  margin-right: 40px;
+}
