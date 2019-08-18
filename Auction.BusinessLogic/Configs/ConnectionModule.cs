@@ -15,7 +15,6 @@ namespace Auction.BusinessLogic.Configs
         }
         public override void Load()
         {
-            Bind<IDataContext>().To<AuctionContext>().InSingletonScope();
             Bind<IUnitOfWork>().To<UnitOfWork>().InSingletonScope().WithConstructorArgument(_connectionString);
         }
     }

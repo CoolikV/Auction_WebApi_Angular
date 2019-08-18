@@ -69,7 +69,6 @@
     <Compile Include="Identity\Repositories\UserManager.cs" />
     <Compile Include="Identity\Repositories\UserRoleManager.cs" />
     <Compile Include="Interfaces\ICategoryRepository.cs" />
-    <Compile Include="Interfaces\IDataContext.cs" />
     <Compile Include="Interfaces\ITradeRepository.cs" />
     <Compile Include="Interfaces\ITradingLotRepository.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />

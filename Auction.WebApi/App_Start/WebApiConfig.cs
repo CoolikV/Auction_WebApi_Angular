@@ -4,7 +4,6 @@ using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Web.Http;
-using System.Web.Http.Cors;
 
 namespace Auction.WebApi
 {
@@ -20,7 +19,6 @@ namespace Auction.WebApi
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
-            //config.EnableCors(new EnableCorsAttribute("http://localhost:4200", "*", "*", "*"));//works for get requests
             //Mapster configuration
             TypeAdapterConfig.GlobalSettings.Default.IgnoreNullValues(true);
             TypeAdapterConfig.GlobalSettings.Default.MaxDepth(3);
