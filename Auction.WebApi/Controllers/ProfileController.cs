@@ -5,7 +5,6 @@ using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
-using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Web;
@@ -21,7 +20,7 @@ namespace Auction.WebApi.Controllers
         readonly ITradeService tradeService;
         readonly ITradingLotService lotService;
 
-        public ProfileController(IAdapter adapter, ITradingLotService lotService, IUserManager userManager, ITradeService tradeService)
+        public ProfileController(ITradingLotService lotService, IUserManager userManager, ITradeService tradeService)
         {
             this.lotService = lotService;
             this.userManager = userManager;
@@ -68,7 +67,7 @@ namespace Auction.WebApi.Controllers
 
         [HttpGet]
         [Route("{id}/trades")]
-        public IHttpActionResult GetTrades(string id, [FromUri] PagingParameterModel paging, [FromUri] TradeFilteringModel filter, string state = "all")
+        public IHttpActionResult GetUserTrades(string id, [FromUri] PagingParameterModel paging, [FromUri] TradeFilteringModel filter, string state = "all")
         {
             IEnumerable<TradeDTO> tradesForPage;
             try

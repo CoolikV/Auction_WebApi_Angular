@@ -3,7 +3,6 @@ using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
-using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
@@ -16,17 +15,12 @@ namespace Auction.WebApi.Controllers
     [RoutePrefix("api/lots")]
     public class LotController : ApiController
     {
-        readonly IAdapter _adapter;
-
         readonly ITradingLotService lotService;
-        readonly IUserManager userManager;
         readonly ICategoryService categoryService;
 
-        public LotController(IAdapter adapter, ITradingLotService lotService, IUserManager userManager, ICategoryService categoryService)
+        public LotController(ITradingLotService lotService, ICategoryService categoryService)
         {
-            _adapter = adapter;
             this.lotService = lotService;
-            this.userManager = userManager;
             this.categoryService = categoryService;
         }
 
@@ -94,7 +88,7 @@ namespace Auction.WebApi.Controllers
             {
                 //REFACTORING and add pictures saving to app_data/static/pictures
                 lotService.CreateLot(newTradingLot, User.Identity.Name);
-                return StatusCode(HttpStatusCode.Created);
+                return Created(nameof(GetTradingLot), newTradingLot);
             }
             catch (DatabaseException)
             {

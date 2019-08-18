@@ -20,7 +20,7 @@ namespace Auction.WebApi
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
-            config.EnableCors(new EnableCorsAttribute("http://localhost:4200", "*", "*"));
+            //config.EnableCors(new EnableCorsAttribute("http://localhost:4200", "*", "*", "*"));//works for get requests
             //Mapster configuration
             TypeAdapterConfig.GlobalSettings.Default.IgnoreNullValues(true);
             TypeAdapterConfig.GlobalSettings.Default.MaxDepth(3);
