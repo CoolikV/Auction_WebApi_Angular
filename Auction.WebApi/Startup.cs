@@ -10,10 +10,11 @@ namespace Auction.WebApi
     {
         public void Configuration(IAppBuilder app)
         {
+            app.UseCors(CorsOptions.AllowAll);
+
             ConfigureAuth(app);
 
             app.UseWebApi(GlobalConfiguration.Configuration);
-            app.UseCors(CorsOptions.AllowAll);
         }
     }
 }

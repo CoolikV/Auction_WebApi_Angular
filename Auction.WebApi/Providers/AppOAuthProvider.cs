@@ -15,8 +15,7 @@ namespace Auction.WebApi.Providers
         {
             _userManager = userManager;
         }
-        //responsible for validating the “Client”, 
-        //in our case we have only one client so we’ll always return that its validated successfully.
+        
         public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
             context.Validated();
@@ -24,7 +23,7 @@ namespace Auction.WebApi.Providers
 
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-            context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
+            context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "http://localhost:4200" });
             System.Security.Claims.ClaimsIdentity claim = null;
             try
             {
@@ -45,7 +44,7 @@ namespace Auction.WebApi.Providers
         {
             IDictionary<string, string> data = new Dictionary<string, string>
             {
-                { "userName", userName }
+                { "UserName", userName }
             };
             return new AuthenticationProperties(data);
         }
