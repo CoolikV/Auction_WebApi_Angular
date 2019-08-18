@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -7,9 +10,29 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginComponent implements OnInit {
 
-  constructor() { }
+  isError: boolean = false;
+
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
   }
 
+  inputNotValid(username: string, password: string) {
+    return !username || !password;
+  }
+
+  signIn(userName: string, password: string) {
+    this.authService.athenticateUser(userName, password)
+      .subscribe((data: any) => {
+        console.log(data);
+        localStorage.setItem('userToken', data.body.access_token)
+        //this.router.navigate(['/home']);
+      },
+        (err: HttpErrorResponse) => {
+          this.isError = true;
+        }
+      )
+    // (err: HttpErrorResponse) => {
+    //   console.log(err.error);
+  }
 }

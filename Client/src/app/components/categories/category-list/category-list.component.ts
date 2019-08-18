@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CategoryService } from 'src/app/services/category.service';
 import { Category } from 'src/app/models/category/category';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-category-list',
@@ -19,7 +20,9 @@ export class CategoryListComponent implements OnInit {
       .subscribe(
         (resp) => {
           this.categories = [...resp.body];
-          console.log(this.categories);
+        }
+        , (err: HttpErrorResponse) => {
+          console.log(err)
         }
       )
   }

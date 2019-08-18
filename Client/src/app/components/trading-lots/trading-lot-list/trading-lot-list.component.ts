@@ -10,6 +10,8 @@ import { TradingLotService } from 'src/app/services/trading-lot.service';
 export class TradingLotListComponent implements OnInit {
 
   tradingLots: TradingLot[];
+  pagination: {};
+
   constructor(private tradingLotService: TradingLotService) { }
 
   ngOnInit() {
@@ -18,6 +20,8 @@ export class TradingLotListComponent implements OnInit {
       .subscribe(
         (resp) => {
           this.tradingLots = [...resp.body];
+          this.pagination = resp.headers.get('Paging-Headers');
+          console.log(this.pagination);
           console.log(this.tradingLots);
           console.log(resp.url)
         }
