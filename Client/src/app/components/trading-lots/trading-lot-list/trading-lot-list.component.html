@@ -1,0 +1,8 @@
+  <div class="row main-content">
+    <div class="col-2">
+      <app-category-list></app-category-list>
+    </div>
+    <div class="col-10">
+      <app-trading-lot-item *ngFor="let lot of tradingLots" [lot]='lot'></app-trading-lot-item>
+    </div>
+  </div>
