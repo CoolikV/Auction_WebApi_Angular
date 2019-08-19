@@ -1,4 +1,5 @@
-﻿using Auction.DataAccess.Entities;
+﻿using Auction.DataAccess.EF;
+using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
 using System;
 using System.Data.Entity;
@@ -9,10 +10,10 @@ namespace Auction.DataAccess.Repositories
 {
     public class TradingLotRepository : ITradingLotRepository
     {
-        internal readonly IDataContext Database;
+        internal readonly AuctionContext Database;
         internal readonly DbSet<TradingLot> dbSet;
 
-        public TradingLotRepository(IDataContext context)
+        public TradingLotRepository(AuctionContext context)
         {
             Database = context;
             dbSet = context.Set<TradingLot>();

@@ -84,6 +84,7 @@ namespace Auction.BusinessLogic.Services
                 ?? throw new NotFoundException("The user name or password is incorrect");
 
             ClaimsIdentity claim = await Database.UserManager.CreateIdentityAsync(appUser, OAuthDefaults.AuthenticationType);
+            claim.AddClaim(new Claim("Id", appUser.Id));
             claim.AddClaim(new Claim("UserName", appUser.UserName));
             claim.AddClaim(new Claim("Email", appUser.Email));
             return claim;

@@ -10,7 +10,7 @@ using System.Data.Entity;
 
 namespace Auction.DataAccess.EF
 {
-    public class AuctionContext : IdentityDbContext<AppUser>, IDataContext
+    public class AuctionContext : IdentityDbContext<AppUser>
     {
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<TradingLot> TradingLots { get; set; }
