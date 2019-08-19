@@ -38,7 +38,6 @@ namespace Auction.BusinessLogic.Services
             {
                 lotPoco.User = Database.UserProfiles.GetProfileByUserName(userName);
                 lotPoco.Category = Database.Categories.GetCategoryById(lot.CategoryId);
-                lotPoco.LotStatus = LotStatus.NotVerified;
 
                 Database.TradingLots.AddTradingLot(lotPoco);
                 Database.Save();
@@ -128,23 +127,6 @@ namespace Auction.BusinessLogic.Services
                 Category category = Database.Categories.GetCategoryById(categoryId);
                 lot.Category = category;
                 lot.CategoryId = categoryId;
-                Database.TradingLots.UpdateTradingLot(lot);
-                Database.Save();
-            }
-            catch (Exception)
-            {
-                throw new DatabaseException();
-            }
-        }
-
-        public void VerifyLot(int lotId)
-        {
-            if (!IsLotExists(lotId))
-                throw new NotFoundException("Can`t found this lot");
-            try
-            {
-                TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
-                lot.LotStatus = LotStatus.Verified;
                 Database.TradingLots.UpdateTradingLot(lot);
                 Database.Save();
             }

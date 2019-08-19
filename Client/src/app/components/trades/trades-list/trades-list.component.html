@@ -1,3 +1,21 @@
-<p>
-  trades-list works!
-</p>
+  <div class="row">
+    <div class="col-2">
+      <div class="sticky-top category-list">
+        <app-category-list></app-category-list>
+      </div>
+    </div>
+    <div class="col-8 main-content">
+      <app-trading-lot-item *ngFor="let trade of trades" [lot]="trade"></app-trading-lot-item>
+    </div>
+    <div class="col-2">
+      <div class="sticky-top filter">
+        <app-trade-filter></app-trade-filter>
+        <button class="btn btn-primary" type="button">Apply filter</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <app-pagination [pagination]="pagination"></app-pagination>
+      </div>
+    </div>
+  </div>

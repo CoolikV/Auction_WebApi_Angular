@@ -26,7 +26,9 @@ export class LoginComponent implements OnInit {
       .subscribe((data: any) => {
         console.log(data);
         localStorage.setItem('userToken', data.body.access_token)
-        //this.router.navigate(['/home']);
+        setTimeout(() => {
+          this.router.navigate(['/lots'])
+        }, 2000);
       },
         (err: HttpErrorResponse) => {
           this.isError = true;

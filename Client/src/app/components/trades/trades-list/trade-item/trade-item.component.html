@@ -1,3 +1,12 @@
-<p>
-  trade-item works!
-</p>
+  <hr>
+  <div class="col-9">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{trade.TradingLot.Name}}</h5>
+        <p class="card-text">{{trade.TradingLot.Description}}</p>
+      </div>
+      <div class="card-footer">
+        <a class="btn btn-primary" [routerLink]="[ '/trades', trade.Id ]">Details</a>
+      </div>
+    </div>
+  </div>

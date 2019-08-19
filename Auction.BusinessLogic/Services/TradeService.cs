@@ -2,7 +2,6 @@
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
-using Auction.DataAccess.Entities.Enums;
 using Auction.DataAccess.Interfaces;
 using Mapster;
 using System;
@@ -36,9 +35,6 @@ namespace Auction.BusinessLogic.Services
                     throw new AuctionException($"Trade for this lot has already began");
 
                 var lot = Database.TradingLots.GetTradingLotById(lotId);
-
-                if (lot.LotStatus == LotStatus.NotVerified)
-                    throw new AuctionException("Lot is not verified, please wait while the manager verifies it.");
 
                 Database.Trades.AddTrade(new Trade
                 {
@@ -128,10 +124,10 @@ namespace Auction.BusinessLogic.Services
         {
             // maybe change Is...Exist methods to throw not found exceptions...
             if (!LotService.IsLotExists(lotId))
-                throw new NotFoundException();
+                throw new NotFoundException($"Lot with id : {lotId}");
             try
             {
-                return Adapter.Adapt<TradeDTO>(Database.Trades.FindTrades(t => t.LotId == lotId).FirstOrDefault());
+                return Adapter.Adapt<TradeDTO>(Database.Trades.FindTrades(t => t.LotId == lotId).Single());
             }
             catch (Exception)
             {

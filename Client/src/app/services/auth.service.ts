@@ -25,8 +25,8 @@ export class AuthService {
     return this.httpService.postFullRequest(this.routePrefix + "/register", newUser);
   }
 
-  isUserAuthenicated() {
-    return localStorage.getItem('userToken');
+  isUserAuthenicated(): boolean {
+    return localStorage.getItem('userToken') != null;
   }
 
   logout() {

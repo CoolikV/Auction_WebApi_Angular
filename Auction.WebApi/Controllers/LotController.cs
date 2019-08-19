@@ -127,26 +127,6 @@ namespace Auction.WebApi.Controllers
             }
         }
 
-        [HttpPatch]
-        [Route("{id:int}")]
-        [Authorize(Roles ="manager,admin")]
-        public IHttpActionResult VerifyLot(int id)
-        {
-            try
-            {
-                lotService.VerifyLot(id);
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-            catch (DatabaseException)
-            {
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-            catch (NotFoundException ex)
-            {
-                return Content(HttpStatusCode.NotFound, ex.Message);
-            }
-        }
-
         [HttpDelete]
         [Route("{id:int}")]
         public IHttpActionResult DeleteTradingLot(int id)

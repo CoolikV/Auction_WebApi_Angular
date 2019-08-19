@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { Trade } from 'src/app/models/trade/trade';
 
 @Component({
   selector: 'app-trade-item',
@@ -6,6 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./trade-item.component.css']
 })
 export class TradeItemComponent implements OnInit {
+
+  @Input()
+  trade: Trade;
 
   constructor() { }
 

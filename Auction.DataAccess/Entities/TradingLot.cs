@@ -20,7 +20,7 @@ namespace Auction.DataAccess.Entities
 
         public TradingLot()
         {
-            LotStatus = LotStatus.NotVerified;
+            LotStatus = LotStatus.NotOnSale;
         }
     }
 }
