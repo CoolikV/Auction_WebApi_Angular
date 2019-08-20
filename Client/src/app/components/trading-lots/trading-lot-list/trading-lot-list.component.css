@@ -5,3 +5,7 @@
 .filter {
   padding-top: 65px;
 }
+
+.right {
+  float: right;
+}

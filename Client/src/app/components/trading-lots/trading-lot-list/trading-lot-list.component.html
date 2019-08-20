@@ -9,6 +9,7 @@
         <h2 class="text-center">No items found
           <br>
           Want add new lot?
+          <br>
           <button class="btn btn-primary" type="button" [routerLink]="[ '/newLot' ]">Add new lot</button>
         </h2>
       </div>
@@ -32,7 +33,26 @@
             <input class="form-control" type="number" name="maxPrice" placeholder="Text" [(ngModel)]="maxPrice">
           </div>
         </div>
+        <div class="form-group">
+          <h5>Name:</h5>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Lot name:</span>
+            </div>
+            <input class="form-control" type="text" name="lotName" [(ngModel)]="lotName">
+          </div>
+        </div>
+        <div class="form-group">
+          <h5>Display:</h5>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Items per. page</span>
+            </div>
+            <input class="form-control" type="number" name="perPage" min="10" max="20" [(ngModel)]="perPage">
+          </div>
+        </div>
         <button class="btn btn-primary" type="button" (click)="applyFiltering()">Apply filter</button>
+        <button class="btn btn-secondary right" type="button" (click)="resetFilter()">Reset filter</button>
       </div>
     </div>
   </div>

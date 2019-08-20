@@ -27,8 +27,8 @@ export class TradingLotItemComponent implements OnInit {
     console.log(this.newTrade);
     this.tradeService.startTrade(this.newTrade)
       .subscribe(
-        (resp) => console.log("success"),
-        (error: HttpErrorResponse) => console.log(error.error.Message)
+        (resp) => alert(`Trade for lot started`),
+        (error: HttpErrorResponse) => alert(error.error.Message)
       )
   }
 

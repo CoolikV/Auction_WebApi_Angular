@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Trade } from 'src/app/models/trade/trade';
 import { TradeService } from 'src/app/services/trade.service';
-import { HttpErrorResponse, HttpClient, HttpResponse } from '@angular/common/http';
 import { Pagination } from 'src/app/models/pagination/pagination';
 
 @Component({
@@ -26,7 +25,6 @@ export class TradesListComponent implements OnInit {
     this.tradeService.getTrades(10, 1, '', '', '', 0)
       .subscribe(
         (data) => {
-          console.log(data.body);
           this.trades = [...data.body];
           this.pagination = JSON.parse(data.headers.get('Paging-Headers'));
         }
