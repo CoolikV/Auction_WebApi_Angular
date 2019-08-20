@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { FormsModule } from '@angular/forms';
 
 import { CategoryItemComponent } from './components/categories/category-list/category-item/category-item.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HomeComponent } from './components/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { CategoryListComponent } from './components/categories/category-list/category-list.component';
@@ -24,6 +24,8 @@ import { PaginationComponent } from './components/pagination/pagination.componen
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { BearerInterceptor } from './helpers/bearer.interceptor';
+import { DatePipe } from '@angular/common';
 
 
 @NgModule({
@@ -54,7 +56,14 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     FormsModule,
     NgbModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: BearerInterceptor,
+      multi: true
+    },
+    DatePipe
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

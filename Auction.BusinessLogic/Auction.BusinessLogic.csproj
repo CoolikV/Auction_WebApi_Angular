@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Configs\BLMapRegister.cs" />
     <Compile Include="Configs\ConnectionModule.cs" />
+    <Compile Include="DTO`s\Authorization\UserClaimsDTO.cs" />
     <Compile Include="DTO`s\Authorization\UserRegisterDTO.cs" />
     <Compile Include="DTO`s\Category\CategoryDTO.cs" />
     <Compile Include="DTO`s\Category\NewCategoryDTO.cs" />

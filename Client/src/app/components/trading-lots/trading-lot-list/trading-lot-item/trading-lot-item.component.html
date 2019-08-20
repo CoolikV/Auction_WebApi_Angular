@@ -1,14 +1,21 @@
-  <hr>
-  <div class="col-9">
+<section>
+  <div class="container py-3">
     <div class="card">
-      <img class="card-img" src="http://127.0.0.1:8887/df.jpg" alt="" height="100">
-
-      <div class="card-body">
-        <h5 class="card-title"> {{lot.Name}}</h5>
-        <p class="card-text">{{lot.Description}}</p>
-      </div>
-      <div class="card-footer">
-        <a class="btn btn-primary" [routerLink]="[ '/lots', lot.Id ]">Details</a>
+      <div class="row ">
+        <div class="col-md-4">
+          <img src="http://127.0.0.1:8887/df.jpg" class="w-100">
+        </div>
+        <div class="col-md-8 px-3">
+          <div class="card-block px-3">
+            <h4 class="card-title">{{lot.Name}}</h4>
+            <p class="card-text">{{lot.Description}}</p>
+            <p class="card-text">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+              nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
+              anim id est laborum.</p>
+            <a class="btn btn-primary">Read More</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+</section>

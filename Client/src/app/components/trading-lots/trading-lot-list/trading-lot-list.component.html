@@ -4,10 +4,10 @@
         <app-category-list></app-category-list>
       </div>
     </div>
-    <div class="col-8 main-content">
+    <div class="col-7 main-content">
       <app-trading-lot-item *ngFor="let lot of tradingLots" [lot]='lot'></app-trading-lot-item>
     </div>
-    <div class="col-2">
+    <div class="col-3">
       <div class="sticky-top filter">
         <app-lot-filter></app-lot-filter>
         <button class="btn btn-primary" type="button">Apply filter</button>

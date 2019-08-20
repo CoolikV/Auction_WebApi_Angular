@@ -50,7 +50,7 @@ namespace Auction.WebApi.Controllers
 
             tradesForPage = tradeService.GetTradesForPage(pagingParameter?.PageNumber ?? 1,
                 pagingParameter?.PageSize ?? 10, filter.StartsOn, filter.EndsOn, filter.MaxPrice,
-                filter.LotName, out int pagesCount, out int totalItemsCount);
+                filter.CategoryId, filter.LotName, out int pagesCount, out int totalItemsCount);
 
             string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
             totalItemsCount, pagesCount));

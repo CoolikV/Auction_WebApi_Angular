@@ -1,7 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { CategoryService } from 'src/app/services/category.service';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Category } from 'src/app/models/category/category';
-import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-category-item',
@@ -12,6 +10,13 @@ export class CategoryItemComponent implements OnInit {
   @Input()
   category: Category;
 
+  @Output()
+  onCategorySelected = new EventEmitter<number>();
+
   ngOnInit() {
+  }
+
+  selected(id) {
+    this.onCategorySelected.emit(id);
   }
 }

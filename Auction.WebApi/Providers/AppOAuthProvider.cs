@@ -21,7 +21,7 @@ namespace Auction.WebApi.Providers
         {
             context.Validated();
         }
-        [EnableCors("*","*","*")]
+        [EnableCors("*","*","*","*")]
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             SetContextHeaders(context);

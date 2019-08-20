@@ -49,6 +49,11 @@ namespace Auction.BusinessLogic.Configs
                 .Map(d => d.Id, s => Guid.NewGuid().ToString())
                 .IgnoreNonMapped(true);
 
+            config.NewConfig<AppUser, UserClaimsDTO>()
+                .Map(d => d.Id, s => s.Id)
+                .Map(d => d.UserName, s => s.UserName)
+                .IgnoreNonMapped(true);
+
         }
     }
 }

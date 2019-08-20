@@ -22,10 +22,18 @@ export class LoginComponent implements OnInit {
   }
 
   signIn(userName: string, password: string) {
+    this.authService.logout();
+
     this.authService.athenticateUser(userName, password)
       .subscribe((data: any) => {
         console.log(data);
-        localStorage.setItem('userToken', data.body.access_token)
+        localStorage.setItem('userToken', data.body.access_token);
+        this.authService.getUserClaims()
+          .subscribe((claims) => {
+            console.log(claims);
+            localStorage.setItem('userClaims', JSON.stringify(claims));
+          })
+
         setTimeout(() => {
           this.router.navigate(['/lots'])
         }, 2000);
@@ -34,7 +42,5 @@ export class LoginComponent implements OnInit {
           this.isError = true;
         }
       )
-    // (err: HttpErrorResponse) => {
-    //   console.log(err.error);
   }
 }

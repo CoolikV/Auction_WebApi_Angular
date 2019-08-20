@@ -17,9 +17,9 @@ namespace Auction.BusinessLogic.Interfaces
         UserProfileDTO GetUserProfileByUserName(string userName);
         UserProfileDTO GetUserProfileById(string userId);
         Task<OperationDetails> EditUserRoleAsync(string userId, string newRoleName);
-        IEnumerable<string> GetAllRoleNames();
         Task<OperationDetails> DeleteUserAccount(string userId);
         void EditUserProfile(string userId, NewUserProfileDTO profileDto);
+        UserClaimsDTO GetUserClaims(string userName);
 
         bool IsUserWithIdExist(string id);
         bool IsUserWithUserNameExist(string userName);

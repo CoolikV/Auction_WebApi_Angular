@@ -16,13 +16,15 @@ namespace Auction.BusinessLogic.Services
         IUnitOfWork Database { get; set; }
         ITradingLotService LotService { get; set; }
         IUserManager UserManager { get; set; }
+        ICategoryService CategoryService { get; set; }
 
-        public TradeService(IUnitOfWork uow, IAdapter adapter, ITradingLotService lotService, IUserManager userManager)
+        public TradeService(IUnitOfWork uow, IAdapter adapter, ITradingLotService lotService, IUserManager userManager, ICategoryService categoryService)
         {
             Database = uow;
             Adapter = adapter;
             LotService = lotService;
             UserManager = userManager;
+            CategoryService = categoryService;
         }
 
         public void StartTrade(int lotId)
@@ -135,13 +137,13 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
-        public IEnumerable<TradeDTO> GetUserTrades(string userId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
+        public IEnumerable<TradeDTO> GetUserTrades(string userId, int? categoryId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
             DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount)
         {
-            return FilterLotsForPage(userId, pageNum, pageSize, tradesState, startDate, endDate, maxBet, lotName, out pagesCount, out totalItemsCount);
+            return FilterTradesForPage(userId, categoryId, pageNum, pageSize, tradesState, startDate, endDate, maxBet, lotName, out pagesCount, out totalItemsCount);
         }
 
-        private IEnumerable<TradeDTO> FilterLotsForPage(string userId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
+        private IEnumerable<TradeDTO> FilterTradesForPage(string userId, int? categoryId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
             DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount)
         {
             IQueryable<Trade> source = Database.Trades.FindTrades();
@@ -152,6 +154,8 @@ namespace Auction.BusinessLogic.Services
                     throw new AuctionException("User with this id does`t exist, check user id and try again");
                 source = FilterForUserByState(source, userId, tradesState);
             }
+            if (categoryId.HasValue && CategoryService.IsCategoryExist(categoryId.Value))
+                source = source.Where(t => t.TradingLot.CategoryId == categoryId);
             if (maxBet.HasValue)
                 source = FilterByMaxBet(source, maxBet.Value);
             if (!string.IsNullOrWhiteSpace(lotName))
@@ -171,9 +175,9 @@ namespace Auction.BusinessLogic.Services
         }
 
         public IEnumerable<TradeDTO> GetTradesForPage(int pageNum, int pageSize, DateTime? startDate,
-            DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount)
+            DateTime? endDate, double? maxBet, int? categoryId, string lotName, out int pagesCount, out int totalItemsCount)
         {
-            return FilterLotsForPage(string.Empty, pageNum, pageSize, string.Empty, startDate, endDate, maxBet, lotName, out pagesCount, out totalItemsCount);
+            return FilterTradesForPage(string.Empty, categoryId, pageNum, pageSize, string.Empty, startDate, endDate, maxBet, lotName, out pagesCount, out totalItemsCount);
         }
 
         public void Dispose()

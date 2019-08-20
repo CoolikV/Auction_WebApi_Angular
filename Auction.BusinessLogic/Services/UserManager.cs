@@ -84,9 +84,7 @@ namespace Auction.BusinessLogic.Services
                 ?? throw new NotFoundException("The user name or password is incorrect");
 
             ClaimsIdentity claim = await Database.UserManager.CreateIdentityAsync(appUser, OAuthDefaults.AuthenticationType);
-            claim.AddClaim(new Claim("Id", appUser.Id));
-            claim.AddClaim(new Claim("UserName", appUser.UserName));
-            claim.AddClaim(new Claim("Email", appUser.Email));
+
             return claim;
         }
 
@@ -167,17 +165,30 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
-        public IEnumerable<string> GetAllRoleNames()
+        public UserClaimsDTO GetUserClaims(string userName)
         {
-            return Database.UserRoleManager.Roles.Select(r => r.Name);
+            try
+            {
+                var user = Database.UserManager.FindByName(userName);
+
+                var userClaims = Adapter.Adapt<UserClaimsDTO>(user);
+
+                userClaims.Role = GetRoleNameForUser(user);
+
+                return userClaims;
+            }
+            catch (NotFoundException ex)
+            {
+                throw ex;
+            }
         }
 
         private string GetRoleNameForUser(AppUser user)
         {
-            var roleId = user.Roles.Where(role => role.UserId == user.Id).Single().RoleId;
-            var roleName = Database.UserRoleManager.Roles.Where(role => role.Id == roleId).Single().Name;
+            var roleId = user.Roles.Where(x => x.UserId == user.Id).Single().RoleId;
+            var role = Database.UserRoleManager.Roles.Where(x => x.Id == roleId).Single().Name;
 
-            return roleName;
+            return role;
         }
         
         #region Condition check methods

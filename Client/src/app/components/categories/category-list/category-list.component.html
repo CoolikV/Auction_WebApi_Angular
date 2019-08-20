@@ -1,4 +1,5 @@
 <div class="list-group">
   <h4 class="text-center">Categories</h4>
-  <app-category-item *ngFor="let category of categories" [category]='category'></app-category-item>
+  <app-category-item *ngFor="let category of categories" [category]='category' (onCategorySelected)="onChanged($event)">
+  </app-category-item>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CategoryService } from 'src/app/services/category.service';
 import { Category } from 'src/app/models/category/category';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -12,8 +12,10 @@ export class CategoryListComponent implements OnInit {
   @Input()
   public categories: Category[];
 
-  constructor(private categoryService: CategoryService) { }
+  @Output()
+  selectedCategory = new EventEmitter<number>();
 
+  constructor(private categoryService: CategoryService) { }
   ngOnInit() {
     this.categoryService
       .getCategories()
@@ -26,4 +28,9 @@ export class CategoryListComponent implements OnInit {
         }
       )
   }
+
+  onChanged(id: any) {
+    this.selectedCategory.emit(id)
+  }
+
 }

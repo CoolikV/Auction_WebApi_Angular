@@ -11,8 +11,8 @@ namespace Auction.BusinessLogic.Interfaces
         TradeDTO GetTradeById(int id);
         TradeDTO GetTradeByLotId(int lotId);
         IEnumerable<TradeDTO> GetTradesForPage(int pageNum, int pageSize, DateTime? startDate,
-            DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount);
-        IEnumerable<TradeDTO> GetUserTrades(string userId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
+            DateTime? endDate, double? maxBet, int? categoryId, string lotName, out int pagesCount, out int totalItemsCount);
+        IEnumerable<TradeDTO> GetUserTrades(string userId, int? categoryId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
             DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount);
     }
 }

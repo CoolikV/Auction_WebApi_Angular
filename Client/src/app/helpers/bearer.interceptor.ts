@@ -12,6 +12,17 @@ export class BearerInterceptor implements HttpInterceptor {
     constructor(private authService: AuthService) { }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return null;
+        if (req.headers.get('No-Auth') == "True")
+            return next.handle(req.clone());
+
+        if (this.authService.isUserAuthenicated()) {
+            req = req.clone({
+                setHeaders: {
+                    Authorization: `Bearer ${this.authService.getToken()}`
+                }
+            });
+            console.log(req);
+        }
+        return next.handle(req);
     }
 }

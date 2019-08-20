@@ -4,6 +4,7 @@ import { HttpInternalService } from './http-internal.service';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { UserRegister } from '../models/auth/user-register';
 import { catchError, map } from 'rxjs/operators';
+import { AuthenticatedUser } from '../models/auth/authenticated-user';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,21 @@ export class AuthService {
     return localStorage.getItem('userToken') != null;
   }
 
+  getToken() {
+    return localStorage.getItem('userToken');
+  }
+
+  getUserClaims() {
+    return this.httpService.getRequest<AuthenticatedUser>(this.routePrefix + '/accounts/claims')
+  }
+
+  recieveClaims(): AuthenticatedUser {
+    let claims = localStorage.getItem('userClaims')
+    return JSON.parse(claims);
+  }
+
   logout() {
     localStorage.removeItem('userToken');
+    localStorage.removeItem('userClaims');
   }
 } 

@@ -16,8 +16,16 @@ export class TradeService {
     return this.httpService.getFullRequest<Trade>(`${this.routePrefix}/${id}`);
   }
 
-  public getTrades(pageSize: number, pageNumber: number, endsOn: Date, startsOn: Date) {
-    return this.httpService.getFullRequest<Trade[]>(`${this.routePrefix}`, { pageSize, pageNumber, endsOn, startsOn });
+  public getTrades(pageSize: number, pageNumber: number, maxPrice: string, endsOn?: string, startsOn?: string, categoryId?: number) {
+    if (!maxPrice)
+      maxPrice = '';
+    if (!endsOn)
+      endsOn = '';
+    if (!startsOn)
+      startsOn = '';
+    if (!pageSize || pageSize > 20)
+      pageSize = 20;
+    return this.httpService.getFullRequest<Trade[]>(`${this.routePrefix}`, { pageSize, pageNumber, endsOn, startsOn, categoryId, maxPrice });
   }
 
   public rateTrade(rate: RateDto) {

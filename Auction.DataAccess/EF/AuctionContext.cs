@@ -2,7 +2,6 @@
 using Auction.DataAccess.Entities.Enums;
 using Auction.DataAccess.EntityConfigurations;
 using Auction.DataAccess.Identity.Entities;
-using Auction.DataAccess.Interfaces;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
@@ -38,9 +37,9 @@ namespace Auction.DataAccess.EF
             {
                 var roles = new List<IdentityRole>()
                 {
-                    new IdentityRole("user"),
-                    new IdentityRole("admin"),
-                    new IdentityRole("manager")
+                    new AppRole(){ Name = "user"},
+                    new AppRole(){ Name = "admin"},
+                    new AppRole(){ Name = "manager"},
                 };
                 context.Roles.Add(roles[0]);
                 context.Roles.Add(roles[1]);
