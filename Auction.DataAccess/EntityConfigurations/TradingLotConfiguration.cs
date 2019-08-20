@@ -25,9 +25,6 @@ namespace Auction.DataAccess.EntityConfigurations
           
             Property(t => t.TradeDuration)
                 .IsRequired();
-        
-            Property(t => t.LotStatus)
-                .IsRequired();
       
             HasRequired(t => t.Category);
    

@@ -121,21 +121,6 @@ namespace Auction.BusinessLogic.Services
                 throw new DatabaseException();
             }
         }
-        //Remove if not gonna use
-        public TradeDTO GetTradeByLotId(int lotId)
-        {
-            // maybe change Is...Exist methods to throw not found exceptions...
-            if (!LotService.IsLotExists(lotId))
-                throw new NotFoundException($"Lot with id : {lotId}");
-            try
-            {
-                return Adapter.Adapt<TradeDTO>(Database.Trades.FindTrades(t => t.LotId == lotId).Single());
-            }
-            catch (Exception)
-            {
-                throw new DatabaseException();
-            }
-        }
 
         public IEnumerable<TradeDTO> GetUserTrades(string userId, int? categoryId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
             DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount)
@@ -146,7 +131,7 @@ namespace Auction.BusinessLogic.Services
         private IEnumerable<TradeDTO> FilterTradesForPage(string userId, int? categoryId, int pageNum, int pageSize, string tradesState, DateTime? startDate,
             DateTime? endDate, double? maxBet, string lotName, out int pagesCount, out int totalItemsCount)
         {
-            IQueryable<Trade> source = Database.Trades.FindTrades();
+            IQueryable<Trade> source = Database.Trades.FindTrades( t => t.TradeEnd >= DateTime.Now);
             
             if (!string.IsNullOrWhiteSpace(userId) && !string.IsNullOrWhiteSpace(tradesState))
             {
@@ -210,12 +195,12 @@ namespace Auction.BusinessLogic.Services
         #region Queries
         private IQueryable<Trade> UserWinTrades(string userId)
         {
-            return Database.Trades.FindTrades().Where(t => t.LastRateUserId == userId && DateTime.Now.CompareTo(t.TradeEnd) >= 0);
+            return Database.Trades.FindTrades().Where(t => t.LastRateUserId == userId && t.TradeEnd <= DateTime.Now);
         }
 
         private IQueryable<Trade> UserLoseTrades(string userId)
         {
-            return UserTrades(userId).Where(t => t.LastRateUserId != userId && DateTime.Now.CompareTo(t.TradeEnd) >= 0);
+            return UserTrades(userId).Where(t => t.LastRateUserId != userId && t.TradeEnd <= DateTime.Now);
         }
 
         private IQueryable<Trade> UserTrades(string userId)

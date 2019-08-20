@@ -56,7 +56,6 @@
   <ItemGroup>
     <Compile Include="EF\AuctionContext.cs" />
     <Compile Include="Entities\Category.cs" />
-    <Compile Include="Entities\Enums\LotStatus.cs" />
     <Compile Include="Entities\Trade.cs" />
     <Compile Include="Entities\TradingLot.cs" />
     <Compile Include="Entities\UserProfile.cs" />
@@ -83,7 +82,9 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

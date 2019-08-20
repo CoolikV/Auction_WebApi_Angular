@@ -2,7 +2,6 @@
 using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.DataAccess.Entities;
-using Auction.DataAccess.Entities.Enums;
 using Auction.DataAccess.Interfaces;
 using Mapster;
 using System;
@@ -57,8 +56,7 @@ namespace Auction.BusinessLogic.Services
                     throw new NotFoundException($"Lot with id: {lotId}");
 
                 TradingLot lotPoco = Database.TradingLots.GetTradingLotById(lotId);
-                if (lotPoco.LotStatus == LotStatus.OnSale)
-                    throw new AuctionException("You can`t change the information about the lot after the start of the bidding");
+
                 if (isManager && lotPoco.CategoryId != lotDto.CategoryId)
                 {
                     if (CategoryService.IsCategoryExist(lotDto.CategoryId) )
@@ -72,10 +70,6 @@ namespace Auction.BusinessLogic.Services
 
                 Database.TradingLots.UpdateTradingLot(lotPoco);
                 Database.Save();
-            }
-            catch(AuctionException ex)
-            {
-                throw ex;
             }
             catch(Exception)
             {

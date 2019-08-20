@@ -5,6 +5,5 @@ export interface TradingLot {
     imgURL: string;
     price: number;
     tradeDuration: number;
-    status: string;
     owner: string;
 }

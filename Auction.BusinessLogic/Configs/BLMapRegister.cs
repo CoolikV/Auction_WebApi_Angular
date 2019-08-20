@@ -34,7 +34,6 @@ namespace Auction.BusinessLogic.Configs
                 .IgnoreNullValues(true);
 
             config.NewConfig<TradingLot, TradingLotDTO>()
-                .Map(dest => dest.Status, src => src.LotStatus)
                 .Map(d => d.Owner, src => src.User.UserName);
 
             config.NewConfig<UserDTO, UserProfile>()
