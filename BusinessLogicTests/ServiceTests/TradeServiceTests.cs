@@ -1,17 +1,16 @@
-﻿using Mapster;
-using Auction.BusinessLogic.DataTransfer;
+﻿using Auction.BusinessLogic.Configs;
+using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.BusinessLogic.Services;
 using Auction.DataAccess.Entities;
 using Auction.DataAccess.Interfaces;
+using Mapster;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using Auction.BusinessLogic.Exceptions;
-using Auction.BusinessLogic.Configs;
-using System.Linq.Expressions;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace BusinessLogicTests.ServiceTests
 {
@@ -34,7 +33,7 @@ namespace BusinessLogicTests.ServiceTests
             tradeRepository = new Mock<ITradeRepository>();
 
             uow.Setup(x => x.Trades).Returns(tradeRepository.Object);
-            uow.Setup(x => x.TradingLots.GetTradingLotById(It.IsAny<int>())).Returns(new TradingLot { Name = It.IsAny<string>(), User = It.IsAny<User>(), TradeDuration = It.IsAny<int>(), Price = It.IsAny<double>(), IsVerified = true });
+            uow.Setup(x => x.TradingLots.GetTradingLotById(It.IsAny<int>())).Returns(new TradingLot { Name = It.IsAny<string>(), User = It.IsAny<User>(), TradeDuration = It.IsAny<int>(), Price = It.IsAny<double>()});
             uow.Setup(x => x.Users.GetUserById(It.IsAny<string>())).Returns(new User { Id = "defId" });
             //may cause exception (adapter)
             tradeService = new TradeService(uow.Object, adapter);

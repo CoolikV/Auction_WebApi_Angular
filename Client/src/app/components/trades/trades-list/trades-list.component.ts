@@ -13,6 +13,7 @@ export class TradesListComponent implements OnInit {
   trades: Trade[];
   pagination: Pagination;
 
+
   maxPrice: string;
   start: string;
   end: string;
@@ -25,6 +26,7 @@ export class TradesListComponent implements OnInit {
     this.tradeService.getTrades(10, 1, '', '', '', 0)
       .subscribe(
         (data) => {
+          console.log(data.body);
           this.trades = [...data.body];
           this.pagination = JSON.parse(data.headers.get('Paging-Headers'));
         },
@@ -78,7 +80,7 @@ export class TradesListComponent implements OnInit {
   }
 
   resetFilter() {
-    //this.categoryId = 0;
+    this.categoryId = 0;
     this.maxPrice = '';
     this.perPage = 10;
     this.end = '';

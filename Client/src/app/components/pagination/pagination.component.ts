@@ -11,7 +11,7 @@ export class PaginationComponent implements OnInit {
   pagination: Pagination;
 
   @Output()
-  nextPage = new EventEmitter<number>();
+  nextPage = new EventEmitter();
 
   @Output()
   prevPage = new EventEmitter();
@@ -22,10 +22,14 @@ export class PaginationComponent implements OnInit {
   }
 
   toPrevPage() {
+    console.log(this.pagination);
+
     this.prevPage.emit();
   }
 
   toNextPage() {
+    console.log(this.pagination);
+
     this.nextPage.emit();
   }
 
