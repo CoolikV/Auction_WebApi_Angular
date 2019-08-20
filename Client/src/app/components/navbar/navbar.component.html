@@ -13,7 +13,7 @@
         <a class="nav-link" [routerLink]="[ 'trades' ]">Buy</a>
       </li>
       <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" [routerLink]="[ 'lots' ]">Sell</a>
+        <a class="nav-link" [routerLink]="[ 'profile/lots' ]">Sell</a>
       </li>
     </ul>
     <a class="nav-link nav navbar-nav navbar-right" [routerLink]="[ 'login' ]" *ngIf="!isLoggedIn()">Log in</a>
@@ -21,10 +21,12 @@
       <li class="nav-item dropdown">
         <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">{{currenUser?.UserName}}</a>
         <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" [routerLink]="['userLots']">Start new trade</a>
-          <a class="dropdown-item">My trades</a>
+          <a class="dropdown-item" [routerLink]="[ 'newLot' ]">Add new lot</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" (click)="logOut()">Logout</a>
+          <a class="dropdown-item" [routerLink]="[ '/profile/lots' ]">My lots</a>
+          <a class="dropdown-item" [routerLink]="[ '/profile/trades' ]">My trades</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" [routerLink]="[ 'home' ]" (click)="logOut()">Logout</a>
         </div>
       </li>
     </ul>

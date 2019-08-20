@@ -67,7 +67,7 @@ namespace Auction.WebApi.Controllers
         {
             try
             {
-                tradeService.StartTrade(tradeModel.LotId);
+                tradeService.StartTrade(tradeModel);
                 return Ok();
             }
             catch (DatabaseException)

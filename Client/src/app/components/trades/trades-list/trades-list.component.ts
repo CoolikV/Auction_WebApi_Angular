@@ -20,7 +20,7 @@ export class TradesListComponent implements OnInit {
   perPage: number;
 
   categoryId: number = 0;
-  constructor(private tradeService: TradeService, private http: HttpClient) { }
+  constructor(private tradeService: TradeService) { }
 
   ngOnInit() {
     this.tradeService.getTrades(10, 1, '', '', '', 0)
@@ -29,9 +29,6 @@ export class TradesListComponent implements OnInit {
           console.log(data.body);
           this.trades = [...data.body];
           this.pagination = JSON.parse(data.headers.get('Paging-Headers'));
-        },
-        (err: HttpErrorResponse) => {
-
         }
       );
   }

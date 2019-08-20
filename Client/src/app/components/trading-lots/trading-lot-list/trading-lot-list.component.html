@@ -1,21 +1,46 @@
   <div class="row h-100">
     <div class="col-2">
       <div class="sticky-top category-list">
-        <app-category-list></app-category-list>
+        <app-category-list (selectedCategory)="onCategorySelected($event)"></app-category-list>
       </div>
     </div>
-    <div class="col-7 main-content">
+    <div class="col-7 main-content col-md-offset-3">
+      <div *ngIf="pagination?.TotalItemsCount === 0">
+        <h2 class="text-center">No items found
+          <br>
+          Want add new lot?
+          <button class="btn btn-primary" type="button" [routerLink]="[ '/newLot' ]">Add new lot</button>
+        </h2>
+      </div>
       <app-trading-lot-item *ngFor="let lot of tradingLots" [lot]='lot'></app-trading-lot-item>
     </div>
     <div class="col-3">
       <div class="sticky-top filter">
-        <app-lot-filter></app-lot-filter>
-        <button class="btn btn-primary" type="button">Apply filter</button>
+        <h4 class="text-center">Filter</h4>
+        <div class="form-group">
+          <h5>Price:</h5>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="">Min. price:</span>
+            </div>
+            <input class="form-control" type="number" name="minPrice" placeholder="Text" [(ngModel)]="minPrice">
+          </div>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Max. price</span>
+            </div>
+            <input class="form-control" type="number" name="maxPrice" placeholder="Text" [(ngModel)]="maxPrice">
+          </div>
+        </div>
+        <button class="btn btn-primary" type="button" (click)="applyFiltering()">Apply filter</button>
       </div>
     </div>
-    <div class="row">
-      <div class="col-12">
-        <app-pagination [pagination]="pagination"></app-pagination>
-      </div>
+  </div>
+  <div class="row" *ngIf="pagination?.TotalItemsCount != 0">
+    <div class="col-4"></div>
+    <div class="col-4 ">
+      <app-pagination [pagination]="pagination" (nextPage)="nextPage()" (prevPage)="prevPage()">
+      </app-pagination>
+      <div class="col-4 "></div>
     </div>
   </div>

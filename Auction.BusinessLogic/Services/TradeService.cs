@@ -27,23 +27,23 @@ namespace Auction.BusinessLogic.Services
             CategoryService = categoryService;
         }
 
-        public void StartTrade(int lotId)
+        public void StartTrade(NewTradeDTO newTrade)
         {
-            if (!LotService.IsLotExists(lotId))
+            if (!LotService.IsLotExists(newTrade.LotId))
                 throw new NotFoundException();
             try
             {
-                if (IsTradeForLotAlreadyStarted(lotId))
+                if (IsTradeForLotAlreadyStarted(newTrade.LotId))
                     throw new AuctionException($"Trade for this lot has already began");
 
-                var lot = Database.TradingLots.GetTradingLotById(lotId);
+                var lot = Database.TradingLots.GetTradingLotById(newTrade.LotId);
 
                 Database.Trades.AddTrade(new Trade
                 {
-                    LotId = lotId,
+                    LotId = newTrade.LotId,
                     TradingLot = lot,
                     TradeStart = DateTime.Now,
-                    TradeEnd = DateTime.Now.AddDays(lot.TradeDuration)
+                    TradeEnd = DateTime.Now.AddDays(newTrade.TradeDuration)
                 });
                 Database.Save();
             }

@@ -26,16 +26,13 @@ export class LoginComponent implements OnInit {
 
     this.authService.athenticateUser(userName, password)
       .subscribe((data: any) => {
-        console.log(data);
         localStorage.setItem('userToken', data.body.access_token);
         this.authService.getUserClaims()
           .subscribe((claims) => {
-            console.log(claims);
             localStorage.setItem('userClaims', JSON.stringify(claims));
           })
-
         setTimeout(() => {
-          this.router.navigate(['/lots'])
+          this.router.navigate(['/trades'])
         }, 2000);
       },
         (err: HttpErrorResponse) => {

@@ -6,6 +6,7 @@ using Auction.DataAccess.Interfaces;
 using Mapster;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Auction.BusinessLogic.Services
@@ -30,11 +31,15 @@ namespace Auction.BusinessLogic.Services
             Database.Dispose();
         }
 
-        public void CreateLot(NewTradingLotDTO lot, string userName)
+        public void CreateLot(NewTradingLotDTO lot, string userName, string folder)
         {
             var lotPoco = Adapter.Adapt<TradingLot>(lot);
             try
             {
+                var fileName = $@"{DateTime.Now.Ticks}{lot.Img}";
+
+                SaveImageToFolder(lot.ImgBase64, fileName, folder);
+                lotPoco.Img = fileName;
                 lotPoco.User = Database.UserProfiles.GetProfileByUserName(userName);
                 lotPoco.Category = Database.Categories.GetCategoryById(lot.CategoryId);
 
@@ -59,7 +64,7 @@ namespace Auction.BusinessLogic.Services
 
                 if (isManager && lotPoco.CategoryId != lotDto.CategoryId)
                 {
-                    if (CategoryService.IsCategoryExist(lotDto.CategoryId) )
+                    if (CategoryService.IsCategoryExist(lotDto.CategoryId))
                     {
                         lotPoco.CategoryId = lotDto.CategoryId;
                         lotPoco.Category = Database.Categories.GetCategoryById(lotDto.CategoryId);
@@ -71,7 +76,7 @@ namespace Auction.BusinessLogic.Services
                 Database.TradingLots.UpdateTradingLot(lotPoco);
                 Database.Save();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw new DatabaseException();
             }
@@ -87,7 +92,7 @@ namespace Auction.BusinessLogic.Services
                 Database.TradingLots.DeleteTradingLotById(lotId);
                 Database.Save();
             }
-            catch(NotFoundException ex)
+            catch (NotFoundException ex)
             {
                 throw ex;
             }
@@ -105,7 +110,7 @@ namespace Auction.BusinessLogic.Services
             {
                 return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.GetTradingLotById(lotId));
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw new DatabaseException();
             }
@@ -148,7 +153,7 @@ namespace Auction.BusinessLogic.Services
             IQueryable<TradingLot> source = Database.TradingLots.FindTradingLots();
             if (!string.IsNullOrWhiteSpace(userId))
             {
-                if(!UserManager.IsUserWithIdExist(userId))
+                if (!UserManager.IsUserWithIdExist(userId))
                     throw new AuctionException("User with this id does`t exist, check user id and try again");
                 source = source.Where(l => l.UserId == userId);
             }
@@ -187,6 +192,20 @@ namespace Auction.BusinessLogic.Services
             catch (Exception)
             {
                 throw new DatabaseException();
+            }
+        }
+
+        private void SaveImageToFolder(string base64String, string fileName, string folder)
+        {
+            byte[] imageBytes = Convert.FromBase64String(base64String);
+
+            using (var ms = new MemoryStream(imageBytes, 0, imageBytes.Length))
+            {
+                using (var imageFile = new FileStream(folder + fileName, FileMode.Create))
+                {
+                    imageFile.Write(imageBytes, 0, imageBytes.Length);
+                    imageFile.Flush();
+                }
             }
         }
     }

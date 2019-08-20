@@ -1,9 +1,8 @@
 export interface TradingLot {
-    id: number;
+    Id: number;
     name: string;
     description: string;
-    imgURL: string;
+    img: string;
     price: number;
-    tradeDuration: number;
     owner: string;
 }

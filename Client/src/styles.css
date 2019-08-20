@@ -1,17 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
-
-/* .col-md-4 {
-  background: lightblue
-}
-
-
-
-.row.category-menu {
-  padding-top: 50px;
-}
-*/
 .main-content {
   margin-top: 65px;
 }

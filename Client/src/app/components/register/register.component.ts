@@ -35,7 +35,7 @@ export class RegisterComponent implements OnInit {
     console.log(newUser);
     this.authService.registerNewUser(newUser).subscribe(
       (resp) => {
-        //redirecting goes here
+        this.router.navigate(['login']);
       },
       (err: HttpErrorResponse) => {
         console.log(err.error.ModelState);

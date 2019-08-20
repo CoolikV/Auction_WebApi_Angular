@@ -39,4 +39,5 @@ export class TradingLotService {
   public deleteLot(lotId: number) {
     return this.httpService.deleteFullRequest(`${this.routePrefix}/${lotId}`)
   }
+
 }

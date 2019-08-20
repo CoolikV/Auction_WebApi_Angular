@@ -6,7 +6,7 @@ namespace Auction.BusinessLogic.Interfaces
 {
     public interface ITradingLotService : IDisposable
     {
-        void CreateLot(NewTradingLotDTO lot, string userName);
+        void CreateLot(NewTradingLotDTO lot, string userName, string folder);
         void EditLot(int lotId, NewTradingLotDTO lot, bool isManager);
         void RemoveLotById(int id);
 

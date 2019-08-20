@@ -21,7 +21,7 @@ namespace Auction.BusinessLogic.Configs
                 .Map(dest => dest.LotId, src => src.TradingLot.Id);
 
             config.NewConfig<Trade, TradeDTO>()
-                .Map(d => d.DaysLeft, src => src.TradeEnd.Subtract(src.TradeStart).Days)
+                .Map(d => d.DaysLeft, src => src.TradeEnd.Subtract(DateTime.Now).Days)
                 .MaxDepth(3);
 
             config.NewConfig<TradingLotDTO, TradingLot>()
@@ -29,7 +29,6 @@ namespace Auction.BusinessLogic.Configs
                 .Map(d => d.Name, s => s.Name)
                 .Map(d => d.Price, s => s.Price)
                 .Map(d => d.Img, s => s.Img)
-                .Map(d => d.TradeDuration, s => s.TradeDuration)
                 .IgnoreNonMapped(true)
                 .IgnoreNullValues(true);
 

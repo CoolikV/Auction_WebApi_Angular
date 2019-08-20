@@ -3,17 +3,20 @@
     <div class="card">
       <div class="row ">
         <div class="col-md-4">
-          <img src="http://127.0.0.1:8887/df.jpg" class="w-100">
+          <img src="http://127.0.0.1:8887/{{lot.Img}}" class="w-100">
         </div>
         <div class="col-md-8 px-3">
           <div class="card-block px-3">
             <h4 class="card-title">{{lot.Name}}</h4>
+            <h6> Description:</h6>
             <p class="card-text">{{lot.Description}}</p>
-            <p class="card-text">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-              anim id est laborum.</p>
-            <a class="btn btn-primary">Read More</a>
+            <h6 class="cart-text">
+              Price: {{lot.Price}} $
+            </h6>
           </div>
+          <label for="duration">Set trade duration:</label>
+          <input id="duration" class="form-control-sm" type="number" [(ngModel)]="duration">
+          <button class="btn btn-success" (click)="startTrade()" [disabled]="!isInputValid()">Start trade</button>
         </div>
       </div>
     </div>

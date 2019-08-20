@@ -6,5 +6,7 @@ namespace Auction.BusinessLogic.DTOs.Trade
     {
         [Required(ErrorMessage = "Lot id is required")]
         public int LotId { get; set; }
+        [Required(ErrorMessage = "Set how long was trade going")]
+        public int TradeDuration { get; set; }
     }
 }

@@ -6,7 +6,7 @@
     </div>
     <div class="col-7 main-content col-md-offset-3">
       <div *ngIf="pagination?.TotalItemsCount === 0">
-        <h2>No items found</h2>
+        <h2 class="text-center">No items found</h2>
       </div>
       <app-trade-item *ngFor="let trade of trades" [trade]="trade"></app-trade-item>
     </div>

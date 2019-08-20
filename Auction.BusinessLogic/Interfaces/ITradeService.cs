@@ -6,7 +6,7 @@ namespace Auction.BusinessLogic.Interfaces
 {
     public interface ITradeService : IDisposable
     {
-        void StartTrade(int lotId);
+        void StartTrade(NewTradeDTO newTrade);
         void RateTradingLot(RateDTO rate, string userName);
         TradeDTO GetTradeById(int id);
         IEnumerable<TradeDTO> GetTradesForPage(int pageNum, int pageSize, DateTime? startDate,

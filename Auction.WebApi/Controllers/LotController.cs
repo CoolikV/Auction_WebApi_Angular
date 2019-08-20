@@ -86,8 +86,9 @@ namespace Auction.WebApi.Controllers
         {
             try
             {
+                var fullPath = System.Web.Hosting.HostingEnvironment.MapPath(@"~/App_Data/static/img/");
                 //REFACTORING and add pictures saving to app_data/static/pictures
-                lotService.CreateLot(newTradingLot, User.Identity.Name);
+                lotService.CreateLot(newTradingLot, User.Identity.Name, fullPath);
                 return Created(nameof(GetTradingLot), newTradingLot);
             }
             catch (DatabaseException)
