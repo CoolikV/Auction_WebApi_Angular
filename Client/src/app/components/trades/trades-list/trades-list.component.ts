@@ -60,7 +60,6 @@ export class TradesListComponent implements OnInit {
           this.pagination = JSON.parse(data.headers.get('Paging-Headers'));
         }
       );
-    console.log("nextpage");
   }
 
   prevPage() {
@@ -71,7 +70,6 @@ export class TradesListComponent implements OnInit {
           this.pagination = JSON.parse(data.headers.get('Paging-Headers'));
         }
       );
-    console.log("prevpage");
   }
 
   resetFilter() {

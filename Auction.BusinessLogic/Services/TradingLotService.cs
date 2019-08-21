@@ -11,6 +11,9 @@ using System.Linq;
 
 namespace Auction.BusinessLogic.Services
 {
+    /// <summary>
+    /// Service for working with trading lots
+    /// </summary>
     public class TradingLotService : ITradingLotService
     {
         IAdapter Adapter { get; set; }
@@ -26,11 +29,12 @@ namespace Auction.BusinessLogic.Services
             UserManager = userManager;
         }
 
-        public void Dispose()
-        {
-            Database.Dispose();
-        }
-
+        /// <summary>
+        /// Creates new lot
+        /// </summary>
+        /// <param name="lot">New lot</param>
+        /// <param name="userName">User name who creates new lot</param>
+        /// <param name="folder">Folder where to save lot picture</param>
         public void CreateLot(NewTradingLotDTO lot, string userName, string folder)
         {
             var lotPoco = Adapter.Adapt<TradingLot>(lot);
@@ -52,36 +56,10 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
-        //delete old image from app data and save new image, then set new img path
-        public void EditLot(int lotId, NewTradingLotDTO lotDto, bool isManager)
-        {
-            try
-            {
-                if (!IsLotExists(lotId))
-                    throw new NotFoundException($"Lot with id: {lotId}");
-
-                TradingLot lotPoco = Database.TradingLots.GetTradingLotById(lotId);
-
-                if (isManager && lotPoco.CategoryId != lotDto.CategoryId)
-                {
-                    if (CategoryService.IsCategoryExist(lotDto.CategoryId))
-                    {
-                        lotPoco.CategoryId = lotDto.CategoryId;
-                        lotPoco.Category = Database.Categories.GetCategoryById(lotDto.CategoryId);
-                    }
-                }
-
-                lotDto.Adapt(lotPoco);
-
-                Database.TradingLots.UpdateTradingLot(lotPoco);
-                Database.Save();
-            }
-            catch (Exception)
-            {
-                throw new DatabaseException();
-            }
-        }
-
+        /// <summary>
+        /// Removes lot
+        /// </summary>
+        /// <param name="lotId">Lot ID</param>
         public void RemoveLotById(int lotId)
         {
             try
@@ -102,6 +80,11 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
+        /// <summary>
+        /// Gets lot
+        /// </summary>
+        /// <param name="lotId">Lot ID</param>
+        /// <returns>Lot</returns>
         public TradingLotDTO GetLotById(int lotId)
         {
             if (!IsLotExists(lotId))
@@ -116,37 +99,56 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
-        public void ChangeLotCategory(int lotId, int categoryId)
-        {
-            if (!IsLotExists(lotId) || !CategoryService.IsCategoryExist(categoryId))
-                throw new NotFoundException();
-            try
-            {
-                TradingLot lot = Database.TradingLots.GetTradingLotById(lotId);
-                Category category = Database.Categories.GetCategoryById(categoryId);
-                lot.Category = category;
-                lot.CategoryId = categoryId;
-                Database.TradingLots.UpdateTradingLot(lot);
-                Database.Save();
-            }
-            catch (Exception)
-            {
-                throw new DatabaseException();
-            }
-        }
-
+        /// <summary>
+        /// Get lots with filtering and pagination
+        /// </summary>
+        /// <param name="pageNum">Page number</param>
+        /// <param name="pageSize">Items per page</param>
+        /// <param name="categoryId">Category ID</param>
+        /// <param name="minPrice">Min lot price</param>
+        /// <param name="maxPrice">Max lot price</param>
+        /// <param name="lotName">Lot name</param>
+        /// <param name="pagesCount">Pages count</param>
+        /// <param name="totalItemsCount">Total items found</param>
+        /// <returns>Filtered collection of lots</returns>
         public IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? categoryId,
             double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
         {
             return FilterLotsForPage(string.Empty, pageNum, pageSize, categoryId, minPrice, maxPrice, lotName, out pagesCount, out totalItemsCount);
         }
 
+        /// <summary>
+        /// Get lots with filtering and pagination for user
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <param name="pageNum">Page number</param>
+        /// <param name="pageSize">Items per page</param>
+        /// <param name="categoryId">Category ID</param>
+        /// <param name="minPrice">Min lot price</param>
+        /// <param name="maxPrice">Max lot price</param>
+        /// <param name="lotName">Lot name</param>
+        /// <param name="pagesCount">Pages count</param>
+        /// <param name="totalItemsCount">Total items found</param>
+        /// <returns>Filtered collection of lots</returns>
         public IEnumerable<TradingLotDTO> GetLotsForUser(string userId, int pageNum, int pageSize, int? categoryId,
             double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
         {
             return FilterLotsForPage(userId, pageNum, pageSize, categoryId, minPrice, maxPrice, lotName, out pagesCount, out totalItemsCount);
         }
 
+        /// <summary>
+        /// Filter lots for page
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <param name="pageNum">Page number</param>
+        /// <param name="pageSize">Items per page</param>
+        /// <param name="categoryId">Category ID</param>
+        /// <param name="minPrice">Min lot price</param>
+        /// <param name="maxPrice">Max lot price</param>
+        /// <param name="lotName">Lot name</param>
+        /// <param name="pagesCount">Pages count</param>
+        /// <param name="totalItemsCount">Total items found</param>
+        /// <returns>Filtered collection of lots</returns>
         private IEnumerable<TradingLotDTO> FilterLotsForPage(string userId, int pageNum, int pageSize, int? categoryId,
             double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount)
         {
@@ -190,6 +192,11 @@ namespace Auction.BusinessLogic.Services
             return Adapter.Adapt<IEnumerable<TradingLotDTO>>(lotsForPage);
         }
 
+        /// <summary>
+        /// Checks is lot exists
+        /// </summary>
+        /// <param name="id">Lot ID</param>
+        /// <returns>True if lot with specified ID exists</returns>
         public bool IsLotExists(int id)
         {
             try
@@ -202,6 +209,12 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
+        /// <summary>
+        /// Saves file to specified folder
+        /// </summary>
+        /// <param name="base64String">File presentation in base64 format</param>
+        /// <param name="fileName">File name</param>
+        /// <param name="folder">Folder path</param>
         private void SaveImageToFolder(string base64String, string fileName, string folder)
         {
             byte[] imageBytes = Convert.FromBase64String(base64String);
@@ -214,6 +227,11 @@ namespace Auction.BusinessLogic.Services
                     imageFile.Flush();
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            Database.Dispose();
         }
     }
 }

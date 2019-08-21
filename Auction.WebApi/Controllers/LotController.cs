@@ -109,29 +109,6 @@ namespace Auction.WebApi.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("{id:int}")]
-        public IHttpActionResult UpdateTradingLot(int id, [FromBody]NewTradingLotDTO newTradingLot)
-        {
-            try
-            {
-                lotService.EditLot(id, newTradingLot, User.IsInRole("manager"));
-                return Ok();
-            }
-            catch (DatabaseException)
-            {
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
-            catch (AuctionException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         [HttpDelete]
         [Route("{id:int}")]
         public IHttpActionResult DeleteTradingLot(int id)

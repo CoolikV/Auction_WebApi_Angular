@@ -1,6 +1,6 @@
 <div class="row">
-  <div class="col-3 col-centered" style="background: lightcoral">
-    <!-- <form class="form-horizontal"> -->
+  <div class="col-4"></div>
+  <div class="col-4">
     <div class="form-group">
       <label for="userName">User name:</label>
       <input class="form-control" type="text" name="username" [(ngModel)]="username">
@@ -36,11 +36,8 @@
     <button class="btn btn-primary"
       [disabled]="isNotValid(username, password, confPassword, email, name, surname, dateOfBirth)"
       (click)="register(username, password, confPassword, email, name, surname, dateOfBirth)">Register</button>
-    <!-- </form> -->
   </div>
-  <div class="col-3" style="background: lightblue;" *ngIf="!isSuccess">
-    <ul>
-      <li *ngFor="let error of errors">{{error.Message}}</li>
-    </ul>
+  <div class="col-4" *ngIf=" !isSuccess">
+
   </div>
 </div>

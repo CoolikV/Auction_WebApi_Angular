@@ -1,10 +1,12 @@
-﻿using Auction.DataAccess.EF;
-using Auction.DataAccess.Interfaces;
+﻿using Auction.DataAccess.Interfaces;
 using Auction.DataAccess.Repositories;
 using Ninject.Modules;
 
 namespace Auction.BusinessLogic.Configs
 {
+    /// <summary>
+    /// Ninject module for database connection
+    /// </summary>
     public class ConnectionModule : NinjectModule
     {
         private readonly string _connectionString;

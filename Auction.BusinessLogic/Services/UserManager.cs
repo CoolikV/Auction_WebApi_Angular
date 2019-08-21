@@ -17,6 +17,9 @@ using System.Threading.Tasks;
 
 namespace Auction.BusinessLogic.Services
 {
+    /// <summary>
+    /// Service for working with users
+    /// </summary>
     public class UserManager : IUserManager
     {
         IAdapter Adapter { get; set; }
@@ -28,6 +31,11 @@ namespace Auction.BusinessLogic.Services
             Adapter = adapter;
         }
 
+        /// <summary>
+        /// Creates new user
+        /// </summary>
+        /// <param name="userDto">New user</param>
+        /// <returns>Operation details which contains is operation was successful</returns>
         public async Task<OperationDetails> CreateUserAsync(UserRegisterDTO userDto)
         {
             if (IsUserWithEmailExist(userDto.Email))
@@ -61,6 +69,15 @@ namespace Auction.BusinessLogic.Services
             return new OperationDetails(true, "Registration successful", string.Empty);
         }
 
+        /// <summary>
+        /// Get users with pagination and filtering
+        /// </summary>
+        /// <param name="pageNum">Page number</param>
+        /// <param name="pageSize">Users per page</param>
+        /// <param name="userName">User name</param>
+        /// <param name="pagesCount">Pages count</param>
+        /// <param name="totalItemsCount">Users found</param>
+        /// <returns>Filtered collection of users</returns>
         public IEnumerable<UserDTO> GetUsersForPage(int pageNum, int pageSize, string userName, out int pagesCount, out int totalItemsCount)
         {
             IQueryable<UserProfile> source = Database.UserProfiles.FindProfiles();
@@ -78,6 +95,12 @@ namespace Auction.BusinessLogic.Services
             return Adapter.Adapt<IEnumerable<UserDTO>>(usersForPage);
         }
 
+        /// <summary>
+        /// Authenticates user
+        /// </summary>
+        /// <param name="userName">User name</param>
+        /// <param name="password">user password</param>
+        /// <returns>Claims for user</returns>
         public async Task<ClaimsIdentity> Authenticate(string userName, string password)
         {
             var appUser = await Database.UserManager.FindAsync(userName, password)
@@ -88,54 +111,28 @@ namespace Auction.BusinessLogic.Services
             return claim;
         }
 
-        public UserProfileDTO GetUserProfileByUserName(string userName)
-        {
-            if (!IsUserWithUserNameExist(userName))
-                throw new NotFoundException($"User with user name: {userName}");
-            return Adapter.Adapt<UserProfileDTO>(Database.UserManager.FindByName(userName).UserProfile);
-        }
-
+        /// <summary>
+        /// Gets user profile
+        /// </summary>
+        /// <param name="userName">User name</param>
+        /// <returns>User profile</returns>
         public UserProfileDTO GetUserProfileById(string userId)
         {
             if (!IsUserWithIdExist(userId))
                 throw new NotFoundException($"User with id: {userId}");
             return Adapter.Adapt<UserProfileDTO>(Database.UserManager.FindById(userId).UserProfile);
         }
-
-        public UserDTO GetUserByUserName(string userName)
-        {
-            if (!IsUserWithUserNameExist(userName))
-                throw new NotFoundException($"User with user name: {userName}");
-
-            return Adapter.Adapt<UserDTO>(Database.UserManager.FindByName(userName));
-        }
-        //maybe change
-        public async Task<OperationDetails> EditUserRoleAsync(string userId, string newRoleName)
-        {
-            if (!IsUserWithIdExist(userId))
-                throw new NotFoundException("Selected user");
-            var appUser = await Database.UserManager.FindByIdAsync(userId);
-
-            string currentUserRole = GetRoleNameForUser(appUser);
-
-            if (currentUserRole.Equals(newRoleName))
-                return new OperationDetails(false,"User already in this role", nameof(newRoleName));
-            
-            await Database.UserManager.RemoveFromRoleAsync(userId, currentUserRole);
-            await Database.UserManager.AddToRoleAsync(userId, newRoleName);
-
-            await Database.UserManager.UpdateAsync(appUser);
-
-            return new OperationDetails(true, $"Role for user {appUser.UserName} was changed from {currentUserRole} to {newRoleName}", string.Empty);
-        }
-
+     
+        /// <summary>
+        /// Delete user
+        /// </summary>
+        /// <param name="userName">User name</param>
+        /// <returns>Information about operation</returns>
         public async Task<OperationDetails> DeleteUserAccount(string userName)
         {
             if (!IsUserWithUserNameExist(userName))
                 throw new NotFoundException($"User with name: {userName}");
-            //var userProfile = FindUserById(userId).UserProfile;
 
-            //Database.UserProfiles.DeleteProfile(userProfile);
             var operationResult = await Database.UserManager.DeleteAsync(Database.UserManager.FindByName(userName));
 
             if (operationResult.Errors.Any())
@@ -146,6 +143,11 @@ namespace Auction.BusinessLogic.Services
             return new OperationDetails(true, $"User account {userName} was successfuly deleted", string.Empty);
         }
 
+        /// <summary>
+        /// Edits user profile
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <param name="profileDto">Edited user profile</param>
         public void EditUserProfile(string userId, NewUserProfileDTO profileDto)
         {
             if (!IsUserWithIdExist(userId))
@@ -165,6 +167,11 @@ namespace Auction.BusinessLogic.Services
             Database.Save();
         }
 
+        /// <summary>
+        /// Gets user claims
+        /// </summary>
+        /// <param name="userName">User name</param>
+        /// <returns>Claims for user</returns>
         public UserClaimsDTO GetUserClaims(string userName)
         {
             try
@@ -183,6 +190,11 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
+        /// <summary>
+        /// Gets user role
+        /// </summary>
+        /// <param name="user">User</param>
+        /// <returns>User role</returns>
         private string GetRoleNameForUser(AppUser user)
         {
             var roleId = user.Roles.Where(x => x.UserId == user.Id).Single().RoleId;
@@ -192,16 +204,31 @@ namespace Auction.BusinessLogic.Services
         }
         
         #region Condition check methods
+        /// <summary>
+        /// Checks is user with specified user name exists
+        /// </summary>
+        /// <param name="userName">User name</param>
+        /// <returns>True if user wxists</returns>
         public bool IsUserWithUserNameExist(string userName)
         {
             return Database.UserManager.FindByName(userName) != null;
         }
 
+        /// <summary>
+        /// Checks is user with specified email exists
+        /// </summary>
+        /// <param name="email">User email</param>
+        /// <returns>True if user exists</returns>
         private bool IsUserWithEmailExist(string email)
         {
             return Database.UserManager.FindByEmail(email) != null;
         }
 
+        /// <summary>
+        /// Checks is user with specified ID exists
+        /// </summary>
+        /// <param name="id">User ID</param>
+        /// <returns>True id user exists</returns>
         public bool IsUserWithIdExist(string id)
         {
             return Database.UserManager.FindById(id) != null;

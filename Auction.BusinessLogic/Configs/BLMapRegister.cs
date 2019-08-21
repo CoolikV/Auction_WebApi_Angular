@@ -10,6 +10,9 @@ using System;
 
 namespace Auction.BusinessLogic.Configs
 {
+    /// <summary>
+    /// Config class for Mapster 
+    /// </summary>
     public class BLMapRegister : IRegister
     {
         public void Register(TypeAdapterConfig config)

@@ -5,7 +5,6 @@ import { TradeService } from 'src/app/services/trade.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { Rate } from 'src/app/models/trade/rate';
-import { AuthenticatedUser } from 'src/app/models/auth/authenticated-user';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({

@@ -11,10 +11,15 @@ using System.Linq;
 
 namespace Auction.BusinessLogic.Services
 {
+    /// <summary>
+    /// Service for working with categories
+    /// </summary>
     public class CategoryService : ICategoryService
     {
         IAdapter Adapter { get; set; }
         IUnitOfWork Database { get; set; }
+
+        private const int _defaultCategoryId = 1;
 
         public CategoryService(IUnitOfWork uow, IAdapter adapter)
         {
@@ -27,6 +32,11 @@ namespace Auction.BusinessLogic.Services
             Database.Dispose();
         }
         
+        /// <summary>
+        /// Get the category by ID
+        /// </summary>
+        /// <param name="id">Category ID</param>
+        /// <returns>Category with specified ID</returns>
         public CategoryDTO GetCategoryById(int id)
         {
 
@@ -47,7 +57,10 @@ namespace Auction.BusinessLogic.Services
                 throw new DatabaseException();
             }
         }
-
+        /// <summary>
+        /// Gets the list of categories
+        /// </summary>
+        /// <returns>List of categories</returns>
         public IEnumerable<CategoryDTO> GetCategories()
         {
             try
@@ -60,6 +73,12 @@ namespace Auction.BusinessLogic.Services
             }
         }
 
+        /// <summary>
+        /// Get trading lot from category
+        /// </summary>
+        /// <param name="categoryId">Category ID</param>
+        /// <param name="lotId">Lot ID</param>
+        /// <returns>Lot</returns>
         public TradingLotDTO GetLotFromCategory(int categoryId, int lotId)
         {
             try
@@ -79,7 +98,10 @@ namespace Auction.BusinessLogic.Services
                 throw new DatabaseException();
             }
         }
-
+        /// <summary>
+        /// Removes category
+        /// </summary>
+        /// <param name="id">Category ID</param>
         public void RemoveCategoryById(int id)
         {
             try
@@ -110,7 +132,11 @@ namespace Auction.BusinessLogic.Services
                 throw new DatabaseException();
             }
         }
-
+        /// <summary>
+        /// Changes category name
+        /// </summary>
+        /// <param name="id">Category ID</param>
+        /// <param name="name">New category name</param>
         public void ChangeCategoryName(int id, string name)
         {
             try
@@ -140,7 +166,10 @@ namespace Auction.BusinessLogic.Services
                 throw new DatabaseException();
             }
         }
-
+        /// <summary>
+        /// Creates new category
+        /// </summary>
+        /// <param name="category">New category</param>
         public void CreateCategory(NewCategoryDTO category)
         {
             try
@@ -194,9 +223,9 @@ namespace Auction.BusinessLogic.Services
         /// </summary>
         /// <param name="tradingLots">Collection of lots, which category will be changed</param>
         /// <param name="categoryId">Id of new category for lots</param>
-        private void MoveLotsToCategory(ICollection<TradingLot> tradingLots, int categoryId = 1)
+        private void MoveLotsToCategory(ICollection<TradingLot> tradingLots)
         {
-            var defaultCat = Database.Categories.GetCategoryById(categoryId);
+            var defaultCat = Database.Categories.GetCategoryById(_defaultCategoryId);
             tradingLots.ToList().ForEach(lot => {
                 lot.Category = defaultCat;
                 lot.CategoryId = defaultCat.Id;

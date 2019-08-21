@@ -32,13 +32,17 @@ export class RegisterComponent implements OnInit {
       userName: username,
       birthDate: dateOfBirth
     };
-    console.log(newUser);
     this.authService.registerNewUser(newUser).subscribe(
       (resp) => {
-        this.router.navigate(['login']);
+        alert("Redirecting to login page")
+        setTimeout(() => {
+          this.router.navigate(['login']);
+        }, 2000);
       },
       (err: HttpErrorResponse) => {
         console.log(err.error.ModelState);
+        this.errors = err.error.ModelState;
+        alert(err.statusText);
         this.isSuccess = false;
       }
     )
