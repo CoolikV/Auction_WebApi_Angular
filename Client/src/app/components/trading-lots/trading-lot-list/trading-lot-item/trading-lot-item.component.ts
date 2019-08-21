@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TradingLot } from 'src/app/models/trading-lot/trading-lot';
 import { TradeService } from 'src/app/services/trade.service';
-import { NewTradeDto } from 'src/app/models/trade/new-trade-dto';
+import { NewTrade } from 'src/app/models/trade/new-trade';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -13,7 +13,7 @@ export class TradingLotItemComponent implements OnInit {
   @Input()
   lot: TradingLot;
 
-  newTrade = {} as NewTradeDto;
+  newTrade = {} as NewTrade;
   duration: number;
   constructor(private tradeService: TradeService) { }
 

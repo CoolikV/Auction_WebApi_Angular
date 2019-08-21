@@ -17,7 +17,7 @@ namespace Auction.DataAccess.EF
 
         public AuctionContext(string connectionString) : base(connectionString)
         {
-            Database.SetInitializer(new DbInitializer());
+            //Database.SetInitializer(new DbInitializer());
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

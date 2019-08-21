@@ -23,6 +23,11 @@ export class NavbarComponent implements OnInit {
     return this.authService.isUserAuthenicated();
   }
 
+  isGuest() {
+    if (!this.isLoggedIn())
+      this.router.navigate(['/login']);
+  }
+
   logOut() {
     this.authService.logout();
     this.router.navigate(['/trades']);

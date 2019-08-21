@@ -13,7 +13,7 @@
         <a class="nav-link" [routerLink]="[ 'trades' ]">Buy</a>
       </li>
       <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" [routerLink]="[ 'profile/lots' ]">Sell</a>
+        <a class="nav-link" [routerLink]="[ 'profile/lots' ]" (click)="isGuest()">Sell</a>
       </li>
     </ul>
     <a class="nav-link nav navbar-nav navbar-right" [routerLink]="[ 'login' ]" *ngIf="!isLoggedIn()">Log in</a>

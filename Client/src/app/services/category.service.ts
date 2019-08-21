@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpInternalService } from './http-internal.service';
 import { Category } from '../models/category/category';
-import { NewCategoryDto } from '../models/category/new-category-dto';
+import { NewCategory } from '../models/category/new-category';
 import { TradingLot } from '../models/trading-lot/trading-lot';
 
 @Injectable({
@@ -28,12 +28,12 @@ export class CategoryService {
     return this.httpService.getFullRequest<TradingLot>(`${this.routePrefix}/${id}/lots`, { lotId })
   }
 
-  public createCategory(category: NewCategoryDto) {
+  public createCategory(category: NewCategory) {
     return this.httpService.postFullRequest(`${this.routePrefix}`, category);
   }
 
   public changeCategoryName(id: number, newName: string) {
-    return this.httpService.putFullRequest(`${this.routePrefix}/${id}`, <NewCategoryDto>{ name: newName })
+    return this.httpService.putFullRequest(`${this.routePrefix}/${id}`, <NewCategory>{ name: newName })
   }
 
   public deleteCategory(id: number) {

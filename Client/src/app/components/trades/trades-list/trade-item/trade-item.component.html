@@ -16,8 +16,13 @@
             <p class="card-text">
               Owner: {{trade.TradingLot.Owner}}
             </p>
-            <h6>Days left: {{trade.DaysLeft}}</h6>
-            <a class="btn btn-primary">Make bet</a>
+            <h6 *ngIf="trade.DaysLeft === 0">Days left: Last day</h6>
+            <h6 *ngIf="trade.DaysLeft > 0">Days left: {{trade.DaysLeft}}</h6>
+            <h6 *ngIf="trade.DaysLeft < 0">Days left: Trade Finished</h6>
+            <p class="card-text">
+              <input type="number" placeholder="Set sum for bet" [(ngModel)]="betSum" min="{{trade.LastPrice + 1}}">
+              <a class="btn btn-primary" (click)="makeBet()">Make bet</a>
+            </p>
           </div>
         </div>
       </div>

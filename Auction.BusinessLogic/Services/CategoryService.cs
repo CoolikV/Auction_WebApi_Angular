@@ -29,13 +29,18 @@ namespace Auction.BusinessLogic.Services
         
         public CategoryDTO GetCategoryById(int id)
         {
-            if(!IsCategoryExist(id))
-                throw new NotFoundException($"Category with id: {id}");
 
             try
             {
+                if(!IsCategoryExist(id))
+                    throw new NotFoundException($"Category with id: {id}");
+
                 var category = Database.Categories.GetCategoryById(id);
                 return Adapter.Adapt<CategoryDTO>(category);
+            }
+            catch(NotFoundException ex)
+            {
+                throw ex;
             }
             catch (Exception)
             {
@@ -57,13 +62,17 @@ namespace Auction.BusinessLogic.Services
 
         public TradingLotDTO GetLotFromCategory(int categoryId, int lotId)
         {
-            if (!IsCategoryContainLot(categoryId, lotId))
-                throw new NotFoundException($"Category doesn`t contain lot with id: {lotId}");
-
             try
             {
+                if (!IsCategoryContainLot(categoryId, lotId))
+                    throw new NotFoundException($"Category doesn`t contain lot with id: {lotId}");
+
                 return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.FindTradingLots(l => l.Id == lotId 
                 && l.CategoryId == categoryId).Single());
+            }
+            catch(NotFoundException ex)
+            {
+                throw ex;
             }
             catch (Exception)
             {
@@ -73,13 +82,13 @@ namespace Auction.BusinessLogic.Services
 
         public void RemoveCategoryById(int id)
         {
-            if (id == 1)
-                throw new AuctionException("You can`t delete default category");
-            if(!IsCategoryExist(id))
-                throw new NotFoundException($"Category with id: {id}");
-
             try
             {
+                if (id == 1)
+                    throw new AuctionException("You can`t delete default category");
+                if(!IsCategoryExist(id))
+                    throw new NotFoundException($"Category with id: {id}");
+
                 var categoryToDelete = Database.Categories.GetCategoryById(id);
 
                 if (categoryToDelete.TradingLots.Any())
@@ -87,6 +96,14 @@ namespace Auction.BusinessLogic.Services
 
                 Database.Categories.DeleteCategoryById(categoryToDelete.Id);
                 Database.Save();
+            }
+            catch(AuctionException ex)
+            {
+                throw ex;
+            }
+            catch(NotFoundException ex)
+            {
+                throw ex;
             }
             catch (Exception)
             {
@@ -96,19 +113,27 @@ namespace Auction.BusinessLogic.Services
 
         public void ChangeCategoryName(int id, string name)
         {
-            if(!IsCategoryExist(id))
-                throw new NotFoundException($"Category with id: {id}");
-            if(!IsCategoryNameFree(name))
-                throw new AuctionException($"Category with name {name} is already exists");
-
             try
             {
+                if(!IsCategoryExist(id))
+                    throw new NotFoundException($"Category with id: {id}");
+                if(!IsCategoryNameFree(name))
+                    throw new AuctionException($"Category with name {name} is already exists");
+
                 var categoryToUpdate = Database.Categories.GetCategoryById(id);
 
                 categoryToUpdate.Name = name;
 
                 Database.Categories.UpdateCategory(categoryToUpdate);
                 Database.Save();
+            }
+            catch(NotFoundException ex)
+            {
+                throw ex;
+            }
+            catch(AuctionException ex)
+            {
+                throw ex;
             }
             catch (Exception)
             {
@@ -118,13 +143,17 @@ namespace Auction.BusinessLogic.Services
 
         public void CreateCategory(NewCategoryDTO category)
         {
-            if (!IsCategoryNameFree(category.Name))
-                throw new AuctionException($"Category {category.Name} already exists.");
-
             try
             {
+                if (!IsCategoryNameFree(category.Name))
+                    throw new AuctionException($"Category {category.Name} already exists.");
+
                 Database.Categories.AddCategory(new Category { Name = category.Name });
                 Database.Save();
+            }
+            catch(AuctionException ex)
+            {
+                throw ex;
             }
             catch (Exception)
             {

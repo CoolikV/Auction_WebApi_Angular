@@ -7,7 +7,6 @@ import { FormsModule } from '@angular/forms';
 
 import { CategoryItemComponent } from './components/categories/category-list/category-item/category-item.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { HomeComponent } from './components/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { CategoryListComponent } from './components/categories/category-list/category-list.component';
 
@@ -30,7 +29,6 @@ import { NewLotComponent } from './components/trading-lots/new-lot/new-lot.compo
   declarations: [
     AppComponent,
     CategoryItemComponent,
-    HomeComponent,
     NavbarComponent,
     CategoryListComponent,
     TradingLotListComponent,

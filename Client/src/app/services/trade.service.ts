@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpInternalService } from './http-internal.service';
 import { Trade } from '../models/trade/trade';
-import { NewTradeDto } from '../models/trade/new-trade-dto';
-import { RateDto } from '../models/trade/rate-dto';
+import { NewTrade } from '../models/trade/new-trade';
+import { Rate } from '../models/trade/rate';
 
 @Injectable({
   providedIn: 'root'
@@ -28,11 +28,11 @@ export class TradeService {
     return this.httpService.getFullRequest<Trade[]>(`${this.routePrefix}`, { pageSize, pageNumber, endsOn, startsOn, categoryId, maxPrice });
   }
 
-  public rateTrade(rate: RateDto) {
+  public rateTrade(rate: Rate) {
     return this.httpService.putFullRequest(`${this.routePrefix}`, rate);
   }
 
-  public startTrade(trade: NewTradeDto) {
+  public startTrade(trade: NewTrade) {
     return this.httpService.postFullRequest(`${this.routePrefix}`, trade);
   }
 }
