@@ -57,7 +57,22 @@ namespace Auction.WebApi.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        //add put update delete methods...
-
+        [HttpGet]
+        [Route("claims")]
+        public IHttpActionResult GetCurrentUserClaims()
+        {
+            try
+            {
+                return Ok(userManager.GetUserClaims(User.Identity.Name));
+            }
+            catch (NotFoundException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

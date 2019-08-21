@@ -6,16 +6,14 @@ namespace Auction.BusinessLogic.Interfaces
 {
     public interface ITradingLotService : IDisposable
     {
-        void CreateLot(NewTradingLotDTO lot, string userName);
-        void EditLot(int lotId, NewTradingLotDTO lot, bool isManager);
+        void CreateLot(NewTradingLotDTO lot, string userName, string folder);
+        TradingLotDTO GetLotById(int id);
         void RemoveLotById(int id);
+
         IEnumerable<TradingLotDTO> GetLotsForPage(int pageNum, int pageSize, int? categoryId,
             double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount);
         IEnumerable<TradingLotDTO> GetLotsForUser(string userId, int pageNum, int pageSize, int? categoryId,
             double? minPrice, double? maxPrice, string lotName, out int pagesCount, out int totalItemsCount);
-        TradingLotDTO GetLotById(int id);
-        void ChangeLotCategory(int lotId, int categoryId);
-        void VerifyLot(int lotId);
 
         bool IsLotExists(int id);
     }

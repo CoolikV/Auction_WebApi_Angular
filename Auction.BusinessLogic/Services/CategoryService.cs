@@ -11,10 +11,15 @@ using System.Linq;
 
 namespace Auction.BusinessLogic.Services
 {
+    /// <summary>
+    /// Service for working with categories
+    /// </summary>
     public class CategoryService : ICategoryService
     {
         IAdapter Adapter { get; set; }
         IUnitOfWork Database { get; set; }
+
+        private const int _defaultCategoryId = 1;
 
         public CategoryService(IUnitOfWork uow, IAdapter adapter)
         {
@@ -27,47 +32,85 @@ namespace Auction.BusinessLogic.Services
             Database.Dispose();
         }
         
+        /// <summary>
+        /// Get the category by ID
+        /// </summary>
+        /// <param name="id">Category ID</param>
+        /// <returns>Category with specified ID</returns>
         public CategoryDTO GetCategoryById(int id)
         {
-            if(!IsCategoryExist(id))
-                throw new NotFoundException($"Category with id: {id}");
 
             try
             {
+                if(!IsCategoryExist(id))
+                    throw new NotFoundException($"Category with id: {id}");
+
                 var category = Database.Categories.GetCategoryById(id);
                 return Adapter.Adapt<CategoryDTO>(category);
             }
+            catch(NotFoundException ex)
+            {
+                throw ex;
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
+        }
+        /// <summary>
+        /// Gets the list of categories
+        /// </summary>
+        /// <returns>List of categories</returns>
+        public IEnumerable<CategoryDTO> GetCategories()
+        {
+            try
+            {
+                return Adapter.Adapt<IEnumerable<CategoryDTO>>(Database.Categories.FindCategories().AsEnumerable());
+            }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
         }
 
+        /// <summary>
+        /// Get trading lot from category
+        /// </summary>
+        /// <param name="categoryId">Category ID</param>
+        /// <param name="lotId">Lot ID</param>
+        /// <returns>Lot</returns>
         public TradingLotDTO GetLotFromCategory(int categoryId, int lotId)
         {
-            if (!IsCategoryContainLot(categoryId, lotId))
-                throw new NotFoundException($"Category doesn`t contain lot with id: {lotId}");
-
             try
             {
+                if (!IsCategoryContainLot(categoryId, lotId))
+                    throw new NotFoundException($"Category doesn`t contain lot with id: {lotId}");
+
                 return Adapter.Adapt<TradingLotDTO>(Database.TradingLots.FindTradingLots(l => l.Id == lotId 
                 && l.CategoryId == categoryId).Single());
             }
+            catch(NotFoundException ex)
+            {
+                throw ex;
+            }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
         }
-
+        /// <summary>
+        /// Removes category
+        /// </summary>
+        /// <param name="id">Category ID</param>
         public void RemoveCategoryById(int id)
         {
-            if (id == 1)
-                throw new AuctionException("You can`t delete default category");
-            if(!IsCategoryExist(id))
-                throw new NotFoundException($"Category with id: {id}");
-
             try
             {
+                if (id == 1)
+                    throw new AuctionException("You can`t delete default category");
+                if(!IsCategoryExist(id))
+                    throw new NotFoundException($"Category with id: {id}");
+
                 var categoryToDelete = Database.Categories.GetCategoryById(id);
 
                 if (categoryToDelete.TradingLots.Any())
@@ -76,21 +119,33 @@ namespace Auction.BusinessLogic.Services
                 Database.Categories.DeleteCategoryById(categoryToDelete.Id);
                 Database.Save();
             }
+            catch(AuctionException ex)
+            {
+                throw ex;
+            }
+            catch(NotFoundException ex)
+            {
+                throw ex;
+            }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
         }
-
+        /// <summary>
+        /// Changes category name
+        /// </summary>
+        /// <param name="id">Category ID</param>
+        /// <param name="name">New category name</param>
         public void ChangeCategoryName(int id, string name)
         {
-            if(!IsCategoryExist(id))
-                throw new NotFoundException($"Category with id: {id}");
-            if(!IsCategoryNameFree(name))
-                throw new AuctionException($"Category with name {name} is already exists");
-
             try
             {
+                if(!IsCategoryExist(id))
+                    throw new NotFoundException($"Category with id: {id}");
+                if(!IsCategoryNameFree(name))
+                    throw new AuctionException($"Category with name {name} is already exists");
+
                 var categoryToUpdate = Database.Categories.GetCategoryById(id);
 
                 categoryToUpdate.Name = name;
@@ -98,21 +153,36 @@ namespace Auction.BusinessLogic.Services
                 Database.Categories.UpdateCategory(categoryToUpdate);
                 Database.Save();
             }
+            catch(NotFoundException ex)
+            {
+                throw ex;
+            }
+            catch(AuctionException ex)
+            {
+                throw ex;
+            }
             catch (Exception)
             {
                 throw new DatabaseException();
             }
         }
-
+        /// <summary>
+        /// Creates new category
+        /// </summary>
+        /// <param name="category">New category</param>
         public void CreateCategory(NewCategoryDTO category)
         {
-            if (!IsCategoryNameFree(category.Name))
-                throw new AuctionException($"Category {category.Name} already exists.");
-
             try
             {
+                if (!IsCategoryNameFree(category.Name))
+                    throw new AuctionException($"Category {category.Name} already exists.");
+
                 Database.Categories.AddCategory(new Category { Name = category.Name });
                 Database.Save();
+            }
+            catch(AuctionException ex)
+            {
+                throw ex;
             }
             catch (Exception)
             {
@@ -153,9 +223,9 @@ namespace Auction.BusinessLogic.Services
         /// </summary>
         /// <param name="tradingLots">Collection of lots, which category will be changed</param>
         /// <param name="categoryId">Id of new category for lots</param>
-        private void MoveLotsToCategory(ICollection<TradingLot> tradingLots, int categoryId = 1)
+        private void MoveLotsToCategory(ICollection<TradingLot> tradingLots)
         {
-            var defaultCat = Database.Categories.GetCategoryById(categoryId);
+            var defaultCat = Database.Categories.GetCategoryById(_defaultCategoryId);
             tradingLots.ToList().ForEach(lot => {
                 lot.Category = defaultCat;
                 lot.CategoryId = defaultCat.Id;

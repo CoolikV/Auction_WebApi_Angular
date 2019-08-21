@@ -4,7 +4,6 @@ using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
-using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
@@ -17,14 +16,11 @@ namespace Auction.WebApi.Controllers
     [RoutePrefix("api/categories")]
     public class CategoryController : ApiController
     {
-        readonly IAdapter _adapter;
-
         readonly ITradingLotService lotService;
         readonly ICategoryService categoryService;
 
-        public CategoryController(IAdapter adapter, ITradingLotService lotService, ICategoryService categoryService)
+        public CategoryController(ITradingLotService lotService, ICategoryService categoryService)
         {
-            _adapter = adapter;
             this.lotService = lotService;
             this.categoryService = categoryService;
         }
@@ -37,6 +33,25 @@ namespace Auction.WebApi.Controllers
             try
             {
                 return Ok(categoryService.GetCategoryById(id));
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("")]
+        public IHttpActionResult GetCategories()
+        {
+            try
+            {
+                return Ok(categoryService.GetCategories());
             }
             catch (DatabaseException)
             {

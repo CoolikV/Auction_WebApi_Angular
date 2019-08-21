@@ -4,7 +4,7 @@ namespace Auction.BusinessLogic.DTOs.Trade
 {
     public class RateDTO
     {
-        [Required(ErrorMessage = "Trade not found or already finished")]
+        [Required(ErrorMessage = "Trade is required")]
         public int TradeId { get; set; }
 
         [Required(ErrorMessage = "Set the bet sum")]

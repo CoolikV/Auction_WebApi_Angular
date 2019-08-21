@@ -1,5 +1,8 @@
 ﻿namespace Auction.BusinessLogic.IdentityDetails
 {
+    /// <summary>
+    /// Class wich contains info about operation result
+    /// </summary>
     public class OperationDetails
     {
         public bool Succedeed { get; private set; }

@@ -1,0 +1,65 @@
+  <div class="row">
+    <div class="col-2">
+      <div class="sticky-top category-list">
+        <app-category-list (selectedCategory)="onCategorySelected($event)"></app-category-list>
+      </div>
+    </div>
+    <div class="col-7 main-content col-md-offset-3">
+      <div *ngIf="pagination?.TotalItemsCount === 0">
+        <h2 class="text-center">No items found</h2>
+      </div>
+      <app-trade-item *ngFor="let trade of trades" [trade]="trade"></app-trade-item>
+    </div>
+    <div class="col-3">
+      <div class="sticky-top filter">
+        <h4 class="text-center">Filter</h4>
+        <div class="form-group">
+          <h5>Price:</h5>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Max.price</span>
+            </div>
+            <input class="form-control" type="number" name="maxPrice" placeholder="Max lot price"
+              [(ngModel)]="maxPrice">
+          </div>
+        </div>
+        <div class="form-group">
+          <h5>Date:</h5>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Starts on:</span>
+            </div>
+            <input class="form-control" type="date" name="startDate" [(ngModel)]="start" min="2019-01-01"
+              max="2020-01-01">
+          </div>
+          <br>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Ends on:</span>
+            </div>
+            <input class="form-control" type="date" name="endDate" [(ngModel)]="end" min="2019-01-01" max="2020-01-01">
+          </div>
+
+          <div class="form-group">
+            <h5>Display:</h5>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Items per. page</span>
+              </div>
+              <input class="form-control" type="number" name="perPage" min="10" max="20" [(ngModel)]="perPage">
+            </div>
+          </div>
+          <button class="btn btn-primary" type="button" (click)="applyFiltering()">Apply filter</button>
+          <button class="btn btn-secondary right" type="button" (click)="resetFilter()">Reset filter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="pagination?.TotalItemsCount != 0">
+    <div class="col-4"></div>
+    <div class="col-4 ">
+      <app-pagination [pagination]="pagination" (nextPage)="nextPage()" (prevPage)="prevPage()">
+      </app-pagination>
+      <div class="col-4 "></div>
+    </div>
+  </div>

@@ -15,11 +15,6 @@ namespace Auction.DataAccess.EntityConfigurations
             Property(t => t.TradeEnd)
                 .IsRequired();
 
-            //NOT SHURE IS THAT RIGHT
-            //HasOptional(t => t.LastRated)
-            //    .WithOptionalDependent();
-            //NOT SHURE IS THAT RIGHT
-
             HasRequired(t => t.TradingLot);
         }
     }

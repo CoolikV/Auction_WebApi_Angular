@@ -3,7 +3,6 @@ using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
-using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
@@ -16,17 +15,12 @@ namespace Auction.WebApi.Controllers
     [RoutePrefix("api/lots")]
     public class LotController : ApiController
     {
-        readonly IAdapter _adapter;
-
         readonly ITradingLotService lotService;
-        readonly IUserManager userManager;
         readonly ICategoryService categoryService;
 
-        public LotController(IAdapter adapter, ITradingLotService lotService, IUserManager userManager, ICategoryService categoryService)
+        public LotController(ITradingLotService lotService, ICategoryService categoryService)
         {
-            _adapter = adapter;
             this.lotService = lotService;
-            this.userManager = userManager;
             this.categoryService = categoryService;
         }
 
@@ -56,15 +50,20 @@ namespace Auction.WebApi.Controllers
         {
             IEnumerable<TradingLotDTO> lotsForPage;
 
-            lotsForPage = lotService.GetLotsForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, filterModel.CategoryId,
-                filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName, out int pagesCount, out int totalItemsCount);
+            try
+            {
+                lotsForPage = lotService.GetLotsForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, filterModel.CategoryId,
+                    filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName, out int pagesCount, out int totalItemsCount);
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
+                    totalItemsCount, pagesCount));
+                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
 
-            string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
-                totalItemsCount, pagesCount));
-
-            HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
-
-            return Ok(lotsForPage);
+                return Ok(lotsForPage);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         [HttpGet]
@@ -92,9 +91,9 @@ namespace Auction.WebApi.Controllers
         {
             try
             {
-                //REFACTORING and add pictures saving to app_data/static/pictures
-                lotService.CreateLot(newTradingLot, User.Identity.Name);
-                return StatusCode(HttpStatusCode.Created);
+                var fullPath = System.Web.Hosting.HostingEnvironment.MapPath(@"~/App_Data/static/img/");
+                lotService.CreateLot(newTradingLot, User.Identity.Name, fullPath);
+                return Created(nameof(GetTradingLot), newTradingLot);
             }
             catch (DatabaseException)
             {
@@ -107,49 +106,6 @@ namespace Auction.WebApi.Controllers
             catch (AuctionException ex)
             {
                 return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPut]
-        [Route("{id:int}")]
-        public IHttpActionResult UpdateTradingLot(int id, [FromBody]NewTradingLotDTO newTradingLot)
-        {
-            try
-            {
-                lotService.EditLot(id, newTradingLot, User.IsInRole("manager"));
-                return Ok();
-            }
-            catch (DatabaseException)
-            {
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-            catch (NotFoundException)
-            {
-                return NotFound();
-            }
-            catch (AuctionException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPatch]
-        [Route("{id:int}")]
-        [Authorize(Roles ="manager,admin")]
-        public IHttpActionResult VerifyLot(int id)
-        {
-            try
-            {
-                lotService.VerifyLot(id);
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-            catch (DatabaseException)
-            {
-                return StatusCode(HttpStatusCode.InternalServerError);
-            }
-            catch (NotFoundException ex)
-            {
-                return Content(HttpStatusCode.NotFound, ex.Message);
             }
         }
 

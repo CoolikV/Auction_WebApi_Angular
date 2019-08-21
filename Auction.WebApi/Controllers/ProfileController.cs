@@ -5,9 +5,9 @@ using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
-using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Net;
 using System.Web;
 using System.Web.Http;
 
@@ -21,7 +21,7 @@ namespace Auction.WebApi.Controllers
         readonly ITradeService tradeService;
         readonly ITradingLotService lotService;
 
-        public ProfileController(IAdapter adapter, ITradingLotService lotService, IUserManager userManager, ITradeService tradeService)
+        public ProfileController(ITradingLotService lotService, IUserManager userManager, ITradeService tradeService)
         {
             this.lotService = lotService;
             this.userManager = userManager;
@@ -64,16 +64,20 @@ namespace Auction.WebApi.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         [HttpGet]
         [Route("{id}/trades")]
-        public IHttpActionResult GetTrades(string id, [FromUri] PagingParameterModel paging, [FromUri] TradeFilteringModel filter, string state = "all")
+        public IHttpActionResult GetUserTrades(string id, [FromUri] PagingParameterModel paging, [FromUri] TradeFilteringModel filter, string state = "all")
         {
             IEnumerable<TradeDTO> tradesForPage;
             try
             {
-                tradesForPage = tradeService.GetUserTrades(id, paging?.PageNumber ?? 1, paging?.PageSize ?? 10,
+                tradesForPage = tradeService.GetUserTrades(id, filter.CategoryId, paging?.PageNumber ?? 1, paging?.PageSize ?? 10,
                     state, filter.StartsOn, filter.EndsOn, filter.MaxPrice, filter.LotName, out int pagesCount, out int totalItemsCount);
 
                 string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
@@ -86,6 +90,10 @@ namespace Auction.WebApi.Controllers
             catch (AuctionException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
 

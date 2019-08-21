@@ -4,6 +4,7 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web.Http.Cors;
 
 namespace Auction.WebApi.Providers
 {
@@ -15,16 +16,15 @@ namespace Auction.WebApi.Providers
         {
             _userManager = userManager;
         }
-        //responsible for validating the “Client”, 
-        //in our case we have only one client so we’ll always return that its validated successfully.
+        
         public override async Task ValidateClientAuthentication(OAuthValidateClientAuthenticationContext context)
         {
             context.Validated();
         }
-
+        [EnableCors("*","*","*","*")]
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-            context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
+            SetContextHeaders(context);
             System.Security.Claims.ClaimsIdentity claim = null;
             try
             {
@@ -45,9 +45,17 @@ namespace Auction.WebApi.Providers
         {
             IDictionary<string, string> data = new Dictionary<string, string>
             {
-                { "userName", userName }
+                { "UserName", userName }
             };
             return new AuthenticationProperties(data);
+        }
+
+        private void SetContextHeaders(OAuthGrantResourceOwnerCredentialsContext context)
+        {
+            context.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
+            context.Response.Headers.Add("Access-Control-Allow-Methods", new[] { "GET, PUT, DELETE, POST, OPTIONS" });
+            context.Response.Headers.Add("Access-Control-Allow-Headers", new[] { "Content-Type, Accept, Authorization" });
+            context.Response.Headers.Add("Access-Control-Max-Age", new[] { "1728000" });
         }
     }
 }

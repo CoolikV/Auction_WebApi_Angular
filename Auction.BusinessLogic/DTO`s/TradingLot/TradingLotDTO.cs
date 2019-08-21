@@ -11,14 +11,12 @@ namespace Auction.BusinessLogic.DTOs.TradingLot
         public string Description { get; set; }
         public string Img { get; set; }
         public double Price { get; set; }
-        public int TradeDuration { get; set; }
-        public string Status { get; set; }
         public int CategoryId { get; set; }
         public string Owner { get; set; }
 
         [JsonIgnore]
         public CategoryDTO Category { get; set; }
-        //maybe remove
+
         [JsonIgnore]
         public UserDTO User { get; set; }
     }

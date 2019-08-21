@@ -22,7 +22,7 @@ namespace Auction.WebApi
                 TokenEndpointPath = new PathString("/Token"),
                 Provider = new AppOAuthProvider(userManager),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(2),
-                AllowInsecureHttp = true,
+                AllowInsecureHttp = true
             };
 
             app.UseOAuthAuthorizationServer(OAuthOptions);

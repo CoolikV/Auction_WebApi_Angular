@@ -3,7 +3,6 @@ using Auction.BusinessLogic.Exceptions;
 using Auction.BusinessLogic.Interfaces;
 using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
-using Mapster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net;
@@ -16,21 +15,11 @@ namespace Auction.WebApi.Controllers
     [Authorize]
     public class TradeController : ApiController
     {
-        readonly IAdapter _adapter;
-
         readonly ITradeService tradeService;
-        readonly ITradingLotService lotService;
-        readonly IUserManager userManager;
-        readonly ICategoryService categoryService;
 
-        public TradeController(IAdapter adapter, ITradeService tradeService, ITradingLotService lotService, IUserManager userManager,
-            ICategoryService categoryService)
+        public TradeController(ITradeService tradeService)
         {
-            _adapter = adapter;
             this.tradeService = tradeService;
-            this.lotService = lotService;
-            this.categoryService = categoryService;
-            this.userManager = userManager;
         }
 
         [HttpGet]
@@ -61,7 +50,7 @@ namespace Auction.WebApi.Controllers
 
             tradesForPage = tradeService.GetTradesForPage(pagingParameter?.PageNumber ?? 1,
                 pagingParameter?.PageSize ?? 10, filter.StartsOn, filter.EndsOn, filter.MaxPrice,
-                filter.LotName, out int pagesCount, out int totalItemsCount);
+                filter.CategoryId, filter.LotName, out int pagesCount, out int totalItemsCount);
 
             string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
             totalItemsCount, pagesCount));
@@ -78,7 +67,7 @@ namespace Auction.WebApi.Controllers
         {
             try
             {
-                tradeService.StartTrade(tradeModel.LotId);
+                tradeService.StartTrade(tradeModel);
                 return Ok();
             }
             catch (DatabaseException)

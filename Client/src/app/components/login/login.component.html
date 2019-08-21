@@ -1,0 +1,24 @@
+<div class="row">
+  <div class="col-3 col-centered">
+    <div class="form-group">
+      <label for="userName">User name:</label>
+      <input id="userName" class="form-control" type="text" [(ngModel)]="username" placeholder="Required field">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" class="form-control" type="password" [(ngModel)]="password" placeholder="Required field">
+    </div>
+    <div>
+      <button class="btn btn-primary" [disabled]="inputNotValid(username, password)"
+        (click)="signIn(username,password)">Log in</button>
+      <button class="btn btn-primary" [routerLink]="['/register']">Register</button>
+    </div>
+    <div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-3 error-block" *ngIf="isError">
+    <p class=" text-danger">User name or password is incorrect</p>
+  </div>
+</div>

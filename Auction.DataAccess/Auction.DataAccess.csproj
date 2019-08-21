@@ -56,7 +56,6 @@
   <ItemGroup>
     <Compile Include="EF\AuctionContext.cs" />
     <Compile Include="Entities\Category.cs" />
-    <Compile Include="Entities\Enums\LotStatus.cs" />
     <Compile Include="Entities\Trade.cs" />
     <Compile Include="Entities\TradingLot.cs" />
     <Compile Include="Entities\UserProfile.cs" />
@@ -69,7 +68,6 @@
     <Compile Include="Identity\Repositories\UserManager.cs" />
     <Compile Include="Identity\Repositories\UserRoleManager.cs" />
     <Compile Include="Interfaces\ICategoryRepository.cs" />
-    <Compile Include="Interfaces\IDataContext.cs" />
     <Compile Include="Interfaces\ITradeRepository.cs" />
     <Compile Include="Interfaces\ITradingLotRepository.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
@@ -84,7 +82,9 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
