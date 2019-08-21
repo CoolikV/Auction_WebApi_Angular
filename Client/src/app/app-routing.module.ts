@@ -14,6 +14,7 @@ const routes: Routes = [
   { path: "login", component: LoginComponent },
   { path: "register", component: RegisterComponent },
   { path: "newLot", component: NewLotComponent },
+  { path: "/profile/trades", component: TradesListComponent },
 
   { path: "**", component: TradesListComponent }
 ];
