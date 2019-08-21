@@ -7,6 +7,7 @@ using Auction.WebApi.Helpers;
 using Auction.WebApi.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Net;
 using System.Web;
 using System.Web.Http;
 
@@ -63,6 +64,10 @@ namespace Auction.WebApi.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         [HttpGet]
@@ -85,6 +90,10 @@ namespace Auction.WebApi.Controllers
             catch (AuctionException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
 

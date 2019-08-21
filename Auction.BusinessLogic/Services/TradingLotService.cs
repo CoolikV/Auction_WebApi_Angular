@@ -172,7 +172,14 @@ namespace Auction.BusinessLogic.Services
             if (!string.IsNullOrWhiteSpace(lotName))
                 source = source.Where(l => l.Name.ToLower().Contains(lotName.ToLower()));
 
-            totalItemsCount = source.Count();
+            try
+            {
+                totalItemsCount = source.Count();
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
 
             pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
             var lotsForPage = source.OrderBy(l => l.Name)

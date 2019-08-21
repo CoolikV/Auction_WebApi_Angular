@@ -50,15 +50,20 @@ namespace Auction.WebApi.Controllers
         {
             IEnumerable<TradingLotDTO> lotsForPage;
 
-            lotsForPage = lotService.GetLotsForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, filterModel.CategoryId,
-                filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName, out int pagesCount, out int totalItemsCount);
+            try
+            {
+                lotsForPage = lotService.GetLotsForPage(paging?.PageNumber ?? 1, paging?.PageSize ?? 10, filterModel.CategoryId,
+                    filterModel.MinPrice, filterModel.MaxPrice, filterModel.LotName, out int pagesCount, out int totalItemsCount);
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
+                    totalItemsCount, pagesCount));
+                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
 
-            string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(paging,
-                totalItemsCount, pagesCount));
-
-            HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
-
-            return Ok(lotsForPage);
+                return Ok(lotsForPage);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         [HttpGet]
@@ -87,7 +92,6 @@ namespace Auction.WebApi.Controllers
             try
             {
                 var fullPath = System.Web.Hosting.HostingEnvironment.MapPath(@"~/App_Data/static/img/");
-                //REFACTORING and add pictures saving to app_data/static/pictures
                 lotService.CreateLot(newTradingLot, User.Identity.Name, fullPath);
                 return Created(nameof(GetTradingLot), newTradingLot);
             }

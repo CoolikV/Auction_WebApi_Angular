@@ -147,8 +147,14 @@ namespace Auction.BusinessLogic.Services
                 source = FilterByLotName(source, lotName);
             if (startDate.HasValue || endDate.HasValue)
                 source = FilterByDate(source, startDate.GetValueOrDefault(DateTime.MinValue), endDate.GetValueOrDefault(DateTime.MaxValue));
-
-            totalItemsCount = source.Count();
+            try
+            {
+                totalItemsCount = source.Count();
+            }
+            catch (Exception)
+            {
+                throw new DatabaseException();
+            }
 
             pagesCount = (int)Math.Ceiling(totalItemsCount / (double)pageSize);
             var tradesForPage = source.OrderBy(t => t.TradeEnd)
