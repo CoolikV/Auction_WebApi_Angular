@@ -46,18 +46,24 @@ namespace Auction.WebApi.Controllers
         [AllowAnonymous]
         public IHttpActionResult GetTrades([FromUri] PagingParameterModel pagingParameter, [FromUri] TradeFilteringModel filter)
         {
-            IEnumerable<TradeDTO> tradesForPage;
+            try
+            {
+                IEnumerable<TradeDTO> tradesForPage;
 
-            tradesForPage = tradeService.GetTradesForPage(pagingParameter?.PageNumber ?? 1,
-                pagingParameter?.PageSize ?? 10, filter.StartsOn, filter.EndsOn, filter.MaxPrice,
-                filter.CategoryId, filter.LotName, out int pagesCount, out int totalItemsCount);
+                tradesForPage = tradeService.GetTradesForPage(pagingParameter?.PageNumber ?? 1,
+                    pagingParameter?.PageSize ?? 10, filter.StartsOn, filter.EndsOn, filter.MaxPrice,
+                    filter.CategoryId, filter.LotName, out int pagesCount, out int totalItemsCount);
 
-            string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
-            totalItemsCount, pagesCount));
+                string metadata = JsonConvert.SerializeObject(PaginationHelper.GeneratePageMetadata(pagingParameter,
+                totalItemsCount, pagesCount));
 
-            HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
-
-            return Ok(tradesForPage);
+                HttpContext.Current.Response.Headers.Add("Paging-Headers", metadata);
+                return Ok(tradesForPage);
+            }
+            catch (DatabaseException)
+            {
+                return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
 
         [HttpPost]

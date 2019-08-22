@@ -98,7 +98,6 @@ namespace Auction.WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize]
         [Route("id")]
         public IHttpActionResult UpdateUserProfile(string id, NewUserProfileDTO profileDto)
         {
