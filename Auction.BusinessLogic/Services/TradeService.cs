@@ -284,12 +284,21 @@ namespace Auction.BusinessLogic.Services
         {
             return Database.UserProfiles.GetProfileById(userId).Trades.AsQueryable();
         }
-
+        /// <summary>
+        /// Gets query for user won trades
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>Query with user won trades</returns>
         private IQueryable<Trade> UserWinTrades(string userId)
         {
             return Database.Trades.FindTrades().Where(t => t.LastRateUserId == userId && t.TradeEnd <= DateTime.Now);
         }
 
+        /// <summary>
+        /// Gets query for user loose trades
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <returns>Query with user loose trades</returns>
         private IQueryable<Trade> UserLoseTrades(string userId)
         {
             return UserTrades(userId).Where(t => t.LastRateUserId != userId && t.TradeEnd <= DateTime.Now);

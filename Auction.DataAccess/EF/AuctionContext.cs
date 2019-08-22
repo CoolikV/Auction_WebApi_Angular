@@ -2,8 +2,6 @@
 using Auction.DataAccess.EntityConfigurations;
 using Auction.DataAccess.Identity.Entities;
 using Microsoft.AspNet.Identity.EntityFramework;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 
 namespace Auction.DataAccess.EF
